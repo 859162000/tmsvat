@@ -1,0 +1,5 @@
+projectKey=ling2-core
+serverUrl=http://localhost:9000
+dashboardUrl=http://localhost:9000/dashboard/index/ling2-core
+ceTaskId=AVKv2tkRAIbreZVC6Ehx
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AVKv2tkRAIbreZVC6Ehx

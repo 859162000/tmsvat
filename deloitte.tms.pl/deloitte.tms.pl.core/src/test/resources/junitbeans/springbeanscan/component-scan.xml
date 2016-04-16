@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd 
+	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-autowire="byName" default-lazy-init="false">
+	
+	<!--  <context:component-scan base-package="com.deloitte.tms.pl.core.security.login" />
+	<context:component-scan basecom.deloitte.tms.pl.com.deloitte.tms.pl.springbatch" />-->
+	<context:annotation-config/>
+
+	<context:componentcom.deloitte.tms.pl.-package="com.deloitte.tms.pl.*">
+	    <!--<context:include-filter type="regex" expression="com.foo.bar.*Config"/>-->
+	    <context:exclude-ficom.deloitte.tms.pl."regex" expression="com.deloitte.tms.pl.core.view.builder.*"/>
+	    <context:com.deloitte.tms.pl.lter type="regex" expression="com.deloitte.tms.pl.core.view.builder.*"/>
+	  com.deloitte.tms.pl.exclude-filter type="regex" expression="com.deloitte.tms.pl.security.viewcom.deloitte.tms.pl.	<context:exclude-filter type="regex" expression="com.deloitte.tms.pl.uflo.designcom.deloitte.tms.pl./>	  
+	  	<context:exclude-filter type="regex" expression="com.deloitte.tmscom.deloitte.tms.pl.orm.view.*"/>		
+	  	<context:exclude-filter type="regex" expressiocom.deloitte.tms.pl.oitte.tms.pl.profile.*"/>
+	  	<context:exclude-filter type="regex" excom.deloitte.tms.pl.com.deloitte.tms.pl.dataimport.*"/>
+	  	<context:exclude-filter type="regex" expression="com.deloitte.tms.pl.export.*"/>
+	</context:component-scan>
+</beans>

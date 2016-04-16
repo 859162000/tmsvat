@@ -1,0 +1,269 @@
+
+<div ng-controller="OrderCtroller">
+	<style>
+	.grid {
+	  height: 400px;
+	}
+	</style>
+								<div role="form" class="form-horizontal">
+                                        <div class="form-body">
+                                            <div class="form-group col-md-4">
+                                                <label class="col-md-4 control-label">开始时间</label>
+                                                <div class="col-md-8">
+                                                    <div class="input-icon right">
+                                                        <i class="fa fa-info-circle tooltips" data-original-title="Email address" data-container="body"></i>
+                                                        <input type="text" class="form-control"> </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group has-success col-md-4">
+                                                <label class="col-md-4 control-label">结束时间大幅度</label>
+                                                <div class="col-md-8">
+                                                    <div class="input-icon right">
+                                                        <i class="fa fa-check tooltips" data-original-title="You look OK!" data-container="body"></i>
+                                                        <input type="text" class="form-control"> </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group has-warning col-md-4">
+                                                <label class="col-md-4 control-label">Input with warning</label>
+                                                <div class="col-md-8">
+                                                    <div class="input-icon right">
+                                                        <i class="fa fa-warning tooltips" data-original-title="please provide an email" data-container="body"></i>
+                                                        <input type="text" class="form-control"> </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group has-error col-md-4">
+                                                <label class="col-md-4 control-label">Input with error</label>
+                                                <div class="col-md-8">
+                                                    <div class="input-icon right">
+                                                        <i class="fa fa-exclamation tooltips" data-original-title="please write a valid email" data-container="body"></i>
+                                                        <input type="text" class="form-control"> </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group has-error col-md-4">
+                                                <label class="col-md-4 control-label">Input with error</label>
+                                                <div class="col-md-8">
+                                                    <div class="input-icon right">
+                                                        <i class="fa fa-exclamation tooltips" data-original-title="please write a valid email" data-container="body"></i>
+                                                        <input type="text" class="form-control"> </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group has-error col-md-4">
+                                                <label class="col-md-4 control-label">Input with error</label>
+                                                <div class="col-md-8">
+                                                    <div class="input-icon right">
+                                                        <i class="fa fa-exclamation tooltips" data-original-title="please write a valid email" data-container="body"></i>
+                                                        <input type="text" class="form-control"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions col-md-12">
+                                            <div class="row">
+                                                <div class="col-md-offset-4 col-md-8">
+                                                    <button type="button" class="btn default">Cancel</button>
+                                                    <button type="submit" class="btn blue">Submit</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+	<div class="clearfix"></div>
+								<div class="portlet box purple">
+                                <div class="portlet-title">
+                                    <div class="tools pull-left">
+                                       	<button type="button" class="btn btn-success" ng-click="queryOrder()">查询</button>
+										<button type="button" class="btn btn-success" data-toggle="modal" data-target="#addOrderDetail" ng-click="addOrder()">添加</button>
+										<!--<button type="button" class="btn btn-success" data-toggle="modal" data-target="#editOrderDetail" ng-click="editOrder()">修改</button>-->
+										<button type="button" class="btn btn-success" ng-click="removeSelectOrders()">删除选择</button>
+										<button type="button" class="btn btn-success" ng-click="resetOrder()">还原修改</button>
+										<!--<button type="button" class="btn btn-success" ng-click="saveOrder()">保存修改</button>-->
+										<!--<button type="button" class="btn btn-success" ng-click="saveOrder()">保存修改</button>-->
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="table-scrollable" style="height:300px">
+                                        <table class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:450px !important"> checkbox </th><!-- ,text-align:'center' -->
+													<th ng-repeat="field in orderColumnDefs">													
+														<div class="cell text-center" ng-style="field.style">
+															<label class="caption">{{field.lable}}</label>
+														</div>
+													</th>  
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="order in orderItems" align="center">
+                                                    <td> checkbox </td>
+													<td ng-repeat="field in orderColumnDefs"> 
+														<div class="cell text-center" title="" style="overflow-x: hidden; overflow-y: visible" ng-bind="order.{{field.name}}"></div>
+													</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+									<div  class="modal fade" id="addOrderDetail" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-full">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                    <h4 class="modal-title">新增</h4>
+                                                </div>
+                                                <div class="modal-body"> 
+											        <div class="form-body">
+														<div class="form-group">  
+															<label class="col-md-2 control-label">关联用户:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.relationUser" placeholder=""> </div>
+															<label class="col-md-2 control-label">昵称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.nickName" placeholder=""> </div>
+															<label class="col-md-2 control-label">订单编号:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.ordercode" placeholder=""> </div>
+															<label class="col-md-2 control-label">总价:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.totalPrice" placeholder=""> </div>
+															<label class="col-md-2 control-label">快递费用:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.expressPrice" placeholder=""> </div>
+															<label class="col-md-2 control-label">支付价:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.payPrice" placeholder=""> </div>
+															<label class="col-md-2 control-label">件数:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.totalNum" placeholder=""> </div>
+															<label class="col-md-2 control-label">名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.name" placeholder=""> </div>
+															<label class="col-md-2 control-label">展示图片:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.showPic" placeholder=""> </div>
+															<label class="col-md-2 control-label">showPicUrl:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.showPicUrl" placeholder=""> </div>
+															<label class="col-md-2 control-label">联系人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.reciverName" placeholder=""> </div>
+															<label class="col-md-2 control-label">联系电话:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.phone" placeholder=""> </div>
+															<label class="col-md-2 control-label">区域:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.region" placeholder=""> </div>
+															<label class="col-md-2 control-label">详细地址:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.address" placeholder=""> </div>
+															<label class="col-md-2 control-label">邮编:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.zipCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">下单日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.orderDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">快递方式:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.expressType" placeholder=""> </div>
+															<label class="col-md-2 control-label">快递单号:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.expressCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">支付方式:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.payType" placeholder=""> </div>
+															<label class="col-md-2 control-label">支付编号:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.payCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">用户备注:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.userRemark" placeholder=""> </div>
+															<label class="col-md-2 control-label">后台备注:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.managerRemark" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.createdBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建日期/时间:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.createDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.modifiedBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.modifiedDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">是否有效:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.flag" placeholder=""> </div>
+															<label class="col-md-2 control-label">状态:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.status" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据分区键:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.dataowner" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据归属:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.companyId" placeholder=""> </div>
+														</div>                                        
+													</div>
+												 </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn green"data-dismiss="modal" ng-click="test()">Save changes</button>
+                                                </div>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                    <div  class="modal fade" id="editOrderDetail" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-full">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                    <h4 class="modal-title">编辑</h4>
+                                                </div>
+                                                <div class="modal-body"> 
+											        <div class="form-body">
+														<div class="form-group">  
+															<label class="col-md-2 control-label">关联用户:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.relationUser" placeholder=""> </div>
+															<label class="col-md-2 control-label">昵称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.nickName" placeholder=""> </div>
+															<label class="col-md-2 control-label">订单编号:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.ordercode" placeholder=""> </div>
+															<label class="col-md-2 control-label">总价:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.totalPrice" placeholder=""> </div>
+															<label class="col-md-2 control-label">快递费用:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.expressPrice" placeholder=""> </div>
+															<label class="col-md-2 control-label">支付价:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.payPrice" placeholder=""> </div>
+															<label class="col-md-2 control-label">件数:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.totalNum" placeholder=""> </div>
+															<label class="col-md-2 control-label">名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.name" placeholder=""> </div>
+															<label class="col-md-2 control-label">展示图片:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.showPic" placeholder=""> </div>
+															<label class="col-md-2 control-label">showPicUrl:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.showPicUrl" placeholder=""> </div>
+															<label class="col-md-2 control-label">联系人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.reciverName" placeholder=""> </div>
+															<label class="col-md-2 control-label">联系电话:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.phone" placeholder=""> </div>
+															<label class="col-md-2 control-label">区域:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.region" placeholder=""> </div>
+															<label class="col-md-2 control-label">详细地址:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.address" placeholder=""> </div>
+															<label class="col-md-2 control-label">邮编:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.zipCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">下单日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.orderDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">快递方式:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.expressType" placeholder=""> </div>
+															<label class="col-md-2 control-label">快递单号:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.expressCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">支付方式:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.payType" placeholder=""> </div>
+															<label class="col-md-2 control-label">支付编号:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.payCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">用户备注:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.userRemark" placeholder=""> </div>
+															<label class="col-md-2 control-label">后台备注:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.managerRemark" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.createdBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建日期/时间:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.createDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.modifiedBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.modifiedDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">是否有效:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.flag" placeholder=""> </div>
+															<label class="col-md-2 control-label">状态:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.status" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据分区键:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.dataowner" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据归属:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentOrder.companyId" placeholder=""> </div>
+														</div>                                        
+													</div>
+												 </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn green"data-dismiss="modal" ng-click="test()">Save changes</button>
+                                                </div>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>

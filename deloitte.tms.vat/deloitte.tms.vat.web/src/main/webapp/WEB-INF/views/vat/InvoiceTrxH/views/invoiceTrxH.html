@@ -1,0 +1,437 @@
+
+<div ng-controller="InvoiceTrxHCtroller">
+	<style>
+	.grid {
+	  height: 400px;
+	}
+	</style>
+	<div class="form-body">
+		<div class="form-group">  
+			<label class="col-md-2 control-label">请领单编码:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.crvatInvoiceTrxNumber" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">请领单名称:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.description" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">请领单日期:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.invoiceTrxDate" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">纳税主体:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.legalEntityId" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">纳税人主体代码:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.legalEntityCode" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">纳税人名称:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.legalEntityName" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">税务机关ID:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.departmentId" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">税务机关代码_枚举值:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.departmentCode" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">税务机关代码名称:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.departmentName" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">终端设备ID:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.equipmentId" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">终端设备编号:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.equipmentCode" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">终端设备名称:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.equipmentName" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">审领人:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.approvalBy" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">审领部门:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.approvalOrgId" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">开票状态:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.invoiceStatus" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">组织ID:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.orgId" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">审批流状态:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.approvalStatus" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">工作流ID:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.wfTaskId" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">审批流状态描述:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.approvalDesc" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">有效日期:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.startDate" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">失效日期:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.endDate" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">创建人:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.createdBy" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">创建日期/时间:</label>
+			<div class="col-md-2">
+				<p class="input-group">
+			        <input type="text" readOnly=true class="form-control" ng-model="invoiceTrxHQuery.createDate" ng-click="createDatePickerOpen=!createDatePickerOpen" datepicker-popup="yyyy-MM-dd" 
+			        is-open="createDatePickerOpen" datepicker-options="myDatePicker.dateOptions"  date-disabled="isDateDisabled(date, mode)" close-text="关闭"/>
+			        <span class="input-group-btn">
+			            <button type="button" class="btn btn-default" ng-click="createDatePickerOpen=!createDatePickerOpen">
+			                <i class="glyphicon glyphicon-calendar"></i>
+			            </button>
+			        </span>
+			     </p>
+			</div> 
+			<label class="col-md-2 control-label">修改人:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.modifiedBy" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">修改日期:</label>
+			<div class="col-md-2">
+				<p class="input-group">
+			        <input type="text" readOnly=true class="form-control" ng-model="invoiceTrxHQuery.modifiedDate" ng-click="modifiedDatePickerOpen=!modifiedDatePickerOpen" datepicker-popup="yyyy-MM-dd" 
+			        is-open="modifiedDatePickerOpen" datepicker-options="myDatePicker.dateOptions"  date-disabled="isDateDisabled(date, mode)" close-text="关闭"/>
+			        <span class="input-group-btn">
+			            <button type="button" class="btn btn-default" ng-click="modifiedDatePickerOpen=!modifiedDatePickerOpen">
+			                <i class="glyphicon glyphicon-calendar"></i>
+			            </button>
+			        </span>
+			     </p>
+			</div> 
+			<label class="col-md-2 control-label">状态:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.status" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">数据分区键:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.bizOrgCode" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">数据分区键:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.dataowner" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">数据归属:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.companyId" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">归档基准日期:</label>
+			<div class="col-md-2">
+				<p class="input-group">
+			        <input type="text" readOnly=true class="form-control" ng-model="invoiceTrxHQuery.archiveBaseDate" ng-click="archiveBaseDatePickerOpen=!archiveBaseDatePickerOpen" datepicker-popup="yyyy-MM-dd" 
+			        is-open="archiveBaseDatePickerOpen" datepicker-options="myDatePicker.dateOptions"  date-disabled="isDateDisabled(date, mode)" close-text="关闭"/>
+			        <span class="input-group-btn">
+			            <button type="button" class="btn btn-default" ng-click="archiveBaseDatePickerOpen=!archiveBaseDatePickerOpen">
+			                <i class="glyphicon glyphicon-calendar"></i>
+			            </button>
+			        </span>
+			     </p>
+			</div> 
+			<label class="col-md-2 control-label">记录版本号，每次修改记录时加1:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.versionId" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">删除标记:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.flag" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">删除人:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.deleteBy" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">删除时间:</label>
+			<div class="col-md-2">
+				<p class="input-group">
+			        <input type="text" readOnly=true class="form-control" ng-model="invoiceTrxHQuery.deleteDate" ng-click="deleteDatePickerOpen=!deleteDatePickerOpen" datepicker-popup="yyyy-MM-dd" 
+			        is-open="deleteDatePickerOpen" datepicker-options="myDatePicker.dateOptions"  date-disabled="isDateDisabled(date, mode)" close-text="关闭"/>
+			        <span class="input-group-btn">
+			            <button type="button" class="btn btn-default" ng-click="deleteDatePickerOpen=!deleteDatePickerOpen">
+			                <i class="glyphicon glyphicon-calendar"></i>
+			            </button>
+			        </span>
+			     </p>
+			</div> 
+			<label class="col-md-2 control-label">ATTRIBUTE1:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.attribute1" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">ATTRIBUTE2:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.attribute2" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">ATTRIBUTE3:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.attribute3" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">ATTRIBUTE4:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.attribute4" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">ATTRIBUTE5:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="invoiceTrxHQuery.attribute5" placeholder="">
+			</div> 
+		</div>                                        
+	</div>
+	<div class="clearfix"></div>
+								<div class="portlet box purple">
+                                <div class="portlet-title">
+                                    <div class="tools pull-left">
+                                       	<button type="button" class="btn btn-success" ng-click="queryInvoiceTrxH()">查询</button>
+										<button type="button" class="btn btn-success" data-toggle="modal" data-target="#addInvoiceTrxHDetail" ng-click="addInvoiceTrxH()">添加</button>
+										<!--<button type="button" class="btn btn-success" data-toggle="modal" data-target="#editInvoiceTrxHDetail" ng-click="editInvoiceTrxH()">修改</button>-->
+										<button type="button" class="btn btn-success" ng-click="removeSelectInvoiceTrxHs()">删除选择</button>
+										<button type="button" class="btn btn-success" ng-click="resetInvoiceTrxH()">还原修改</button>
+										<!--<button type="button" class="btn btn-success" ng-click="saveInvoiceTrxH()">保存修改</button>-->
+										<!--<button type="button" class="btn btn-success" ng-click="saveInvoiceTrxH()">保存修改</button>-->
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="table-scrollable" style="height:300px">
+                                        <table class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:450px !important"> checkbox </th><!-- ,text-align:'center' -->
+													<th ng-repeat="field in invoiceTrxHColumnDefs">													
+														<div class="cell text-center" ng-style="field.style">
+															<label class="caption">{{field.lable}}</label>
+														</div>
+													</th>  
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="invoiceTrxH in invoiceTrxHItems" align="center">
+                                                    <td> checkbox </td>
+													<td ng-repeat="field in invoiceTrxHColumnDefs"> 
+														<div class="cell text-center" title="" style="overflow-x: hidden; overflow-y: visible" ng-bind="invoiceTrxH.{{field.name}}"></div>
+													</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+									<div  class="modal fade" id="addInvoiceTrxHDetail" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-full">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                    <h4 class="modal-title">新增</h4>
+                                                </div>
+                                                <div class="modal-body"> 
+											        <div class="form-body">
+														<div class="form-group">  
+															<label class="col-md-2 control-label">请领单编码:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.crvatInvoiceTrxNumber" placeholder=""> </div>
+															<label class="col-md-2 control-label">请领单名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.description" placeholder=""> </div>
+															<label class="col-md-2 control-label">请领单日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.invoiceTrxDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">纳税主体:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.legalEntityId" placeholder=""> </div>
+															<label class="col-md-2 control-label">纳税人主体代码:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.legalEntityCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">纳税人名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.legalEntityName" placeholder=""> </div>
+															<label class="col-md-2 control-label">税务机关ID:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.departmentId" placeholder=""> </div>
+															<label class="col-md-2 control-label">税务机关代码_枚举值:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.departmentCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">税务机关代码名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.departmentName" placeholder=""> </div>
+															<label class="col-md-2 control-label">终端设备ID:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.equipmentId" placeholder=""> </div>
+															<label class="col-md-2 control-label">终端设备编号:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.equipmentCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">终端设备名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.equipmentName" placeholder=""> </div>
+															<label class="col-md-2 control-label">审领人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.approvalBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">审领部门:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.approvalOrgId" placeholder=""> </div>
+															<label class="col-md-2 control-label">开票状态:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.invoiceStatus" placeholder=""> </div>
+															<label class="col-md-2 control-label">组织ID:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.orgId" placeholder=""> </div>
+															<label class="col-md-2 control-label">审批流状态:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.approvalStatus" placeholder=""> </div>
+															<label class="col-md-2 control-label">工作流ID:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.wfTaskId" placeholder=""> </div>
+															<label class="col-md-2 control-label">审批流状态描述:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.approvalDesc" placeholder=""> </div>
+															<label class="col-md-2 control-label">有效日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.startDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">失效日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.endDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.createdBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建日期/时间:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.createDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.modifiedBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.modifiedDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">状态:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.status" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据分区键:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.bizOrgCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据分区键:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.dataowner" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据归属:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.companyId" placeholder=""> </div>
+															<label class="col-md-2 control-label">归档基准日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.archiveBaseDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">记录版本号，每次修改记录时加1:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.versionId" placeholder=""> </div>
+															<label class="col-md-2 control-label">删除标记:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.flag" placeholder=""> </div>
+															<label class="col-md-2 control-label">删除人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.deleteBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">删除时间:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.deleteDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">ATTRIBUTE1:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.attribute1" placeholder=""> </div>
+															<label class="col-md-2 control-label">ATTRIBUTE2:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.attribute2" placeholder=""> </div>
+															<label class="col-md-2 control-label">ATTRIBUTE3:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.attribute3" placeholder=""> </div>
+															<label class="col-md-2 control-label">ATTRIBUTE4:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.attribute4" placeholder=""> </div>
+															<label class="col-md-2 control-label">ATTRIBUTE5:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.attribute5" placeholder=""> </div>
+														</div>                                        
+													</div>
+												 </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn green"data-dismiss="modal" ng-click="test()">Save changes</button>
+                                                </div>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                    <div  class="modal fade" id="editInvoiceTrxHDetail" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-full">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                    <h4 class="modal-title">编辑</h4>
+                                                </div>
+                                                <div class="modal-body"> 
+											        <div class="form-body">
+														<div class="form-group">  
+															<label class="col-md-2 control-label">请领单编码:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.crvatInvoiceTrxNumber" placeholder=""> </div>
+															<label class="col-md-2 control-label">请领单名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.description" placeholder=""> </div>
+															<label class="col-md-2 control-label">请领单日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.invoiceTrxDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">纳税主体:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.legalEntityId" placeholder=""> </div>
+															<label class="col-md-2 control-label">纳税人主体代码:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.legalEntityCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">纳税人名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.legalEntityName" placeholder=""> </div>
+															<label class="col-md-2 control-label">税务机关ID:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.departmentId" placeholder=""> </div>
+															<label class="col-md-2 control-label">税务机关代码_枚举值:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.departmentCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">税务机关代码名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.departmentName" placeholder=""> </div>
+															<label class="col-md-2 control-label">终端设备ID:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.equipmentId" placeholder=""> </div>
+															<label class="col-md-2 control-label">终端设备编号:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.equipmentCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">终端设备名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.equipmentName" placeholder=""> </div>
+															<label class="col-md-2 control-label">审领人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.approvalBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">审领部门:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.approvalOrgId" placeholder=""> </div>
+															<label class="col-md-2 control-label">开票状态:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.invoiceStatus" placeholder=""> </div>
+															<label class="col-md-2 control-label">组织ID:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.orgId" placeholder=""> </div>
+															<label class="col-md-2 control-label">审批流状态:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.approvalStatus" placeholder=""> </div>
+															<label class="col-md-2 control-label">工作流ID:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.wfTaskId" placeholder=""> </div>
+															<label class="col-md-2 control-label">审批流状态描述:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.approvalDesc" placeholder=""> </div>
+															<label class="col-md-2 control-label">有效日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.startDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">失效日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.endDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.createdBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建日期/时间:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.createDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.modifiedBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.modifiedDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">状态:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.status" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据分区键:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.bizOrgCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据分区键:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.dataowner" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据归属:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.companyId" placeholder=""> </div>
+															<label class="col-md-2 control-label">归档基准日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.archiveBaseDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">记录版本号，每次修改记录时加1:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.versionId" placeholder=""> </div>
+															<label class="col-md-2 control-label">删除标记:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.flag" placeholder=""> </div>
+															<label class="col-md-2 control-label">删除人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.deleteBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">删除时间:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.deleteDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">ATTRIBUTE1:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.attribute1" placeholder=""> </div>
+															<label class="col-md-2 control-label">ATTRIBUTE2:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.attribute2" placeholder=""> </div>
+															<label class="col-md-2 control-label">ATTRIBUTE3:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.attribute3" placeholder=""> </div>
+															<label class="col-md-2 control-label">ATTRIBUTE4:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.attribute4" placeholder=""> </div>
+															<label class="col-md-2 control-label">ATTRIBUTE5:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentInvoiceTrxH.attribute5" placeholder=""> </div>
+														</div>                                        
+													</div>
+												 </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn green"data-dismiss="modal" ng-click="test()">Save changes</button>
+                                                </div>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>

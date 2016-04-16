@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<siiscmd xmlns="http://www.aisino.com.cn">
+	<sendbackinv>
+		<sendbackinvrecord>
+			<sendbackinvrecordhead>
+				<binvkind>
+					<value>2</value>
+				</binvkind>
+				<binvcode>3100143320</binvcode>
+				<binvnr>10047366</binvnr>
+				<binvdate>201507071527</binvdate>
+				<bmachinenr>0</bmachinenr>
+				<bcancelled>0</bcancelled>
+				<invkind>
+					<value>2</value>
+				</invkind>
+				<doctype>
+					<value>1</value>
+				</doctype>
+				<docnr>600000385</docnr>
+				<docdate>201507031505</docdate>
+				<custnr>ZHXG</custnr>
+				<custname>中海集装箱运输（香港）有限公司</custname>
+				<custtaxnr>310022131312221</custtaxnr>
+				<custaddrtel>上海青州北路112号 32717322</custaddrtel>
+				<custbankacct>icbc 312031030131221</custbankacct>
+				<memo>清单编号:700171284|结算方式:ZD|</memo>
+				<memo2>CHB_BILLID:2108767|CHB_HANDLE_ADDRESS:GSFS</memo2>
+				<refinvcode></refinvcode>
+				<refinvnr></refinvnr>
+				<rednoticenr></rednoticenr>
+				<issuer>0284</issuer>
+				<checker>0284</checker>
+				<payee>0284</payee>
+				<sellerbankacct>招商银行上海分行江湾支行 214881399710001</sellerbankacct>
+				<selleraddresstel>上海分行路97号 33121001</selleraddresstel>
+				<totalamount>15900.0</totalamount>
+				<totaltax>954.0</totaltax>
+			</sendbackinvrecordhead>
+			<sendbackinvrecorditem>
+				<prodnr>10023</prodnr>
+				<prodname>堆存费</prodname>
+				<spec></spec>
+				<unit>/箱天</unit>
+				<quantity>1.0</quantity>
+				<price>16000.0</price>
+				<amount>16000.0</amount>
+				<taxrate>0.06</taxrate>
+				<tax>960.0</tax>
+				<discountvalue>100.0</discountvalue>
+				<discounttax>6.0</discounttax>
+			</sendbackinvrecorditem>
+		</sendbackinvrecord>
+	</sendbackinv>
+</siiscmd>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Property name="metaData">
+    <Property name="securityTag">DB.Console</Property>
+  </Property>
+  <Arguments/>
+  <Context/>
+  <Model/>
+  <View listener="spring:ling2.DataViewMaintain#onInit">
+    <IFrame id="iFramePreview">
+      <Property name="width">100%</Property>
+      <Property name="height">100%</Property>
+    </IFrame>
+  </View>
+</ViewConfig>

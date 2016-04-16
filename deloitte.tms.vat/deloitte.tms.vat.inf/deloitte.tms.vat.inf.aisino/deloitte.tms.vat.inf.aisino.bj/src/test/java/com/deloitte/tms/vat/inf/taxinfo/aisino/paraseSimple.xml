@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service> 
+ <err count="1"> 
+  <refp> 
+   <RETCODE>-2</RETCODE> 
+   <RETMSG>操作出现异常</RETMSG> 
+  </refp> 
+ </err> 
+</service>

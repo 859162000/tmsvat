@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<siiscmd xmlns="http://www.aisino.sh.cn">
+	<cancelinv>
+		<key>
+			<invkind>
+				<value>0</value>
+			</invkind>
+			<invcode>3100124130</invcode>
+			<invnr>00067185</invnr>
+		</key>
+	</cancelinv>
+</siiscmd>

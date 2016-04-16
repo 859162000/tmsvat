@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.deloitte</groupId>
+		<artifactId>deloitte.tms.vat</artifactId>
+		<version>1.0.0</version>
+	</parent>
+	<artifactId>deloitte.tms.vat.inf.citic</artifactId>
+	<dependencies>
+	
+		<dependency><!-- add this as need import ISecurityInterceptor which at deloitte.tms.pl.web -->
+			<groupId>com.deloitte</groupId>
+			<artifactId>deloitte.tms.pl.web</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.deloitte</groupId>
+			<artifactId>deloitte.tms.vat.core</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.deloitte</groupId>
+			<artifactId>deloitte.tms.pl.job</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>oldcsmpapi</groupId>
+			<artifactId>oldcsmpapi</artifactId>
+			<version>1.8</version>
+		</dependency>
+	</dependencies>
+
+</project>

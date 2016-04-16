@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="deloitte.tms.vat.web">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <dependent-module archiveName="deloitte.tms.vat.core-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.vat.core/deloitte.tms.vat.core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="deloitte.tms.pl.core-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.pl.core/deloitte.tms.pl.core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="deloitte.tms.pl.security-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.pl.security/deloitte.tms.pl.security">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="deloitte.tms.pl.cache-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.pl.cache/deloitte.tms.pl.cache">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="deloitte.tms.pl.cache.config-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.pl.cache.config/deloitte.tms.pl.cache.config">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="deloitte.tms.pl.security.config-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.pl.security.config/deloitte.tms.pl.security.config">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="deloitte.tms.pl.web-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.pl.web/deloitte.tms.pl.web">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="deloitte.tms.pl.job-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.pl.job/deloitte.tms.pl.job">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="deloitte.tms.pl.workflow-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.pl.workflow/deloitte.tms.pl.workflow">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="deloitte.tms.vat.inf.citic-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.vat.inf.citic/deloitte.tms.vat.inf.citic">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="deloitte.tms.vat.inf.aisino.core-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.vat.inf.aisino.core/deloitte.tms.vat.inf.aisino.core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="deloitte.tms.vat.inf.aisino.bj-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.vat.inf.aisino.bj/deloitte.tms.vat.inf.aisino.bj">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="deloitte.tms.vat.web"/>
+        <property name="java-output-path" value="/deloitte.tms.vat.web/target/classes"/>
+    </wb-module>
+</project-modules>

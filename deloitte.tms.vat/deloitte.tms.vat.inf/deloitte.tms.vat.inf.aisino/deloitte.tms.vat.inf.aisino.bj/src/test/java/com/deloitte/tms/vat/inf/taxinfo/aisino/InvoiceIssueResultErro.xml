@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <err count="2">
+  <refp>
+   <RETCODE>4001</RETCODE>
+   <RETMSG>商品单价、数量和金额不符合计算关系</RETMSG>
+   <JE>0</JE>
+   <SE>0</SE>
+   <KPRQ>1899-12-30</KPRQ>
+   <FPDM/>
+   <FPHM/>
+   <SYZFPDM/>
+   <SYZFPHM/>
+   <SYZFPZL>-1</SYZFPZL>
+  </refp>
+  <refp>
+   <RETCODE>4001</RETCODE>
+   <RETMSG>4001-购买方纳税人识别号长度不正确三证合一后 6-20位</RETMSG>
+   <JE>0</JE>
+   <SE>0</SE>
+   <KPRQ>1899-12-30</KPRQ>
+   <FPDM/>
+   <FPHM/>
+   <SYZFPDM/>
+   <SYZFPHM/>
+   <SYZFPZL>0</SYZFPZL>
+  </refp>
+ </err>
+</service>

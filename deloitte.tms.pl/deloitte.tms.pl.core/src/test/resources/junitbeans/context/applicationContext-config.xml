@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+
+	<bean id="propertyConfigurer"
+		class="com.deloitte.tms.pl.core.commons.utils.PropertiesUtils">
+		<property name="locations">
+			<list>
+				<value>classpath*:junitconfig/*.properties</value>
+			</list>
+		</property>
+		<!--加载顺序，优先于spring batch jar当中的加载次序 -->
+		<property name="order" value="0"></property>
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+</beans>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:javaee="http://java.sun.com/xml/ns/javaee"
+	xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+	version="2.4">
+	<context-param>
+		<javaee:param-name>contextConfigLocation</javaee:param-name>
+		<javaee:param-value>classpath*:beans/**/*.xml</javaee:param-value>
+	</context-param>
+	
+	<listener>
+		<javaee:listener-class>com.bstek.dorado.web.servlet.SpringContextLoaderListener</javaee:listener-class>
+	</listener>
+	
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>*</url-pattern>
+	</filter-mapping>
+	
+	<!-- <filter>
+		<filter-name>GZIPEncoder</filter-name>
+		<filter-class>com.bstek.dorado.core.GZIPEncodeFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>GZIPEncoder</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping> -->
+	<!-- spring 安全验证  包括GenericFilterBean才能有效-->
+	<!-- <filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping> -->
+	
+	<filter>
+		<filter-name>OpenSessionInViewFilter</filter-name>
+		<filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
+		<init-param>
+			<javaee:param-name>excludeSuffixs</javaee:param-name>
+			<javaee:param-value>js,css,jpg,gif,png</javaee:param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>OpenSessionInViewFilter</filter-name>
+		<url-pattern>*.ling</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>OpenSessionInViewFilter</filter-name>
+		<url-pattern>/dorado/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>OpenSessionInViewFilter</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+	
+	<!--<filter>
+		<filter-name>dorado5filter</filter-name>
+		<filter-class>com.bstek.dorado.core.DoradoFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>dorado5filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping> -->
+	
+	<servlet>
+		<servlet-name>spring-mvc</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<javaee:param-name>contextConfigLocation</javaee:param-name>
+			<javaee:param-value>/WEB-INF/spring-mvc-servlet.xml</javaee:param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>spring-mvc</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>dorado7Servlet</servlet-name>
+		<servlet-class>com.bstek.dorado.web.servlet.DoradoServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dorado7Servlet</servlet-name>
+		<url-pattern>*.ling</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>dorado7Servlet</servlet-name>
+		<url-pattern>*.dpkg</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>dorado7Servlet</servlet-name>
+		<url-pattern>/dorado/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>dorado7Servlet</servlet-name>
+		<url-pattern>/dorado/exception.d</url-pattern>
+	</servlet-mapping>
+	
+	<!--<servlet>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<servlet-class>com.bstek.dorado.core.DoradoServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>*.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/smartweb2.RPC.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/smartweb2.loadStyleSheet.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/smartweb2.loadFile.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/smartweb2.loadConst.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/smartweb2.loadRes.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/smartweb2.loadUserLib.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/export2Excel.download.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/export2Excel.output.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/smartweb2.showRPCLoadingTip.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/smartweb2.showRPCSubmitter.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/designer.d</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dorado5Servlet</servlet-name>
+		<url-pattern>/dorado/designer.exception.d</url-pattern>
+	</servlet-mapping> -->
+
+
+	<!--<jsp-config>
+		<taglib>
+			<taglib-uri>http://www.bstek.com/dorado</taglib-uri>
+			<taglib-location>/WEB-INF/dorado.tld</taglib-location>
+		</taglib>
+	</jsp-config>-->
+	<!-- <error-page>
+		<error-code>404</error-code>
+		<location>/errorpage-404.jsp</location>
+	</error-page> -->
+</web-app>

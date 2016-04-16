@@ -1,0 +1,1 @@
+grant select ,update,delete,INSERT on bdf2.tbl_org_path to program;

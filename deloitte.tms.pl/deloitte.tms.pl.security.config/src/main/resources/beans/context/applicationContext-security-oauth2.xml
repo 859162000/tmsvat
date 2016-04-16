@@ -1,0 +1,26 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+	xmlns:sec="http://www.springframework.org/schema/security" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+		
+	<!-- <bean id="ling2.qqAuthenticationFilter" class="com.deloitte.tms.pl.security.security.filter.QQAuthenticationProcessingFilter" parent="ling2.baseAuthenticationFilter">
+		<property name="filterProcessesUrl" value="/qq_oauth2_security_check_"></property>
+	</bean>
+	<bean id="ling2.taobaoAuthenticationFiltecom.deloitte.tms.pl.com.deloitte.tms.pl.security.security.filter.TaoBaoAuthenticationProcessingFilter" parent="ling2.baseAuthenticationFilter">
+		<property name="filterProcessesUrl" value="/taobao_oauth2_security_check_"></property>
+	</bean>
+	
+	<bean id="ling2.baseAuthenticcom.deloitte.tms.pl.r" class="com.deloitte.tms.pl.security.security.filter.Oauth2AuthenticationProcessingFilter" abstract="true">
+		<property name="sessionAuthenticationStrategy" ref="ling2.concurrentSessionControlStrategy" />
+		<property name="rememberMeServices" ref="ling2.tokenBasedRememberMeServices"></property>
+		<property name="authenticationManager" ref="ling2.authenticationManager"></property>
+		<property name="authenticationSuccessHandler" ref="ling2.savedRequestAwareAuthenticationSuccessHandler"></property>
+		<property name="authenticationFailureHandler" ref="ling2.authenticationFailureHandler"></property>
+		<property name="oauth2Service" ref="oauth2Service"></property>
+		<property name="passwordEncoder" ref="ling2.passwordEncoder"></property>
+	</bean> -->
+	
+</beans>

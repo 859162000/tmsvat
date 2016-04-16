@@ -1,0 +1,82 @@
+<div ng-controller="UserManageCtroller">
+	<style>
+	.grid {
+	  height: 400px;
+	}
+	</style>
+	<div class="form-body">
+		<div class="form-group">  
+		<label class="col-md-2 control-label">是否有效:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.flag" placeholder=""> </div>
+		<label class="col-md-2 control-label">状态:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.status" placeholder=""> </div>
+		<label class="col-md-2 control-label">关联用户:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.relationUser" placeholder=""> </div>
+		<label class="col-md-2 control-label">昵称:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.nickName" placeholder=""> </div>
+		<label class="col-md-2 control-label">订单编号:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.ordercode" placeholder=""> </div>
+		<label class="col-md-2 control-label">总价:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.totalPrice" placeholder=""> </div>
+		<label class="col-md-2 control-label">快递费用:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.expressPrice" placeholder=""> </div>
+		<label class="col-md-2 control-label">支付价:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.payPrice" placeholder=""> </div>
+		<label class="col-md-2 control-label">件数:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.totalNum" placeholder=""> </div>
+		<label class="col-md-2 control-label">名称:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.name" placeholder=""> </div>
+		<label class="col-md-2 control-label">展示图片:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.showPic" placeholder=""> </div>
+		<label class="col-md-2 control-label">showPicUrl:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.showPicUrl" placeholder=""> </div>
+		<label class="col-md-2 control-label">联系人:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.reciverName" placeholder=""> </div>
+		<label class="col-md-2 control-label">联系电话:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.phone" placeholder=""> </div>
+		<label class="col-md-2 control-label">区域:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.region" placeholder=""> </div>
+		<label class="col-md-2 control-label">详细地址:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.address" placeholder=""> </div>
+		<label class="col-md-2 control-label">邮编:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.zipCode" placeholder=""> </div>
+		<label class="col-md-2 control-label">下单日期:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.orderDate" placeholder=""> </div>
+		<label class="col-md-2 control-label">快递方式:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.expressType" placeholder=""> </div>
+		<label class="col-md-2 control-label">快递单号:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.expressCode" placeholder=""> </div>
+		<label class="col-md-2 control-label">支付方式:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.payType" placeholder=""> </div>
+		<label class="col-md-2 control-label">支付编号:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.payCode" placeholder=""> </div>
+		<label class="col-md-2 control-label">用户备注:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.userRemark" placeholder=""> </div>
+		<label class="col-md-2 control-label">后台备注:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.managerRemark" placeholder=""> </div>
+		<label class="col-md-2 control-label">firstinsert:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.firstinsert" placeholder=""> </div>
+		<label class="col-md-2 control-label">lastmodified:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.lastmodified" placeholder=""> </div>
+		<label class="col-md-2 control-label">insertman:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.insertman" placeholder=""> </div>
+		<label class="col-md-2 control-label">updateman:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.updateman" placeholder=""> </div>
+		<label class="col-md-2 control-label">dataowner:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.dataowner" placeholder=""> </div>
+		<label class="col-md-2 control-label">dataStatu:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.dataStatu" placeholder=""> </div>
+		<label class="col-md-2 control-label">company:</label>
+		<div class="col-md-2"> <input type="text" class="form-control" ng-model="orderQuery.company" placeholder=""> </div>
+		</div>                                        
+	</div>
+	<div class="clearfix"></div>
+	<div>
+		<button type="button" class="btn btn-success" ng-click="addOrder()">添加</button>
+		<button type="button" class="btn btn-success" ng-click="editOrder()">修改</button>
+		<button type="button" class="btn btn-success" ng-click="removeSelectOrder()">删除选择</button>
+		<button type="button" class="btn btn-success" ng-click="resetOrder()">还原修改</button>
+		<button type="button" class="btn btn-success" ng-click="saveOrder()">保存修改</button>
+	</div>
+	<div ui-grid="gridOptions" ui-grid-edit ui-grid-row-edit ui-grid-cellNav ui-grid-pagination ui-grid-selection class="grid"></div>
+</div>

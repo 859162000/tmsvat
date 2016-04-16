@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <ip/>
+ <port/>
+ <data>
+  <record>
+   <SPMC/>
+   <HSBZ/>
+   <SLV/>
+   <JE/>
+   <DJ/>
+   <JLDW/>
+   <GGXH/>
+   <SE/>
+   <SL/>
+  </record>
+  <record>
+   <SPMC/>
+   <HSBZ/>
+   <SLV/>
+   <JE/>
+   <DJ/>
+   <JLDW/>
+   <GGXH/>
+   <SE/>
+   <SL/>
+  </record>
+ </data>
+</service>

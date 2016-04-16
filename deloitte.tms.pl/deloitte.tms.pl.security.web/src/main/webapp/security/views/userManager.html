@@ -1,0 +1,45 @@
+<div ng-controller="UserManageCtroller">
+<style>
+.grid {
+  height: 400px;
+}
+</style>
+									<div class="form-body">
+                                        <div class="form-group">                                                            
+                                            <label class="col-md-2 control-label">订单状态:</label>
+                                            <div class="col-md-2">
+                                            	<select name="repeatSelect" ng-model="odersQuery.params.status">
+											      <option ng-repeat="option in orderStatus" value="{{option.code}}">{{option.name}}</option>
+											    </select>
+											</div>
+                                            <label class="col-md-2 control-label">客户用户名:</label>
+                                            <div class="col-md-2"> <input type="text" class="form-control" ng-model="odersQuery.params.relationUser" placeholder=""> </div>
+                                             <label class="col-md-2 control-label">订单编号=:</label>
+                                            <div class="col-md-2"><input class="form-control" ng-model="odersQuery.params.ordercode"></input></div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">商品名称:</label>
+                                            <div class="col-md-2"> <input class="form-control" ng-model="odersQuery.params.name" placeholder=""> </div>
+                                            <label class="col-md-2 control-label">联系人:</label>
+                                            <div class="col-md-2"> <input class="form-control" ng-model="odersQuery.params.reciverName" placeholder=""> </div>
+                                            <label class="col-md-2 control-label">快递方式:</label>
+                                            <div class="col-md-2">
+                                            	<select name="repeatSelect" ng-model="odersQuery.params.expressType">
+											      <option ng-repeat="option in expressTypes" value="{{option.code}}">{{option.name}}</option>
+											    </select>                                            
+                                            </div>
+                                            <!-- <label class="col-md-2 control-label">下单日期从:</label>
+                                            <div class="col-md-2"><input class="form-control" ng-model="odersQuery.params.orderDateBeg"></input></div>
+                                             <label class="col-md-2 control-label">到:</label>
+                                            <div class="col-md-2"><input class="form-control" ng-model="odersQuery.params.orderDateEnd"></input></div>   -->                                                          
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div>
+ 		<button type="button" id="swapData" class="btn btn-success" ng-click="swapData()">Swap Data</button>
+      <button type="button" id="addData" class="btn btn-success" ng-click="addData()">Add Data</button>
+      <button type="button" id="removeFirstRow" class="btn btn-success" ng-click="removeFirstRow()">Remove First Row</button>
+      <button type="button" id="reset" class="btn btn-success" ng-click="reset()">Reset</button></div>
+<div ui-grid="gridOptions" ui-grid-edit ui-grid-row-edit ui-grid-cellNav ui-grid-pagination ui-grid-selection class="grid"></div>
+</div>

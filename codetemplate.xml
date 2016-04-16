@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+<template autoinsert="false" context="fieldcomment_context" deleted="false" description="字段的注释" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.fieldcomment" name="fieldcomment">
+/**  
+ * ${field}  
+ */  
+</template>
+<template autoinsert="false" context="typecomment_context" deleted="false" description="创建的类型的注释" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.typecomment" name="typecomment">
+/**  
+ *〈一句话功能简述〉
+ * 功能详细描述
+ * @author ${user}
+ * @create ${date} ${time} 
+ * @version 1.0.0
+ * @see [相关类/方法]（可选）
+ * @since [产品/模块版本] （可选）
+ */  
+</template>
+<template autoinsert="true" context="gettercomment_context" deleted="false" description="getter 方法的注释" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.gettercomment" name="gettercomment">
+/**  
+ * 返回 ${bare_field_name} 的值   
+ * @return ${bare_field_name}  
+ */  
+ </template>
+<template autoinsert="true" context="filecomment_context" deleted="false" description="已创建的 Java 文件的注释" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.filecomment" name="filecomment">
+/**    
+ * Copyright (C),Deloitte
+ * @FileName: ${file_name}  
+ * @Package: ${package_name}  
+ * @Description: //模块目的、功能描述  
+ * @Author ${user}  
+ * @Date ${date} ${time}  
+ * @History: //修改记录
+ * 〈author〉      〈time〉      〈version〉       〈desc〉
+ * 修改人姓名            修改时间            版本号              描述   
+*/  
+</template>
+<template autoinsert="true" context="delegatecomment_context" deleted="false" description="代表方法的注释" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.delegatecomment" name="delegatecomment">
+/**  
+ * ${tags}  
+ * ${see_to_target}  
+ */
+ </template>
+<template autoinsert="false" context="overridecomment_context" deleted="false" description="覆盖方法的注释" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.overridecomment" name="overridecomment">
+/**   
+ * ${tags}  
+ * ${see_to_overridden}  
+ */
+</template>
+<template autoinsert="false" context="methodcomment_context" deleted="false" description="非覆盖方法的注释" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.methodcomment" name="methodcomment">
+/** 
+ *〈一句话功能简述〉 
+ * 功能详细描述
+ * ${tags}
+ * @see [相关类/方法]（可选）
+ * @since [产品/模块版本] （可选）
+ */
+</template>
+<template autoinsert="false" context="constructorcomment_context" deleted="false" description="创建的构造函数的注释" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.constructorcomment" name="constructorcomment">
+/**  
+ * 构造函数
+ * ${tags}  
+*/ 
+</template>
+<template autoinsert="false" context="settercomment_context" deleted="false" description="setter 方法的注释" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.settercomment" name="settercomment">
+/**  
+ * 设置 ${bare_field_name} 的值  
+ * @param ${param}
+ */
+ </template>
+</templates>

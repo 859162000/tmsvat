@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+	
+	<http pattern="/index.jsp*" security="none"/>
+	
+	<http entry-point-ref="ling2.authenticationEntryPoint" access-denied-page="${ling2.accessDeniedPage}">
+		<custom-filter ref="ling2.contextFilter" after="SECURITY_CONTEXT_FILTER"/>
+		<custom-filter ref="ling2.logoutFilter" position="LOGOUT_FILTER"/>
+		<!--<custom-filter ref="ling2.preAuthenticatedProcessingFilter" position="PRE_AUTH_FILTER"/>	
+		 <custom-filter ref="ling2.casAuthenticationFilter" position="CAS_FILTER"/>
+		<custom-filter ref="ling2.qqAuthenticationFilter" after="FORM_LOGIN_FILTER"/>
+		<custom-filter ref="ling2.taobaoAuthenticationFilter" before="FORM_LOGIN_FILTER"/> -->
+			
+		<custom-filter ref="ling2.usernamePasswordAuthenticationFilter" position="FORM_LOGIN_FILTER"/>
+		<custom-filter ref="ling2.concurrentSessionFilter"  position="CONCURRENT_SESSION_FILTER"/>
+		<custom-filter ref="ling2.basicAuthenticationFilter" position="BASIC_AUTH_FILTER"/>		
+		
+		<custom-filter ref="ling2.rememberMeLoginFilter" position="REMEMBER_ME_FILTER"/>
+		
+		<anonymous key="doesNotMatter"/>
+		<session-management session-authentication-strategy-ref="${ling2.loginCreateSessionStrategy}"></session-management>
+		<custom-filter ref="ling2.controllerFilter" after="SESSION_MANAGEMENT_FILTER"/>
+		<custom-filter ref="ling2.filterSecurityInterceptor" before="FILTER_SECURITY_INTERCEPTOR"/>
+		
+		<intercept-url pattern="/index.jsp" access="" /> 
+		<intercept-url pattern="/userinfo/**" access="ROLE_USER" />    
+        <intercept-url pattern="/ecommerce.commodity**" access="ROLE_ADMIN" />
+	</http>
+	
+	
+	
+	<authentication-manager alias="ling2.authenticationManager">	
+		<authentication-provider ref="ling2.casAuthenticationProvider"/>
+		<authentication-provider ref="ling2.formLoginAuthenticationProvider"/>
+		<authentication-provider ref="ling2.rememberMeAuthenticationProvider"/>
+		<authentication-provider ref="ling2.anonymousAuthenticationProvider"/>
+	</authentication-manager>
+	
+	
+	<beans:bean id="ling2.preAuthenticatedProcessingFilter" class="com.deloitte.tms.pl.security.security.filter.PreAuthenticatedProcessingFilter">
+	    <beans:constructor-arg name="preAuthentications">
+			<beans:list>
+				<beans:ref bean="ling2.cookieLoginService"/>
+			</beans:list>
+		</beans:constructor-arg>
+	</beans:bean>
+	<beans:bean id="ling2.forwardRedirectStrategy" class="com.deloitte.tms.pl.security.security.ForwardRedirectStrategy"></beans:bean>
+	
+	<beans:bean id="ling2.sessionRegistry" class="com.deloitte.tms.pl.security.security.session.SessionRegistryImpl" />
+	
+	<beans:bean id="ling2.concurrentSessionFilter" class="com.deloitte.tms.pl.security.security.filter.ConcurrentSessionControlFilter">
+		<beans:constructor-arg name="sessionRegistry" ref="ling2.sessionRegistry"></beans:constructor-arg>
+		<beans:constructor-arg name="expiredUrl" value="${ling2.sessionExpiredUrl}"></beans:constructor-arg>
+		<beans:constructor-arg name="sessionKickAwayUrl" value="${ling2.sessionKickAwayUrl}"></beans:constructor-arg>
+	</beans:bean>
+	
+	<beans:bean id="ling2.noneCreateSessionStrategy" class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy">
+		<beans:property name="alwaysCreateSession" value="false"></beans:property>
+		<beans:property name="migrateSessionAttributes" value="false"></beans:property>
+	</beans:bean>
+	
+	<beans:bean id="ling2.concurrentSessionControlStrategy" class="com.deloitte.tms.pl.security.security.session.ConcurrentSessionControlStrategyImpl">
+		<beans:constructor-arg name="sessionRegistry" ref="ling2.sessionRegistry" />
+		<beans:property name="maximumSessions" value="${ling2.securityMaximumSessions}" />
+	</beans:bean>
+	
+	<beans:bean id="ling2.filterSecurityInterceptor" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+		<beans:property name="securityMetadataSource" ref="ling2.urlMetadataSource"></beans:property>
+		<beans:property name="authenticationManager" ref="ling2.authenticationManager"></beans:property>
+		<beans:property name="accessDecisionManager" ref="ling2.accessDecisionManager"></beans:property>
+	</beans:bean>
+	
+	<beans:bean id="ling2.accessDecisionManager" class="com.deloitte.tms.pl.security.security.decision.UrlAccessDecisionManager">
+		<beans:constructor-arg name="decisionVoters">
+			<beans:list>
+				<beans:ref bean="ling2.authenticatedVoter"/>
+				<beans:ref bean="ling2.userVoter"/>
+				<beans:ref bean="ling2.positionVoter"/>
+				<beans:ref bean="ling2.deptVoter"/>
+				<beans:ref bean="ling2.groupVoter"/>
+			</beans:list>
+		</beans:constructor-arg>
+	</beans:bean>
+	
+	<beans:bean id="ling2.authenticatedVoter" class="org.springframework.security.access.vote.AuthenticatedVoter"></beans:bean>
+	<beans:bean class="com.deloitte.tms.pl.security.controller.impl.CaptchaController">
+		<beans:constructor-arg name="url" value="${ling2.generateCaptchaUrl}"></beans:constructor-arg>
+	</beans:bean>
+	
+	<beans:bean id="ling2.userPasswordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"></beans:bean>
+	
+	<beans:bean id="ling2.userVoter" class="com.deloitte.tms.pl.security.security.decision.UserAccessDecisionVoter"></beans:bean>
+	<beans:bean id="ling2.deptVoter" class="com.deloitte.tms.pl.security.security.decision.DeptAccessDecisionVoter"></beans:bean>
+	<beans:bean id="ling2.positionVoter" class="com.deloitte.tms.pl.security.security.decision.PositionAccessDecisionVoter"></beans:bean>
+	<beans:bean id="ling2.groupVoter" class="com.deloitte.tms.pl.security.security.decision.GroupAccessDecisionVoter"></beans:bean>
+	
+	<beans:bean id="ling2.tokenBasedRememberMeServices" class="org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices">
+		<beans:constructor-arg name="key" value="${ling2.rememberMeLoginCookieKey}"></beans:constructor-arg>
+		<beans:constructor-arg name="userDetailsService" ref="ling2.userService"></beans:constructor-arg>
+		<beans:property name="parameter" value="remember_me_"></beans:property>
+	</beans:bean>
+
+	<beans:bean id="ling2.anonymousAuthenticationProvider" class="org.springframework.security.authentication.AnonymousAuthenticationProvider">
+		<beans:constructor-arg name="key" value="doesNotMatter"></beans:constructor-arg>
+	</beans:bean>
+	
+	<beans:bean id="ling2.rememberMeAuthenticationProvider" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+		<beans:constructor-arg name="key" value="${ling2.rememberMeLoginCookieKey}"></beans:constructor-arg>
+	</beans:bean>
+	
+	<beans:bean id="ling2.formLoginAuthenticationProvider" class="com.deloitte.tms.pl.security.security.provider.FormLoginAuthenticationProvider">
+		<beans:property name="userDetailsService" ref="ling2.userService"></beans:property>
+		<beans:property name="passwordEncoder" ref="ling2.userPasswordEncoder"></beans:property>
+		<beans:property name="frameworkService" ref="ling2.frameworkService"></beans:property>
+		<beans:property name="contextHolder" ref="contextHolder"></beans:property>
+		<beans:property name="cookieLoginTokenService" ref="ling2.cookieLoginService"></beans:property>
+		<beans:property name="sessionShareProvider" ref="ling2.sessionShareProvider"></beans:property>
+		<beans:property name="hideUserNotFoundExceptions" value="false"></beans:property>
+	</beans:bean>
+	
+	<beans:bean id="ling2.casAuthenticationProvider" class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+		<beans:property name="authenticationUserDetailsService" ref="ling2.authenticationUserDetailsService"></beans:property>
+		<beans:property name="ticketValidator" ref="${ling2.casTicketValidator}"></beans:property>
+		<beans:property name="key" value="${ling2.casAuthenticationTokenKey}"></beans:property>
+		<beans:property name="serviceProperties" ref="ling2.caserviceProperties"></beans:property>
+	</beans:bean>
+	
+	<beans:bean id="ling2.cas10TicketValidator" class="org.jasig.cas.client.validation.Cas10TicketValidator">
+		<beans:constructor-arg index="0" value="${ling2.casServerUrl}"></beans:constructor-arg>
+	</beans:bean>
+	<beans:bean id="ling2.cas20ServiceTicketValidator" class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+		<beans:constructor-arg index="0" value="${ling2.casServerUrl}"></beans:constructor-arg>
+	</beans:bean>
+	
+	<beans:bean id="ling2.authenticationUserDetailsService" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+		<beans:constructor-arg name="userDetailsService" ref="ling2.userService"></beans:constructor-arg>
+	</beans:bean>
+	
+	<beans:bean id="ling2.componentAccessDecisionManager" class="com.deloitte.tms.pl.security.security.decision.ComponentAccessDecisionManager">
+		<beans:constructor-arg name="decisionVoters">
+			<beans:list>
+				<beans:ref bean="ling2.userVoter"/>
+				<beans:ref bean="ling2.positionVoter"/>
+				<beans:ref bean="ling2.deptVoter"/>
+				<beans:ref bean="ling2.groupVoter"/>
+			</beans:list>
+		</beans:constructor-arg>
+	</beans:bean>
+	
+	<beans:bean id="ling2.frameworkService" class="com.deloitte.tms.pl.security.service.impl.DefaultFrameworkService">
+		<beans:property name="deptService" ref="ling2.deptService"></beans:property>
+		<beans:property name="positionService" ref="ling2.positionService"></beans:property>
+		<beans:property name="groupService" ref="ling2.groupService"></beans:property>
+		<beans:property name="passwordEncoder" ref="ling2.passwordEncoder"/>
+	</beans:bean>
+	
+	<beans:bean id="ling2.contextFilter" class="com.deloitte.tms.pl.security.security.filter.ContextFilter"></beans:bean>
+	<beans:bean id="ling2.logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+		<beans:constructor-arg name="logoutSuccessUrl" value="${ling2.logoutSuccessURL}"></beans:constructor-arg>
+		<beans:constructor-arg name="handlers">
+			<beans:bean class="com.deloitte.tms.pl.security.security.filter.LogoutHandlerFactory"></beans:bean>
+		</beans:constructor-arg>
+		<beans:property name="filterProcessesUrl" value="${ling2.logoutURL}"></beans:property>
+	</beans:bean>
+	
+	<beans:bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"></beans:bean>
+
+	<beans:bean id="ling2.basicAuthenticationFilter" class="com.deloitte.tms.pl.security.security.filter.BasicLoginAuthenticationFilter">
+		<beans:constructor-arg name="authenticationManager" ref="ling2.authenticationManager"></beans:constructor-arg>
+		<beans:property name="authenticationEntryPoint" ref="ling2.basicAuthenticationEntryPoint" />
+	</beans:bean>
+	
+	<beans:bean id="ling2.authenticationEntryPoint" class="com.deloitte.tms.pl.security.security.MultiAuthenticationEntryPoint">
+		<beans:property name="authenticationType" value="${ling2.authenticationType}"></beans:property>
+		<beans:property name="loginUrlAuthenticationEntryPoint" ref="ling2.loginUrlAuthenticationEntryPoint"></beans:property>
+		<beans:property name="casAuthenticationEntryPoint" ref="ling2.casAuthenticationEntryPoint"></beans:property>
+		<beans:property name="basicAuthenticationEntryPoint" ref="ling2.basicAuthenticationEntryPoint"></beans:property>
+	</beans:bean>
+	
+	<beans:bean id="ling2.loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+		<beans:constructor-arg name="loginFormUrl" value="${ling2.formLoginUrl}"></beans:constructor-arg>
+		<beans:property name="forceHttps" value="${ling2.forceHttpsFormLogin}"></beans:property>
+		<beans:property name="useForward" value="${ling2.useForwardFormLogin}"></beans:property>
+		<beans:property name="portMapper" ref="ling2.portMapper"></beans:property>
+	</beans:bean>
+	<beans:bean id="ling2.portMapper" class="org.springframework.security.web.PortMapperImpl">
+		<beans:property name="portMappings">
+			<beans:map>
+              <beans:entry key="80"><beans:value>443</beans:value></beans:entry>
+              <beans:entry key="8080"><beans:value>8443</beans:value></beans:entry>
+              <beans:entry key="7001"><beans:value>443</beans:value></beans:entry>
+              <beans:entry key="7180"><beans:value>443</beans:value></beans:entry>
+          	</beans:map>
+		</beans:property>
+	</beans:bean>
+	<beans:bean id="ling2.casAuthenticationEntryPoint" class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
+		<beans:property name="loginUrl" value="${ling2.casLoginUrl}"></beans:property>
+		<beans:property name="serviceProperties" ref="ling2.caserviceProperties"></beans:property>
+	</beans:bean>
+	<beans:bean id="ling2.caserviceProperties" class="com.deloitte.tms.pl.security.security.CasServiceProperties">
+		<beans:property name="service" value="${ling2.casClientServerUrl}"></beans:property>
+		<beans:property name="authenticateAllArtifacts" value="true"></beans:property>
+	</beans:bean>
+	<beans:bean id="ling2.basicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+		<beans:property name="realmName" value="${ling2.basicRealmName}"></beans:property>
+	</beans:bean>
+	
+	<beans:bean id="ling2.casAuthenticationFilter" class="com.deloitte.tms.pl.security.security.filter.CasLoginAuthenticationFilter">
+		<beans:property name="filterProcessesUrl" value="/cas_security_check_"></beans:property>
+		<beans:property name="authenticationManager" ref="ling2.authenticationManager"></beans:property>
+		<beans:property name="sessionAuthenticationStrategy" ref="ling2.concurrentSessionControlStrategy" />
+		<beans:property name="contextHolder" ref="contextHolder"></beans:property>
+		<beans:property name="cookieLoginTokenService" ref="ling2.cookieLoginService"></beans:property>
+	</beans:bean>
+	
+	<beans:bean id="ling2.usernamePasswordAuthenticationFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+		<beans:property name="usernameParameter" value="${ling2.username}"></beans:property>
+		<beans:property name="passwordParameter" value="${ling2.password}"></beans:property>
+		<beans:property name="sessionAuthenticationStrategy" ref="ling2.concurrentSessionControlStrategy" />
+		<beans:property name="filterProcessesUrl" value="/security_check_"></beans:property>
+		<beans:property name="rememberMeServices" ref="ling2.tokenBasedRememberMeServices"></beans:property>
+		<beans:property name="authenticationManager" ref="ling2.authenticationManager"></beans:property>
+		<beans:property name="authenticationSuccessHandler" ref="ling2.savedRequestAwareAuthenticationSuccessHandler"></beans:property>
+		<beans:property name="authenticationFailureHandler" ref="ling2.authenticationFailureHandler"></beans:property>
+	</beans:bean>
+	
+	<beans:bean id="ling2.rememberMeLoginFilter" class="com.deloitte.tms.pl.security.security.filter.RememberMeLoginFilter">
+		<beans:constructor-arg name="authenticationManager" ref="ling2.authenticationManager"></beans:constructor-arg>
+		<beans:constructor-arg name="rememberMeServices" ref="ling2.tokenBasedRememberMeServices"></beans:constructor-arg>
+		<beans:property name="userService" ref="ling2.userService"/>
+		<beans:property name="contextHolder" ref="contextHolder"></beans:property>
+		<beans:property name="cookieLoginTokenService" ref="ling2.cookieLoginService"></beans:property>
+		<beans:property name="authenticationFailureHandler">
+			<beans:bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+				<beans:constructor-arg name="defaultFailureUrl" value="${ling2.rememberMeLoginFailUrl}"></beans:constructor-arg>
+			</beans:bean>
+		</beans:property>
+	</beans:bean>
+	
+	<!-- <beans:bean id="ling2.cookieLoginFilter" class="com.deloitte.tms.pl.security.security.filter.CookieLoginFilter">
+	    <beans:property name="cookieLoginService" ref="ling2.cookieLoginService"></beans:property>
+	</beans:bean> -->
+	
+	<beans:bean id="ling2.authenticationFailureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+		<beans:property name="defaultFailureUrl" value="${ling2.loginFailureTargetUrl}"></beans:property>	
+		<beans:property name="useForward" value="${ling2.loginFailureToTargetUrlUseForward}"></beans:property>	
+	</beans:bean>
+	
+	<!-- 实现登陆后跳转至登录前页面 -->
+	<beans:bean id="ling2.savedRequestAwareAuthenticationSuccessHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+		<beans:property name="alwaysUseDefaultTargetUrl" value="${ling2.loginSuccessAlwaysUseDefaultTargetUrl}"></beans:property>
+		<beans:property name="defaultTargetUrl" value="${ling2.loginSuccessDefaultTargetUrl}"></beans:property>
+		<beans:property name="targetUrlParameter" value="_last_jumping_url"></beans:property>
+		<beans:property name="redirectStrategy" ref="ling2.forwardRedirectStrategy"></beans:property>
+	</beans:bean>
+	
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="${ling2.formLoginUrl}"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="${ling2.sessionExpiredUrl}"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="${ling2.rememberMeLoginFailUrl}"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="${ling2.generateCaptchaUrl}"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="${ling2.logoutSuccessURL}"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="${ling2.userRegisterMainWizardPath}"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="/index.html"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="/index.jsp"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="/*.dpkg"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="/dorado/**"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="/css/**"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="/images/**"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="/static/**"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="/ling2view"></beans:property>
+	</beans:bean>
+	<beans:bean parent="ling2.anonymousUrl">
+		<beans:property name="urlPattern" value="/*.ico"></beans:property>
+	</beans:bean>
+	<beans:bean id="ling2.anonymousUrl" class="com.deloitte.tms.pl.security.security.metadata.AnonymousUrl" abstract="true"></beans:bean>
+	 
+</beans:beans>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:d="http://www.bstek.com/dorado/schema"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.bstek.com/dorado/schema http://www.bstek.com/dorado/schema/spring-dorado-7.0.xsd">
+
+	<bean id="baseDaoSimple" class="com.deloitte.tms.pl.core.dao.impl.BaseDaoSimple">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<bean id="baseDao" class="com.deloitte.tms.pl.core.dao.impl.BaseDao" parent="baseDaoSimple">
+	</bean>
+	<bean id="baseJdbcDao" class="com.deloitte.tms.pl.core.dao.impl.BaseJdbcDao">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<context:component-scan base-package="com.deloitte.tms.pl.core.security.login" />
+
+	<!-- <bean id="testDao" class="com.deloitte.tms.pl.core.dao.TestDao" parent="baseDao" 
+		/> <bean id="TestDaoSimple" class="com.deloitte.tms.pl.core.dao.TestDaoSimple" parent="baseDaoSimple" 
+		/> <bean id="baseService" class="com.deloitte.tms.pl.core.service.BaseService"> <property 
+		name="dao" ref="TestDao" /> </bean> <bean id="baseService2" class="com.deloitte.tms.pl.core.service.BaseService"> 
+		<property name="dao" ref="TestDaoSimple" /> </bean> -->
+</beans>

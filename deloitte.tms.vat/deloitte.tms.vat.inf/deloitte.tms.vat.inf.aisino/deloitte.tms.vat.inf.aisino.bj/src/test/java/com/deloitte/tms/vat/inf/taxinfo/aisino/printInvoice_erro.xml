@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <err count="1">
+  <refp>
+   <RETCODE>-1</RETCODE>
+   <RETMSG>异常:'''' is not a valid integer value</RETMSG>
+   <FPZL/>
+   <FPHM/>
+   <FPDM/>
+  </refp>
+ </err>
+</service>

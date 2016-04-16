@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js" data-ng-app="LingApp"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js" data-ng-app="LingApp"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en" data-ng-app="DictionaryApp">
+    <!--<![endif]-->
+    <!-- BEGIN HEAD -->
+
+    <head>
+        <title data-ng-bind="'系统管理 | ' + $state.current.data.pageTitle"></title>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=11">
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <meta content="" name="description" />
+        <meta content="" name="author" />
+        <!-- BEGIN GLOBAL MANDATORY STYLES -->
+        <link href="../assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="../assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+        <link href="../assets/global/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="../assets/global/css/components.css" id="style_components" rel="stylesheet" type="text/css" />
+        <link href="../assets/global/plugins/bootstrap-toastr/toastr.min.css" rel="stylesheet" type="text/css" />
+        <!-- END THEME STYLES -->
+        <link rel="shortcut icon" href="favicon.ico" /> 
+        <script type="text/ng-template" id="category_renderer.html">									 	
+		  <p ng-class="{'strong':true,'label-info':category.id==currentCategory.id}" ng-click="showSelected(category)" ng-dblclick="loadChildCategory(category)">
+				<i ng-class="{'fa fa-folder-open':category.expand,'fa fa-folder':!ategory.expand}" ng-click="loadChildCategory(category)"></i>
+				{{category.label}}
+				
+				<span ng-show="category.id==currentCategory.id&&category.id!=null" class="label label-sm label-info" ng-click="addChild(category)">新增子节点</span>
+				<span ng-show="category.id==currentCategory.id" class="label label-sm label-danger" ng-click="removeCategory(category)">删除</span>
+				
+				<!--
+				<label ng-click="addChild(category)">新增子节点</label>
+				<label ng-click="removeCategory(category)">删除</label>
+				<i class="fa fa-plus" ng-click="addChild(category)" ng-show="category.id"></i>
+		          		<i class="fa fa-minus" ng-click="removeCategory(category)"></i>-->
+			</p>									 	
+          	<ul ng-show="category.expand">
+          		<li ng-repeat="category in category.childs" ng-include="'category_renderer.html'">							             		
+          		</li>
+          	</ul>							 	
+		</script>
+
+        </head>
+    <body class="col-md-11">
+            <div class="page-content-wrapper">
+                <div class="page-content">
+                	<div class="clearfix"></div>
+                    <div ui-view class="fade-in-up"> 
+                    <i class="icon-ok-sign"></i>
+                    <!-- BEGIN PAGE HEADER-->
+						<div class="row" ng-controller="DictionaryTree">
+							<div class="col-md-6">
+								<div class="row text-center"><button type="button" class="btn green" ng-click="addRoot()">添加根节点</button></div>
+								 <div>
+									 <ul>
+									 	<li ng-repeat="category in categories" ng-include="'category_renderer.html'">
+									 	
+									 	</li>
+									 </ul>
+								 </div>
+							</div>
+							<div class="col-md-5">
+								<div role="form" class="form-horizontal">
+									<div class="form-body">
+										<div class="form-group col-md-12">
+											<label class="col-md-4 control-label">名称<span class="required" aria-required="true"> * </span></label>
+											<div class="col-md-8">
+												<input type="text" class="form-control" ng-model="currentCategory.label">
+											</div>
+										</div>
+										<div class="form-group col-md-12">
+											<label class="col-md-4 control-label">代码<span class="required" aria-required="true"> * </span></label>
+											<div class="col-md-8">
+												<input type="text" class="form-control" ng-model="currentCategory.code">
+											</div>
+										</div>										
+										<div class="form-group col-md-12">
+											<label class="col-md-4 control-label">排序<span class="required" aria-required="true"> * </span></label>
+											<div class="col-md-8">
+												<input type="number" class="form-control" ng-model="currentCategory.sortOrder">
+											</div>
+										</div>
+										<div class="form-group col-md-12">
+											<label class="col-md-4 control-label">描述</label>
+											<div class="col-md-8">
+												<input type="text" class="form-control" ng-model="currentCategory.description">
+											</div>
+										</div>
+										<div class="form-group col-md-12">
+											<label class="col-md-4 control-label">层级</label>
+											<div class="col-md-8">
+												<input type="number" class="form-control" ng-model="currentCategory.level">
+											</div>
+										</div>
+										<div class="form-group col-md-12">
+											<label class="col-md-4 control-label">节点id</label>
+											<div class="col-md-8">
+												<input class="form-control" ng-model="currentCategory.id" readonly="true">
+											</div>
+										</div>
+										<div class="form-group col-md-12">
+											<label class="col-md-4 control-label">父节点id</label>
+											<div class="col-md-8">
+												<input class="form-control" ng-model="currentCategory.parentId">
+											</div>
+										</div>
+						
+										<div class="form-actions col-md-12">
+											<div class="row">
+												<div class="col-md-offset-4 col-md-8">
+													<button type="submit" class="btn blue" ng-click="saveCurrent()">保存</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+                    
+                    </div>
+                    <div class="clearfix"></div>
+                    <!-- END ACTUAL CONTENT -->
+                </div>
+            </div>
+        <!-- END FOOTER -->
+        <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+        <!-- BEGIN CORE JQUERY PLUGINS -->
+        <!--[if lt IE 9]>
+	<script src="../assets/global/plugins/respond.min.js"></script>
+	<script src="../assets/global/plugins/excanvas.min.js"></script> 
+	<![endif]-->
+        <script src="../assets/global/plugins/jquery.min.js" type="text/javascript"></script>
+        <script src="../assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+        
+        <!-- END CORE JQUERY PLUGINS -->
+        <!-- BEGIN CORE ANGULARJS PLUGINS -->
+        <script src="../assets/global/plugins/angularjs/angular.min.js" type="text/javascript"></script>
+        <script src="../assets/global/plugins/angularjs/angular-sanitize.min.js" type="text/javascript"></script>
+        <script src="../assets/global/plugins/angularjs/angular-touch.min.js" type="text/javascript"></script>
+        <script src="../assets/global/plugins/angularjs/plugins/angular-ui-router.min.js" type="text/javascript"></script>
+        <script src="../assets/global/plugins/angularjs/plugins/ocLazyLoad.min.js" type="text/javascript"></script>
+        <script src="../assets/global/plugins/angularjs/plugins/ui-bootstrap-tpls.min.js" type="text/javascript"></script>
+        <script src="../assets/global/plugins/angularjs/angular-animate.js"></script>
+        <script src="../assets/global/plugins/bootstrap-toastr/toastr.min.js" type="text/javascript"></script>
+        <!-- END CORE ANGULARJS PLUGINS -->
+        
+        <!-- BEGIN APP LEVEL ANGULARJS SCRIPTS -->
+        <script src="../resource/corejs/config.js" type="text/javascript"></script>
+        <script src="../resource/corejs/app.js" type="text/javascript"></script>
+        <script src="../resource/corejs/ling3.js" type="text/javascript"></script>
+        <script src="../resource/corejs/directives.js" type="text/javascript"></script>
+        <script src="dictionaryController.js" type="text/javascript"></script>
+        
+        <!-- END APP LEVEL ANGULARJS SCRIPTS -->
+        
+        <!-- END JAVASCRIPTS -->
+    </body>
+    <!-- END BODY -->
+
+</html>

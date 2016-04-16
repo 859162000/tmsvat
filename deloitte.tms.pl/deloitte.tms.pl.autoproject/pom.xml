@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.deloitte</groupId>
+    <artifactId>deloitte.tms.pl</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <artifactId>deloitte.tms.pl.autoproject</artifactId>
+  <dependencies>
+  	<dependency>
+	  <groupId>ling2.3rd</groupId>
+	  <artifactId>jasperreports-jtidy-r938</artifactId>
+	  <version>1.0</version>
+	</dependency>
+  	<dependency>
+  		<groupId>com.deloitte</groupId>
+  		<artifactId>deloitte.tms.pl.core</artifactId>
+  		<version>1.0.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.deloitte</groupId>
+  		<artifactId>deloitte.tms.vat.core</artifactId>
+  		<version>1.0.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.deloitte</groupId>
+  		<artifactId>deloitte.tms.vat.web</artifactId>
+  		<version>1.0.0</version>
+  		<type>war</type>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.deloitte</groupId>
+  		<artifactId>deloitte.tms.pl.config</artifactId>
+  		<version>1.0.0</version>
+  	</dependency>
+  </dependencies>
+</project>

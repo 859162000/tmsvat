@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <sid/>
+ <ip/>
+ <port/>
+ <data>
+  <fp>
+   <FPZL/>
+   <GFMC/>
+   <GFSH/>
+   <GFDZDH/>
+   <GFYHZH/>
+   <BZ/>
+   <SKR/>
+   <FHR/>
+   <KPR/>
+   <XFYHZH/>
+   <XFDZDH/>
+   <QDBZ/>
+   <XSDJBH/>
+   <KPBZ/>
+  </fp>
+  <group>
+   <fpmx>
+    <SPMC/>
+    <HSBZ/>
+    <SLV/>
+    <JE/>
+    <DJ/>
+    <JLDW/>
+    <GGXH/>
+    <SE/>
+    <SL/>
+   </fpmx>
+   <fpmx>
+    <SPMC/>
+    <HSBZ/>
+    <SLV/>
+    <JE/>
+    <DJ/>
+    <JLDW/>
+    <GGXH/>
+    <SE/>
+    <SL/>
+   </fpmx>
+  </group>
+ </data>
+</service>

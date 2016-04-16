@@ -1,0 +1,24 @@
+1.初始化第一个用户
+/security.view.register.RegisterWizard.ling
+2.修改数据库为管理员
+UPDATE base_user SET ADMINISTRATOR_=true
+3.初始化菜单数据
+/generate.system.menu.action
+4.刷新菜单缓存
+/security.view.url.UrlMaintain.ling
+
+数据增删改查
+/riskmanager.control.view.controlFrameworkmanager.ling
+
+报表需要的启动参数
+-Xss5120k
+
+-Xmx3550m -Xms3550m -Xmn2g -Xss128k
+
+-Xms512m
+-Xmx1024m
+-XX:MaxNewSize=256m
+-XX:MaxPermSize=512m
+
+${dorado.getDataProvider("dictionaryView#getdDictionaryEntitiesByCodeWithNull").getResult("supplyPlace")}
+${dorado.getDataProvider("dictionaryView#getdDictionaryEntitiesByCode").getResult("supplyPlace")}

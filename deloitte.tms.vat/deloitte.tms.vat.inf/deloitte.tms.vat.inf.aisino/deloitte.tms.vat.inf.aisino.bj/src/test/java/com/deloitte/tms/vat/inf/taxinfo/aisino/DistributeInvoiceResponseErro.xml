@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<kpserver>
+ <errorinfo>
+  <Code>Q100</Code>
+  <Message>输入的发票代码、号码不匹配，或不存在此发票卷。</Message>
+ </errorinfo>
+</kpserver>

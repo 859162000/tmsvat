@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<siiscmd xmlns="http://www.aisino.sh.cn">
+	<issueinv>
+		<invrecord>
+			<invrecordhead>
+				<machinetaxnr>310101000000014</machinetaxnr>
+				<machinenr>0</machinenr>
+				<invkind>
+					<value>0</value>
+				</invkind>
+				<doctype>
+					<value>2</value>
+				</doctype>
+				<docnr>600000387</docnr>
+				<docdate>2015-07-03 15:05:12</docdate>
+				<custnr>ZHXG</custnr>
+				<custname>中海集装箱运输（香港）有限公司</custname>
+				<custtaxnr>310022131312221</custtaxnr>
+				<custaddrtel>上海青州北路112号 32717322</custaddrtel>
+				<custbankacct>icbc 312031030131221</custbankacct>
+				<memo>清单编号:700171284|结算方式:ZD|</memo>
+				<memo2>CHB_BILLID:2108767|CHB_HANDLE_ADDRESS:GSFS</memo2>
+				<refinvcode></refinvcode>
+				<refinvnr></refinvnr>
+				<rednoticenr>3101001210000267</rednoticenr>
+				<issuer>0284</issuer>
+				<checker>0284</checker>
+				<payee>0284</payee>
+				<sellerbankacct>招商银行上海分行江湾支行 214881399710001</sellerbankacct>
+				<selleraddresstel>上海分行路97号 33121001</selleraddresstel>
+			</invrecordhead>
+			<invrecorditem>
+				<prodnr>10021</prodnr>
+				<prodname>堆存费1</prodname>
+				<spec></spec>
+				<unit>/箱天</unit>
+				<quantity>-1</quantity>
+				<price>7934.95</price>
+				<amount>-7934.95</amount>
+				<taxrate>.17</taxrate>
+				<tax>-1348.95</tax>
+				<includetax>0</includetax>
+				<discountvalue></discountvalue>
+				<discounttax></discounttax>
+			</invrecorditem>
+		</invrecord>
+	</issueinv>
+</siiscmd>
+
+<!-- 说明： 专票红冲 需传红字通知单号 rednoticenr 而: 原发票代码refinvcode 发票号码refInvnr 可传可不传 
+	普票红冲 不需要传红字通知单号 rednoticenr 而: 原发票代码refinvcode 发票号码refInvnr 必须传给我们 注: 单价为正数 
+	数量,金额均为负数 doctype字段为2，代表红字发票。例如: <doctype><value>2</value></doctype> -->

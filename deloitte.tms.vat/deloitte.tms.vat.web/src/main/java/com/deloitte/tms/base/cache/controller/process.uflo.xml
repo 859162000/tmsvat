@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<uflo-process name="salesinvoice">
+  <start g="103,159,38,60" name="准备单已生成">
+    <sequence-flow name="to 准备单受理" to="准备单受理" g=":-40,-9"/>
+  </start>
+  <task g="305,161,115,55" name="准备单受理" url="invoicePreProcess/invoicePreProcessCheckInit.do" task-listener-bean="sakesInvoiceTaskListener" task-type="Normal" allow-specify-assignee="false" assignment-type="Handler" assignment-handler-bean="salesInvoiceAssignmentHandler">
+    <sequence-flow name="to 是否受理" to="是否受理" g=":-40,-9"/>
+  </task>
+  <end g="892,148,38,60" name="准备单完成" terminate="true"/>
+  <decision g="500,155,38,60" name="是否受理" decision-type="Handler" handler-bean="salesInvoiceDecisionHandler">
+    <sequence-flow name="to 已受理" to="已受理" g=":-40,-9"/>
+    <sequence-flow name="to 已退回" to="已退回" g=":-40,-9"/>
+  </decision>
+  <action g="648,215,115,55" name="已退回" handler-bean="doNothingActionHandler">
+    <sequence-flow name="to 准备单完成" to="准备单完成" g=":-40,-9"/>
+  </action>
+  <action g="648,112,115,55" name="已受理" handler-bean="doNothingActionHandler">
+    <sequence-flow name="to 准备单完成" to="准备单完成" g=":-40,-9"/>
+  </action>
+</uflo-process>

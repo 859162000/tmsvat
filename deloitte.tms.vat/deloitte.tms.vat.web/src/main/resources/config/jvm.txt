@@ -1,0 +1,7 @@
+
+-Xms512m
+-Xmx1024m
+-XX:MaxNewSize=256m
+-XX:MaxPermSize=512m
+
+-Xmx3550m -Xms3550m -Xmn2g -Xss128k

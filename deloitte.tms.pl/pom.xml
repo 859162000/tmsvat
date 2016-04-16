@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.deloitte</groupId>
+    <artifactId>deloitte.tms.parent</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <artifactId>deloitte.tms.pl</artifactId>
+  <packaging>pom</packaging>
+  <modules>
+  	<module>deloitte.tms.pl.dictionary.core</module>
+  	<module>deloitte.tms.pl.security.web</module>
+  	<module>deloitte.tms.pl.attachment.config</module>
+  	<module>deloitte.tms.pl.attachment.core</module>
+  	<module>deloitte.tms.pl.autoproject</module>
+  	<module>deloitte.tms.pl.cache</module>
+  	<module>deloitte.tms.pl.cache.config</module>
+  	<module>deloitte.tms.pl.config</module>
+  	<module>deloitte.tms.pl.core</module>
+  	<module>deloitte.tms.pl.genjar</module>
+  	<module>deloitte.tms.pl.job</module>
+  	<module>deloitte.tms.pl.message</module>
+  	<module>deloitte.tms.pl.workflow</module>
+  	<!--  <module>deloitte.tms.pl.dataimport</module>  	
+  	-->
+  	<module>deloitte.tms.pl.samplecenter</module>
+  	<module>deloitte.tms.pl.security</module>
+  	<module>deloitte.tms.pl.security.config</module>
+  	<module>deloitte.tms.pl.web</module>
+  </modules>
+</project>

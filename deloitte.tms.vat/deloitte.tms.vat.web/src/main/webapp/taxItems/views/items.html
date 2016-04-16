@@ -1,0 +1,293 @@
+
+<div ng-controller="ItemsCtroller">
+	<style>
+	.grid {
+	  height: 400px;
+	}
+	</style>
+	<div class="form-body">
+		<div class="form-group">  
+			<label class="col-md-2 control-label">税种ID:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.categoryId" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">税目代码:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.itemCode" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">税目名称:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.ordercode" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">所属组织:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.orgId" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">计税规则:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.itemTaxRules" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">Y 启用 N 不启用:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.isUsed" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">备注:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.comments" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">创建日期:</label>
+			<div class="col-md-2">
+				<p class="input-group">
+			        <input type="text" readOnly=true class="form-control" ng-model="itemsQuery.creationDate" ng-click="creationDatePickerOpen=!creationDatePickerOpen" datepicker-popup="yyyy-MM-dd" 
+			        is-open="creationDatePickerOpen" datepicker-options="myDatePicker.dateOptions"  date-disabled="isDateDisabled(date, mode)" close-text="关闭"/>
+			        <span class="input-group-btn">
+			            <button type="button" class="btn btn-default" ng-click="creationDatePickerOpen=!creationDatePickerOpen">
+			                <i class="glyphicon glyphicon-calendar"></i>
+			            </button>
+			        </span>
+			     </p>
+			</div> 
+			<label class="col-md-2 control-label">创建者:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.createdBy" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">适用行业:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.adaptIndustryId" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">开始日期:</label>
+			<div class="col-md-2">
+				<p class="input-group">
+			        <input type="text" readOnly=true class="form-control" ng-model="itemsQuery.sDate" ng-click="sDatePickerOpen=!sDatePickerOpen" datepicker-popup="yyyy-MM-dd" 
+			        is-open="sDatePickerOpen" datepicker-options="myDatePicker.dateOptions"  date-disabled="isDateDisabled(date, mode)" close-text="关闭"/>
+			        <span class="input-group-btn">
+			            <button type="button" class="btn btn-default" ng-click="sDatePickerOpen=!sDatePickerOpen">
+			                <i class="glyphicon glyphicon-calendar"></i>
+			            </button>
+			        </span>
+			     </p>
+			</div> 
+			<label class="col-md-2 control-label">结束日期:</label>
+			<div class="col-md-2">
+				<p class="input-group">
+			        <input type="text" readOnly=true class="form-control" ng-model="itemsQuery.eDate" ng-click="eDatePickerOpen=!eDatePickerOpen" datepicker-popup="yyyy-MM-dd" 
+			        is-open="eDatePickerOpen" datepicker-options="myDatePicker.dateOptions"  date-disabled="isDateDisabled(date, mode)" close-text="关闭"/>
+			        <span class="input-group-btn">
+			            <button type="button" class="btn btn-default" ng-click="eDatePickerOpen=!eDatePickerOpen">
+			                <i class="glyphicon glyphicon-calendar"></i>
+			            </button>
+			        </span>
+			     </p>
+			</div> 
+			<label class="col-md-2 control-label">创建人:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.createdBy" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">创建日期/时间:</label>
+			<div class="col-md-2">
+				<p class="input-group">
+			        <input type="text" readOnly=true class="form-control" ng-model="itemsQuery.createDate" ng-click="createDatePickerOpen=!createDatePickerOpen" datepicker-popup="yyyy-MM-dd" 
+			        is-open="createDatePickerOpen" datepicker-options="myDatePicker.dateOptions"  date-disabled="isDateDisabled(date, mode)" close-text="关闭"/>
+			        <span class="input-group-btn">
+			            <button type="button" class="btn btn-default" ng-click="createDatePickerOpen=!createDatePickerOpen">
+			                <i class="glyphicon glyphicon-calendar"></i>
+			            </button>
+			        </span>
+			     </p>
+			</div> 
+			<label class="col-md-2 control-label">修改人:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.modifiedBy" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">修改日期:</label>
+			<div class="col-md-2">
+				<p class="input-group">
+			        <input type="text" readOnly=true class="form-control" ng-model="itemsQuery.modifiedDate" ng-click="modifiedDatePickerOpen=!modifiedDatePickerOpen" datepicker-popup="yyyy-MM-dd" 
+			        is-open="modifiedDatePickerOpen" datepicker-options="myDatePicker.dateOptions"  date-disabled="isDateDisabled(date, mode)" close-text="关闭"/>
+			        <span class="input-group-btn">
+			            <button type="button" class="btn btn-default" ng-click="modifiedDatePickerOpen=!modifiedDatePickerOpen">
+			                <i class="glyphicon glyphicon-calendar"></i>
+			            </button>
+			        </span>
+			     </p>
+			</div> 
+			<label class="col-md-2 control-label">是否有效:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.flag" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">状态:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.status" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">数据分区键:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.dataowner" placeholder="">
+			</div> 
+			<label class="col-md-2 control-label">数据归属:</label>
+			<div class="col-md-2">
+			     <input type="text" class="form-control" ng-model="itemsQuery.companyId" placeholder="">
+			</div> 
+		</div>                                        
+	</div>
+	<div class="clearfix"></div>
+								<div class="portlet box purple">
+                                <div class="portlet-title">
+                                    <div class="tools pull-left">
+                                       	<button type="button" class="btn btn-success" ng-click="queryItems()">查询</button>
+										<button type="button" class="btn btn-success" data-toggle="modal" data-target="#addItemsDetail" ng-click="addItems()">添加</button>
+										<!--<button type="button" class="btn btn-success" data-toggle="modal" data-target="#editItemsDetail" ng-click="editItems()">修改</button>-->
+										<button type="button" class="btn btn-success" ng-click="removeSelectItemss()">删除选择</button>
+										<button type="button" class="btn btn-success" ng-click="resetItems()">还原修改</button>
+										<!--<button type="button" class="btn btn-success" ng-click="saveItems()">保存修改</button>-->
+										<!--<button type="button" class="btn btn-success" ng-click="saveItems()">保存修改</button>-->
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="table-scrollable" style="height:300px">
+                                        <table class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:450px !important"> checkbox </th><!-- ,text-align:'center' -->
+													<th ng-repeat="field in itemsColumnDefs">													
+														<div class="cell text-center" ng-style="field.style">
+															<label class="caption">{{field.lable}}</label>
+														</div>
+													</th>  
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="items in itemsItems" align="center">
+                                                    <td> checkbox </td>
+													<td ng-repeat="field in itemsColumnDefs"> 
+														<div class="cell text-center" title="" style="overflow-x: hidden; overflow-y: visible" ng-bind="items.{{field.name}}"></div>
+													</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+									<div  class="modal fade" id="addItemsDetail" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-full">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                    <h4 class="modal-title">新增</h4>
+                                                </div>
+                                                <div class="modal-body"> 
+											        <div class="form-body">
+														<div class="form-group">  
+															<label class="col-md-2 control-label">税种ID:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.categoryId" placeholder=""> </div>
+															<label class="col-md-2 control-label">税目代码:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.itemCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">税目名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.ordercode" placeholder=""> </div>
+															<label class="col-md-2 control-label">所属组织:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.orgId" placeholder=""> </div>
+															<label class="col-md-2 control-label">计税规则:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.itemTaxRules" placeholder=""> </div>
+															<label class="col-md-2 control-label">Y 启用 N 不启用:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.isUsed" placeholder=""> </div>
+															<label class="col-md-2 control-label">备注:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.comments" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.creationDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建者:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.createdBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">适用行业:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.adaptIndustryId" placeholder=""> </div>
+															<label class="col-md-2 control-label">开始日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.sDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">结束日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.eDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.createdBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建日期/时间:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.createDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.modifiedBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.modifiedDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">是否有效:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.flag" placeholder=""> </div>
+															<label class="col-md-2 control-label">状态:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.status" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据分区键:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.dataowner" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据归属:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.companyId" placeholder=""> </div>
+														</div>                                        
+													</div>
+												 </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn green"data-dismiss="modal" ng-click="test()">Save changes</button>
+                                                </div>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                    <div  class="modal fade" id="editItemsDetail" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-full">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                    <h4 class="modal-title">编辑</h4>
+                                                </div>
+                                                <div class="modal-body"> 
+											        <div class="form-body">
+														<div class="form-group">  
+															<label class="col-md-2 control-label">税种ID:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.categoryId" placeholder=""> </div>
+															<label class="col-md-2 control-label">税目代码:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.itemCode" placeholder=""> </div>
+															<label class="col-md-2 control-label">税目名称:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.ordercode" placeholder=""> </div>
+															<label class="col-md-2 control-label">所属组织:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.orgId" placeholder=""> </div>
+															<label class="col-md-2 control-label">计税规则:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.itemTaxRules" placeholder=""> </div>
+															<label class="col-md-2 control-label">Y 启用 N 不启用:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.isUsed" placeholder=""> </div>
+															<label class="col-md-2 control-label">备注:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.comments" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.creationDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建者:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.createdBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">适用行业:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.adaptIndustryId" placeholder=""> </div>
+															<label class="col-md-2 control-label">开始日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.sDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">结束日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.eDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.createdBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">创建日期/时间:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.createDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改人:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.modifiedBy" placeholder=""> </div>
+															<label class="col-md-2 control-label">修改日期:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.modifiedDate" placeholder=""> </div>
+															<label class="col-md-2 control-label">是否有效:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.flag" placeholder=""> </div>
+															<label class="col-md-2 control-label">状态:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.status" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据分区键:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.dataowner" placeholder=""> </div>
+															<label class="col-md-2 control-label">数据归属:</label>
+															<div class="col-md-2"> <input type="text" class="form-control" ng-model="currentItems.companyId" placeholder=""> </div>
+														</div>                                        
+													</div>
+												 </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn green"data-dismiss="modal" ng-click="test()">Save changes</button>
+                                                </div>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>

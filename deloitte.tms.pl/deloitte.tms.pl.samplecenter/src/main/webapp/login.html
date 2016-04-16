@@ -1,0 +1,353 @@
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <meta http-equiv="Cache-Control" content="must-revalidate,no-cache" />
+    <title>登录</title>
+</head>
+<body>
+<!-- 头部开始 -->
+<header class="header">
+    <a href="javascript:void(0);" class="back goback" onclick="return false;"></a>
+    <div class="h_label">登录</div>
+    <a href="javascript:void(0);" class="menu">菜单</a>
+    <nav class="t-nav">
+    <ul>
+        <li><a href="index.html" class="home">首页</a></li>
+        <li><a href="search.html" class="search">搜索</a></li>
+        <li><a href="category.html" class="category">分类</a></li>
+        <li><a href="cart.html?action=list_cart" class="cart">购物车</a></li>
+        <li><a href="personcenter.html" class="user">我的XXXXXXXX</a></li>
+    </ul>
+</nav></header>
+<!-- 头部结束 -->
+<section class="content">
+<form action="security_check_" method="post" id="form1">
+    <!-- 登录开始 -->
+    <section class="page_lr main">
+        <div class="inp user bg">
+            <span class="icon"></span>
+            <span class="input"><input id="username" name="username" type="text" placeholder="手机号/邮箱/昵称" /></span>
+            <span class="more"></span>
+            <span class="clear"></span>
+        </div>
+        <ul class="detail"></ul>
+        <div class="inp pw bg">
+            <span class="icon"></span>
+            <span class="input"><input id="password" name="password" type="password" placeholder="密码" /></span>
+            <span class="change"></span>
+            <span class="clear"></span>
+        </div>
+		<div class="pw_contain">
+	<div class="inp graphics short small bg">
+		<span class="input"><input class="identify_code" type="text" placeholder="请输入图形验证码" /></span>
+		<span class="clear"></span>
+	</div>
+	<div class="identify">
+		<a class="refresh" href="#" onclick="return false;">refresh</a>
+		<img class="repic" src="" />
+	</div>
+</div>
+        <a class="btn" href="#" onclick="return false;">登录</a>
+        <dl class="func">
+            <dt><a href="#">找回密码</a></dt>
+            <dd><a href="register.html">注册</a></dd>
+        </dl>
+   </form>     
+    </section>
+	<section class="page_lr defend">为保障账户安全，请勿设置与邮箱密码相同的账户登录密码或支付密码，<a href="#">谨防诈骗</a><span>！</span></section>
+    <!-- 登录结束 -->
+	<section class="page_lr another">
+	<span class="title">
+		<em>第三方账号登录</em>
+	</span>
+	<ul>
+		<!-- <li class="qq">
+			<a href="https://mpassport.dangdang.com/login_third.html?app=qq&burl=http%3A%2F%2Fhome.m.dangdang.com%2F%3F%26login_app%3Dweb&sid=28b7ef60d33d79926c2c3fb40d3f3c66">
+				<em>腾讯QQ</em>
+				<i>腾讯QQ</i>
+			</a>
+		</li>
+        		<li class="alipay">
+			<a href="https://mpassport.dangdang.com/login_third.html?app=alipay&burl=http%3A%2F%2Fhome.m.dangdang.com%2F%3F%26login_app%3Dweb&sid=28b7ef60d33d79926c2c3fb40d3f3c66">
+				<em>支付宝</em>
+				<i>支付宝</i>
+			</a>
+		</li>
+        		<li class="sina">
+			<a href="https://mpassport.dangdang.com/login_third.html?app=sina&burl=http%3A%2F%2Fhome.m.dangdang.com%2F%3F%26login_app%3Dweb&sid=28b7ef60d33d79926c2c3fb40d3f3c66">
+				<em>新浪微博</em>
+				<i>新浪微博</i>
+			</a>
+		</li> -->
+	</ul>
+</section>
+<section class="support_space"></section>
+	<section class="support">
+		<ul>
+			<li><i></i>7天无理由退货</li>
+			<li><i></i>支持货到付款</li>
+			<li><i></i>100%正品</li>
+		</ul>
+	</section>
+</section>
+<section class="error" style="visible:true">
+    <div>
+        <p>
+            <span class="text">111111111</span>
+        </p>
+    </div>
+</section>
+<section class="loading"></section>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="./js/html5.js"></script>
+<![endif]-->
+<!--[if lt IE 8]>
+<script type="text/javascript" src="./js/json3.js"></script>
+<![endif]-->
+<script src="../assets/global/plugins/jquery.min.js" type="text/javascript"></script>
+<!-- <script src="olddata/corejs/common.min.js"></script>
+<script src="olddata/js/app.min.js"></script> -->
+<!--<script src="corejs/fastclick.min.js"></script>-->
+<script>
+	//FastClick.attach(document.body);
+	var keyname = "login_nick",
+  	histories = function(that){
+      var detail = $(".main .detail");
+      if(detail.css("display") != "none"){
+          detail.hide();
+          $(".pw").removeClass("nomar");
+          that.removeClass("up");
+      }else{
+          detail.show();
+          $(".pw").addClass("nomar");
+          that.addClass("up");
+      }
+  	};	
+$(function(){
+        // 顶部菜单
+	$(".header .menu").on("click", function(e){
+		if($(this).hasClass("active")){
+			$(this).removeClass("active");
+			$(".t-nav").removeClass("active");
+		}else{
+			$(this).addClass("active");
+			$(".t-nav").addClass("active");
+		}
+		e.preventDefault();
+	});
+	$(".header .goback").on("click", function(e){
+		history.go(-1);
+	});
+	        // 输入框如果有内容显示清除按钮
+	$("input").each(function(key, val){
+		var that = $(this);
+		if(that.val() != ""){
+			that.closest(".inp").find(".clear").show();
+		}else{
+			that.closest(".inp").find(".clear").hide();
+		}
+	});
+	// 显示隐藏密码
+	$(".change").click(function(){
+		var that = $(this),
+			input = that.closest(".pw").find("input");
+		if(that.attr("class").indexOf("show") < 0){
+			input.prop("type", "text");
+			that.addClass("show");
+		}else{
+			input.prop("type", "password");
+			that.removeClass("show");
+		}
+	});
+	// 清除功能
+	$(".clear").click(function(){
+		$(this).parent().find("input").val("").focus();
+		$(this).hide();
+		changeBtn();
+	});
+	// 激活清除功能
+	//$(".main input").keyup(function(){
+	$(".main input").on("input propertychange", function(){
+		var len = $(this).val().length;
+		if(len > 0){
+			$(this).closest(".inp").removeClass("err").find(".clear").show();
+		}else{
+			$(this).closest(".inp").find(".clear").hide();
+		}
+		changeBtn();
+	});
+	// 改变提交按钮状态
+	function changeBtn(){
+		if($(".main .btn").length > 0){
+			var flag = true;
+			if($("#username").length > 0 && $.trim($("#username").val()) == ""){
+				flag = false;
+			}
+			if($("#password").length > 0 && $.trim($("#password").val()) == ""){
+				flag = false;
+			}
+			if($("#mobile").length > 0 && $.trim($("#mobile").val()) == ""){
+				flag = false;
+			}
+			if($("#verify").length > 0 && $.trim($("#verify").val()) == ""){
+				flag = false;
+			}
+			if($("#v_verify").length > 0 && $("#v_verify").css("display") != "none" && $.trim($("#v_verify").find(".identify_code").val()) == ""){
+				flag = false;
+			}
+			if($("#v_identify").length > 0 && $("#v_identify").css("display") != "none" && $.trim($("#v_identify").find(".identify_code").val()) == ""){
+				flag = false;
+			}
+			if(flag){
+				$(".main .btn").addClass("ok");
+			}else{
+				$(".main .btn").removeClass("ok");
+			}
+		}
+	}
+			// 加载验证码
+	function identifyImg(ind){
+		var ident = $(".identify .repic"),
+			img = new Image(),
+			exp = new Date();
+		ident.attr("src", "");
+		img.onload = function(){
+			ident.attr("src", img.src);
+			$(".pw_contain input").val("");
+		}
+		img.src = ind + "&v=" + exp.getTime();
+	}
+	// 绑定刷新验证码事件
+	$(".main .refresh").click(function(){
+		var wrap = $(this).closest(".pw_contain"),
+			url = "";
+		if(wrap.attr("id") && wrap.attr("id") == "v_verify"){
+			url = v_img_url;
+		}else if(wrap.attr("id") && wrap.attr("id") == "v_identify"){
+			url = i_img_url;
+		}else{
+			url = img_url;
+		}
+		identifyImg(url);
+		$(".identify_code").val("").closest(".inp").find(".clear").hide();
+	});
+			// 显示错误提示
+	var errTips = function(text){
+		var that = $(".error");
+		if(!text){
+			text = "该用户不存在，请注册";
+		}
+		that.find(".text").html(text);
+		that.show();
+		setTimeout(function(){
+			that.hide();
+		}, 2000);
+	};
+    // 提交
+    // 验证码key
+	var	key = "",img_url = "";
+      $(".main .btn").click(function(){
+          var flag = true;
+          $(".main input").each(function(sort, obj){
+			if((!$(obj).closest(".pw_contain") && $(obj).closest(".inp").css("display") != "none") || $(obj).closest(".pw_contain").css("display") != "none"){
+				if($.trim($(obj).val()) == ""){
+					flag = false;
+					return false;
+					$(obj).closest(".bg").addClass("err");
+				}else{
+					$(obj).closest(".bg").removeClass("err");
+				}
+			}
+          });
+          if(flag){
+		/*var parms = {
+				username: $.trim($("#username").val()),
+				password: $("#password").val()
+			};
+		if($(".pw_contain").css("display") != "none"){
+			parms.captcha_key = key;
+			parms.captcha_code = $.trim($(".identify_code").val());
+		}*/
+		//document.form.submit();
+          	$("#form1").submit();
+          }else{
+			return false;
+			if($.trim($("#username").val()) == "" || $.trim($("#password").val()) == ""){
+	              	errTips("请输入用户名或密码");
+			}else if($.trim($(".identify_code").val()) == ""){
+				errTips("请输入验证码");
+			}
+          }
+      });
+		// 历史记录
+		$(".more").on("click", function(){
+			if($(".more").css("display") != "none"){
+				histories($(this));
+			}
+		});
+		// 选择历史记录
+		$(".main .detail").on("click", "em", function(){
+			$(".main .user .input input").val($(this).text());
+			$(".main .pw .input input").val("");
+			//histories($(".more"));
+			//$(".more").trigger("tap");
+		});
+		// 删除历史记录
+		$(".main .detail").on("click", "i", function(){
+			var that = $(this).closest("li");
+			if($(".main .detail li").length <= 1){
+				histories($(".more"));
+				$(".more").hide();
+			}
+			userList.splice(userList.length - 1 - that.index(), 1);
+			setStorage(keyname, userList.join(splitSign));
+			that.remove();
+		});
+		// 点击收起历史记录
+		$(document.body).click(function(e){
+			if($(".more").css("display") != "none" && e.target.className.indexOf("more") < 0 && e.target.className.indexOf("user_clear") < 0 && $(".more").attr("class").indexOf("up") >= 0){
+				histories($(".more"));
+			}
+		});
+		// 读取历史记录
+		var userList = "",
+			splitSign = ",";
+		userList = getStorage(keyname);
+		if(userList){
+			userList = userList.split(splitSign);
+			if(userList.length > 0){
+				var o = userList.length - 1,
+					m = 0;
+				if(userList.length >= 5){
+					m = userList.length - 5;
+				}
+				for(var i = o; i >= m; i--){
+					$(".main  .detail").append("<li><em>" + userList[i] + "</em><i class='user_clear'></i></li>");
+				}
+				$(".more").show();
+			}
+		}else{
+			userList = [];
+		}
+		// 默认填充最后一次登录密码
+		var lastName = "";
+		if(userList.length > 0){
+			lastName = userList[userList.length - 1];
+			$("#username").closest(".inp").find(".clear").show();
+		}else{
+			$("#username").closest(".inp").find(".clear").hide();
+		}
+		$("#username").val(lastName);
+		// 改变提交按钮状态
+		changeBtn();
+		
+		processLoginErroCode();
+});
+</script>
+</body>
+</html>

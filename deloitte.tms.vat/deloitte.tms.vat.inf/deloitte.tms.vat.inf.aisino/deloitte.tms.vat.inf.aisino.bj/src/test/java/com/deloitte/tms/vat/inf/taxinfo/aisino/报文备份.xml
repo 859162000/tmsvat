@@ -1,0 +1,694 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service> 
+ <err count="1"> 
+  <refp> 
+   <RETCODE>-2</RETCODE> 
+   <RETMSG>操作出现异常</RETMSG> 
+  </refp> 
+ </err> 
+</service>
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <err count="2">
+  <refp>
+   <RETCODE>4001</RETCODE>
+   <RETMSG>商品单价、数量和金额不符合计算关系</RETMSG>
+   <JE>0</JE>
+   <SE>0</SE>
+   <KPRQ>1899-12-30</KPRQ>
+   <FPDM/>
+   <FPHM/>
+   <SYZFPDM/>
+   <SYZFPHM/>
+   <SYZFPZL>-1</SYZFPZL>
+  </refp>
+  <refp>
+   <RETCODE>4001</RETCODE>
+   <RETMSG>4001-购买方纳税人识别号长度不正确三证合一后 6-20位</RETMSG>
+   <JE>0</JE>
+   <SE>0</SE>
+   <KPRQ>1899-12-30</KPRQ>
+   <FPDM/>
+   <FPHM/>
+   <SYZFPDM/>
+   <SYZFPHM/>
+   <SYZFPZL>0</SYZFPZL>
+  </refp>
+ </err>
+</service>
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <err count="2">
+  <refp>
+   <RETCODE>4001</RETCODE>
+   <RETMSG>4001-商品单价、数量和金额不符合计算关系</RETMSG>
+   <JE>0</JE>
+   <SE>0</SE>
+   <KPRQ>1899-12-30</KPRQ>
+   <FPDM/>
+   <FPHM/>
+   <SYZFPDM/>
+   <SYZFPHM/>
+   <SYZFPZL>0</SYZFPZL>
+  </refp>
+  <refp>
+   <RETCODE>4001</RETCODE>
+   <RETMSG>4001-商品单价、数量和金额不符合计算关系</RETMSG>
+   <JE>0</JE>
+   <SE>0</SE>
+   <KPRQ>1899-12-30</KPRQ>
+   <FPDM/>
+   <FPHM/>
+   <SYZFPDM/>
+   <SYZFPHM/>
+   <SYZFPZL>0</SYZFPZL>
+  </refp>
+ </err>
+</service>
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <err count="1">
+  <refp>
+   <RETCODE>4011</RETCODE>
+   <RETMSG>4011-开票成功[0000,]</RETMSG>
+   <JE>50000.0</JE>
+   <SE>3000.0</SE>
+   <KPRQ>2016-04-09</KPRQ>
+   <FPDM>1100123530</FPDM>
+   <FPHM>00076375</FPHM>
+   <SYZFPDM>1100123530</SYZFPDM>
+   <SYZFPHM>00076374</SYZFPHM>
+   <SYZFPZL>0</SYZFPZL>
+  </refp>
+ </err>
+</service>
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <err count="1">
+  <refp>
+   <RETCODE>4011</RETCODE>
+   <RETMSG>4011-开票成功[0000,]</RETMSG>
+   <JE>50000.0</JE>
+   <SE>3000.0</SE>
+   <KPRQ>2016-04-09</KPRQ>
+   <FPDM>1100123530</FPDM>
+   <FPHM>00076376</FPHM>
+   <SYZFPDM>1100123530</SYZFPDM>
+   <SYZFPHM>00076375</SYZFPHM>
+   <SYZFPZL>0</SYZFPZL>
+  </refp>
+ </err>
+</service>
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <err count="5">
+  <refp>
+   <RETCODE>4011</RETCODE>
+   <RETMSG>4011-开票成功[0000,]</RETMSG>
+   <JE>250000.0</JE>
+   <SE>15000.0</SE>
+   <KPRQ>2016-04-09</KPRQ>
+   <FPDM>1100123530</FPDM>
+   <FPHM>00076377</FPHM>
+   <SYZFPDM>1100123530</SYZFPDM>
+   <SYZFPHM>00076376</SYZFPHM>
+   <SYZFPZL>0</SYZFPZL>
+  </refp>
+  <refp>
+   <RETCODE>4011</RETCODE>
+   <RETMSG>4011-开票成功[0000,]</RETMSG>
+   <JE>250000.0</JE>
+   <SE>15000.0</SE>
+   <KPRQ>2016-04-09</KPRQ>
+   <FPDM>1100123530</FPDM>
+   <FPHM>00076378</FPHM>
+   <SYZFPDM>1100123530</SYZFPDM>
+   <SYZFPHM>00076377</SYZFPHM>
+   <SYZFPZL>0</SYZFPZL>
+  </refp>
+  <refp>
+   <RETCODE>4011</RETCODE>
+   <RETMSG>4011-开票成功[0000,]</RETMSG>
+   <JE>250000.0</JE>
+   <SE>15000.0</SE>
+   <KPRQ>2016-04-09</KPRQ>
+   <FPDM>1100123530</FPDM>
+   <FPHM>00076379</FPHM>
+   <SYZFPDM>1100123530</SYZFPDM>
+   <SYZFPHM>00076378</SYZFPHM>
+   <SYZFPZL>0</SYZFPZL>
+  </refp>
+  <refp>
+   <RETCODE>4011</RETCODE>
+   <RETMSG>4011-开票成功[0000,]</RETMSG>
+   <JE>250000.0</JE>
+   <SE>15000.0</SE>
+   <KPRQ>2016-04-09</KPRQ>
+   <FPDM>1100123530</FPDM>
+   <FPHM>00076380</FPHM>
+   <SYZFPDM>1100123530</SYZFPDM>
+   <SYZFPHM>00076379</SYZFPHM>
+   <SYZFPZL>0</SYZFPZL>
+  </refp>
+  <refp>
+   <RETCODE>4011</RETCODE>
+   <RETMSG>4011-开票成功[0000,]</RETMSG>
+   <JE>250000.0</JE>
+   <SE>15000.0</SE>
+   <KPRQ>2016-04-09</KPRQ>
+   <FPDM>1100123530</FPDM>
+   <FPHM>00076381</FPHM>
+   <SYZFPDM>1100123530</SYZFPDM>
+   <SYZFPHM>00076380</SYZFPHM>
+   <SYZFPZL>0</SYZFPZL>
+  </refp>
+ </err>
+</service>
+
+<!--打印成功-->
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <err count="1">
+  <refp>
+   <RETCODE>5011</RETCODE>
+   <RETMSG>5011-打印成功[0000,]</RETMSG>
+   <FPZL>0</FPZL>
+   <FPHM>00076381</FPHM>
+   <FPDM>1100123530</FPDM>
+  </refp>
+ </err>
+</service>
+
+<!-- 打印失败 -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <err count="1">
+  <refp>
+   <RETCODE>5013</RETCODE>
+   <RETMSG>5013-打印失败[0004,]</RETMSG>
+   <FPZL>0</FPZL>
+   <FPHM>00076382</FPHM>
+   <FPDM>1100123530</FPDM>
+  </refp>
+ </err>
+</service>
+
+<!-- 查询金税盘 -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <err count="2">
+  <refp>
+   <RETCODE>3011</RETCODE>
+   <RETMSG>3011-金税盘状态信息读取成功[0000,]</RETMSG>
+   <FPHM>00076382</FPHM>
+   <FPDM>1100123530</FPDM>
+   <KCFPSL>73</KCFPSL>
+   <JSSBRQ>2016/04/09 18:18:21</JSSBRQ>
+   <XFSH>110101201603098</XFSH>
+   <SCFS>1</SCFS>
+   <KPDH>6</KPDH>
+   <CSQBZ>0</CSQBZ>
+   <SSQBZ>0</SSQBZ>
+   <KPFS>1</KPFS>
+   <KPFWQH>0</KPFWQH>
+   <JSPH>661563899011</JSPH>
+   <XFMC>大客户二部测试服务器</XFMC>
+  </refp>
+  <refp>
+   <RETCODE>3011</RETCODE>
+   <RETMSG>3011-金税盘状态信息读取成功[0000,]</RETMSG>
+   <FPHM>00884146</FPHM>
+   <FPDM>1100111650</FPDM>
+   <KCFPSL>72</KCFPSL>
+   <JSSBRQ>2016/04/09 18:18:21</JSSBRQ>
+   <XFSH>110101201603098</XFSH>
+   <SCFS>1</SCFS>
+   <KPDH>6</KPDH>
+   <CSQBZ>0</CSQBZ>
+   <SSQBZ>0</SSQBZ>
+   <KPFS>1</KPFS>
+   <KPFWQH>0</KPFWQH>
+   <JSPH>661563899011</JSPH>
+   <XFMC>大客户二部测试服务器</XFMC>
+  </refp>
+ </err>
+</service>
+
+<!-- 金税盘查询,错误 -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service>
+ <err count="3">
+  <refp>
+   <RETCODE>3011</RETCODE>
+   <RETMSG>3011-金税盘状态信息读取成功[0000,]</RETMSG>
+   <FPHM>00076382</FPHM>
+   <FPDM>1100123530</FPDM>
+   <KCFPSL>73</KCFPSL>
+   <JSSBRQ>2016/04/09 18:19:19</JSSBRQ>
+   <XFSH>110101201603098</XFSH>
+   <SCFS>1</SCFS>
+   <KPDH>6</KPDH>
+   <CSQBZ>0</CSQBZ>
+   <SSQBZ>0</SSQBZ>
+   <KPFS>1</KPFS>
+   <KPFWQH>0</KPFWQH>
+   <JSPH>661563899011</JSPH>
+   <XFMC>大客户二部测试服务器</XFMC>
+  </refp>
+  <refp>
+   <RETCODE>3011</RETCODE>
+   <RETMSG>3011-金税盘状态信息读取成功[0000,]</RETMSG>
+   <FPHM>00884146</FPHM>
+   <FPDM>1100111650</FPDM>
+   <KCFPSL>72</KCFPSL>
+   <JSSBRQ>2016/04/09 18:19:19</JSSBRQ>
+   <XFSH>110101201603098</XFSH>
+   <SCFS>1</SCFS>
+   <KPDH>6</KPDH>
+   <CSQBZ>0</CSQBZ>
+   <SSQBZ>0</SSQBZ>
+   <KPFS>1</KPFS>
+   <KPFWQH>0</KPFWQH>
+   <JSPH>661563899011</JSPH>
+   <XFMC>大客户二部测试服务器</XFMC>
+  </refp>
+  <refp>
+   <RETCODE>3011</RETCODE>
+   <RETMSG>3011-金税盘状态信息读取成功[0000,]</RETMSG>
+   <FPHM>00000000</FPHM>
+   <FPDM/>
+   <KCFPSL>0</KCFPSL>
+   <JSSBRQ>2016/04/09 18:19:19</JSSBRQ>
+   <XFSH>110101201603098</XFSH>
+   <SCFS>1</SCFS>
+   <KPDH>6</KPDH>
+   <CSQBZ>0</CSQBZ>
+   <SSQBZ>0</SSQBZ>
+   <KPFS>1</KPFS>
+   <KPFWQH>0</KPFWQH>
+   <JSPH>661563899011</JSPH>
+   <XFMC>大客户二部测试服务器</XFMC>
+  </refp>
+ </err>
+</service>
+
+<!-- 服务端库存查询 -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Input>
+ <IP>192.168.33.224</IP>
+ <PORT>8080</PORT>
+ <NSRSBH>110101201603098</NSRSBH>
+ <KPFWQH>0</KPFWQH>
+ <KPDH/>
+</Input>
+
+log4j:WARN No appenders could be found for logger (org.apache.axis.i18n.ProjectResourceBundle).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+<?xml version="1.0" encoding="UTF-8"?>
+
+<kpserver>
+ <Volumes>
+  <Volume>
+   <ID>0</ID>
+   <FPZL>0</FPZL>
+   <FPDM>1100123530</FPDM>
+   <StartNO>00076267</StartNO>
+   <Count>100</Count>
+   <Remain>88</Remain>
+   <KPDH>5</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>1</ID>
+   <FPZL>0</FPZL>
+   <FPDM>1100123530</FPDM>
+   <StartNO>00076387</StartNO>
+   <Count>100</Count>
+   <Remain>68</Remain>
+   <KPDH>6</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>2</ID>
+   <FPZL>0</FPZL>
+   <FPDM>1100123530</FPDM>
+   <StartNO>00076456</StartNO>
+   <Count>125</Count>
+   <Remain>124</Remain>
+   <KPDH>7</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>3</ID>
+   <FPZL>0</FPZL>
+   <FPDM>1100123530</FPDM>
+   <StartNO>00076581</StartNO>
+   <Count>200</Count>
+   <Remain>199</Remain>
+   <KPDH>9</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>4</ID>
+   <FPZL>2</FPZL>
+   <FPDM>1100111650</FPDM>
+   <StartNO>00884028</StartNO>
+   <Count>100</Count>
+   <Remain>90</Remain>
+   <KPDH>5</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>5</ID>
+   <FPZL>2</FPZL>
+   <FPDM>1100111650</FPDM>
+   <StartNO>00884146</StartNO>
+   <Count>100</Count>
+   <Remain>72</Remain>
+   <KPDH>6</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>6</ID>
+   <FPZL>0</FPZL>
+   <FPDM>1100123530</FPDM>
+   <StartNO>00066247</StartNO>
+   <Count>10</Count>
+   <Remain>8</Remain>
+   <KPDH>1</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>7</ID>
+   <FPZL>0</FPZL>
+   <FPDM>1100123530</FPDM>
+   <StartNO>00076780</StartNO>
+   <Count>100</Count>
+   <Remain>100</Remain>
+   <KPDH>10</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>8</ID>
+   <FPZL>0</FPZL>
+   <FPDM>1100123530</FPDM>
+   <StartNO>00077980</StartNO>
+   <Count>54900</Count>
+   <Remain>53800</Remain>
+   <KPDH>0</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>9</ID>
+   <FPZL>0</FPZL>
+   <FPDM>1100123530</FPDM>
+   <StartNO>00076880</StartNO>
+   <Count>100</Count>
+   <Remain>100</Remain>
+   <KPDH>8</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>10</ID>
+   <FPZL>0</FPZL>
+   <FPDM>1100123530</FPDM>
+   <StartNO>00076980</StartNO>
+   <Count>1000</Count>
+   <Remain>1000</Remain>
+   <KPDH>2</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>11</ID>
+   <FPZL>2</FPZL>
+   <FPDM>1100111650</FPDM>
+   <StartNO>00884218</StartNO>
+   <Count>135</Count>
+   <Remain>135</Remain>
+   <KPDH>7</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>12</ID>
+   <FPZL>2</FPZL>
+   <FPDM>1100111650</FPDM>
+   <StartNO>00884353</StartNO>
+   <Count>200</Count>
+   <Remain>200</Remain>
+   <KPDH>9</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>13</ID>
+   <FPZL>2</FPZL>
+   <FPDM>1100111650</FPDM>
+   <StartNO>00884553</StartNO>
+   <Count>100</Count>
+   <Remain>100</Remain>
+   <KPDH>10</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>14</ID>
+   <FPZL>2</FPZL>
+   <FPDM>1100111650</FPDM>
+   <StartNO>00885753</StartNO>
+   <Count>54900</Count>
+   <Remain>53800</Remain>
+   <KPDH>0</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>15</ID>
+   <FPZL>2</FPZL>
+   <FPDM>1100111650</FPDM>
+   <StartNO>00884653</StartNO>
+   <Count>100</Count>
+   <Remain>100</Remain>
+   <KPDH>8</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>16</ID>
+   <FPZL>2</FPZL>
+   <FPDM>1100111650</FPDM>
+   <StartNO>00884753</StartNO>
+   <Count>1000</Count>
+   <Remain>1000</Remain>
+   <KPDH>2</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+ </Volumes>
+ <errorinfo>
+  <Code>0000</Code>
+  <Message/>
+ </errorinfo>
+</kpserver>
+
+<!-- 0表示服务器上的剩余的,未分配的 -->
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Input>
+ <IP>192.168.33.224</IP>
+ <PORT>8080</PORT>
+ <NSRSBH>110101201603098</NSRSBH>
+ <KPFWQH>0</KPFWQH>
+ <KPDH>0</KPDH>
+</Input>
+
+log4j:WARN No appenders could be found for logger (org.apache.axis.i18n.ProjectResourceBundle).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+<?xml version="1.0" encoding="UTF-8"?>
+
+<kpserver>
+ <Volumes>
+  <Volume>
+   <ID>8</ID>
+   <FPZL>0</FPZL>
+   <FPDM>1100123530</FPDM>
+   <StartNO>00077980</StartNO>
+   <Count>54900</Count>
+   <Remain>53800</Remain>
+   <KPDH>0</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+  <Volume>
+   <ID>14</ID>
+   <FPZL>2</FPZL>
+   <FPDM>1100111650</FPDM>
+   <StartNO>00885753</StartNO>
+   <Count>54900</Count>
+   <Remain>53800</Remain>
+   <KPDH>0</KPDH>
+   <BuyDate>2016-03-09 14:00:00</BuyDate>
+   <Limit>99999999.99</Limit>
+  </Volume>
+ </Volumes>
+ <errorinfo>
+  <Code>0000</Code>
+  <Message/>
+ </errorinfo>
+</kpserver>
+
+<!-- 发票分发 -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<kpserver>
+ <errorinfo>
+  <Code>Q100</Code>
+  <Message>输入的发票代码、号码不匹配，或不存在此发票卷。</Message>
+ </errorinfo>
+</kpserver>
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<kpserver>
+ <errorinfo>
+  <Code>0000</Code>
+  <Message>成功</Message>
+ </errorinfo>
+</kpserver>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 重复分发 -->
+<Input>
+ <IP>192.168.33.224</IP>
+ <PORT>8080</PORT>
+ <NSRSBH>110101201603098</NSRSBH>
+ <KPFWQH>0</KPFWQH>
+ <KPDH>6</KPDH>
+ <FPZL>0</FPZL>
+ <FPDM>1100123530</FPDM>
+ <StartNO>00077980</StartNO>
+ <InvoiceCount>2</InvoiceCount>
+</Input>
+
+log4j:WARN No appenders could be found for logger (org.apache.axis.i18n.ProjectResourceBundle).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+<?xml version="1.0" encoding="UTF-8"?>
+
+<kpserver>
+ <errorinfo>
+  <Code>TCD_162_19</Code>
+  <Message>此卷已分配，不能再给终端分配发票。</Message>
+ </errorinfo>
+</kpserver>
+<!-- 发过的和没有发过的一起-->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Input>
+ <IP>192.168.33.224</IP>
+ <PORT>8080</PORT>
+ <NSRSBH>110101201603098</NSRSBH>
+ <KPFWQH>0</KPFWQH>
+ <KPDH>6</KPDH>
+ <FPZL>0</FPZL>
+ <FPDM>1100123530</FPDM>
+ <StartNO>00077980</StartNO>
+ <InvoiceCount>4</InvoiceCount>
+</Input>
+
+log4j:WARN No appenders could be found for logger (org.apache.axis.i18n.ProjectResourceBundle).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+<?xml version="1.0" encoding="UTF-8"?>
+
+<kpserver>
+ <errorinfo>
+  <Code>TCD_176_19</Code>
+  <Message>无可用发票！</Message>
+ </errorinfo>
+</kpserver>
+
+<!-- 测试交叉 -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Input>
+ <IP>192.168.33.224</IP>
+ <PORT>8080</PORT>
+ <NSRSBH>110101201603098</NSRSBH>
+ <KPFWQH>0</KPFWQH>
+ <KPDH>6</KPDH>
+ <FPZL>0</FPZL>
+ <FPDM>1100123530</FPDM>
+ <StartNO>00077980</StartNO>
+ <InvoiceCount>4</InvoiceCount>
+</Input>
+
+log4j:WARN No appenders could be found for logger (org.apache.axis.i18n.ProjectResourceBundle).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+<?xml version="1.0" encoding="UTF-8"?>
+
+<kpserver>
+ <errorinfo>
+  <Code>TCD_176_13</Code>
+  <Message>无可用发票！</Message>
+ </errorinfo>
+</kpserver>
+
+<!-- 发一段 还一段 -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Input>
+ <IP>192.168.33.224</IP>
+ <PORT>8080</PORT>
+ <NSRSBH>110101201603098</NSRSBH>
+ <KPFWQH>0</KPFWQH>
+ <KPDH>6</KPDH>
+ <FPZL>0</FPZL>
+ <FPDM>1100123530</FPDM>
+ <StartNO>00077980</StartNO>
+ <InvoiceCount>2</InvoiceCount>
+</Input>
+
+log4j:WARN No appenders could be found for logger (org.apache.axis.i18n.ProjectResourceBundle).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+<?xml version="1.0" encoding="UTF-8"?>
+
+<kpserver>
+ <errorinfo>
+  <Code>0000</Code>
+  <Message>成功</Message>
+ </errorinfo>
+</kpserver>
