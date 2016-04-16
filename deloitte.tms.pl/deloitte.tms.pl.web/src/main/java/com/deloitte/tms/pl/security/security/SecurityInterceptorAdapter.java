@@ -21,12 +21,13 @@ import com.deloitte.tms.pl.core.context.IContextHolder;
 import com.deloitte.tms.pl.core.context.utils.ContextUtils;
 import com.deloitte.tms.pl.security.model.SecurityUser;
 import com.deloitte.tms.pl.security.security.cookielogin.CookieLoginTokenService;
+import com.deloitte.tms.pl.security.service.IUserService;
 
 /**
  * @author Jacky.gao
  * @since 2013-5-10
  */
-@Component
+@Component("securityInterceptor")
 public class SecurityInterceptorAdapter implements ISecurityInterceptor {
 	protected final Log logger = LogFactory.getLog(getClass());
 	@Resource

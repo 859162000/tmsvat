@@ -28,7 +28,7 @@ public class PageUtils {
 		}
 		return result;
 	}
-	public static Integer getPageIndex(Map params){
+	public static Integer getPageIndex(Map params){//page=1, customerNameInSendFormid=, rows=10
 		AssertHelper.notEmpty_assert(params,"分页参数错误:空");
 		AssertHelper.notEmpty_assert(params.get("pageIndex"),"分页参数:pageIndex错误");
 		return Integer.parseInt(params.get("pageIndex").toString());
@@ -43,6 +43,21 @@ public class PageUtils {
 		AssertHelper.notEmpty_assert(params.get("pageSize"),"分页参数:pageSize错误");
 		return Integer.parseInt(params.get("pageSize").toString());
 	}
+	public static Integer getPage(Map params){//=1, customerNameInSendFormid=, rows=10
+		AssertHelper.notEmpty_assert(params,"分页参数错误:空");
+		AssertHelper.notEmpty_assert(params.get("page"),"分页参数:pageIndex错误");
+		return Integer.parseInt(params.get("page").toString());
+	}
+	public static Integer getRows(Map params){
+		AssertHelper.notEmpty_assert(params,"分页参数错误:空");
+		AssertHelper.notEmpty_assert(params.get("rows"),"分页参数:pageIndex错误");
+		return Integer.parseInt(params.get("rows").toString());
+	}
+	
+	
+	
+	
+	
 
 	/**
 	 * 根据每页记录数和当前页页数返回当前页首条在数据库里的位置

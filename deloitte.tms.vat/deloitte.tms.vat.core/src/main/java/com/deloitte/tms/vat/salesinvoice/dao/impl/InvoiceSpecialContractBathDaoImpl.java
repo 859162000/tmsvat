@@ -24,8 +24,11 @@ import com.deloitte.tms.base.taxsetting.model.TmsMdProject;
 import com.deloitte.tms.base.taxsetting.model.TmsMdTrxAffirmSetting;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
+import com.deloitte.tms.pl.core.commons.utils.DateUtils;
 import com.deloitte.tms.pl.core.dao.impl.BaseDao;
 import com.deloitte.tms.vat.salesinvoice.dao.InvoiceSpecialContractBathDao;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatInf;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesH;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesL;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesLInParam;
 @Component
@@ -267,7 +270,6 @@ public class InvoiceSpecialContractBathDaoImpl  extends BaseDao<TmsCrvatInvReqBa
 		String invoiceReqendDate = (String) map.get("invoiceReqendDate");//申请日期结束
 		String status = (String) map.get("status");//申请状态
 		String crvatInvoiceReqNumber = (String) map.get("crvatInvoiceReqNumber");//申请单号
-		SimpleDateFormat  sim = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		StringBuffer query=new StringBuffer();
 		query.append(" from TmsCrvatInvReqBatchesH where 1=1 ");
 		Map<String,Object> values=new HashMap<String,Object>();
@@ -282,27 +284,18 @@ public class InvoiceSpecialContractBathDaoImpl  extends BaseDao<TmsCrvatInvReqBa
 			values.put("crvatInvoiceReqNumber", crvatInvoiceReqNumber);
 		}
 		if(AssertHelper.notEmpty(invoiceReqStartDate))
-		{  Date stra = null;
-			try {
-			stra = sim.parse(invoiceReqStartDate);
-		} catch (ParseException e) {
-		}
+		{  
 			query.append(" and invoiceReqDate >=:invoiceReqStartDate");
-			values.put("invoiceReqStartDate", invoiceReqStartDate);
+			values.put("invoiceReqStartDate", DateUtils.parseTime(invoiceReqStartDate, "yyyy-MM-dd"));
 		}
 		if(AssertHelper.notEmpty(invoiceReqendDate))
 		{
-			 Date end = null;
-				try {
-				end = sim.parse(invoiceReqendDate);
-			} catch (ParseException e) {
-			}
 			query.append(" and invoiceReqDate <=:invoiceReqendDate");
-			values.put("invoiceReqendDate", invoiceReqendDate);
+			values.put("invoiceReqendDate", DateUtils.parseTime(invoiceReqendDate, "yyyy-MM-dd"));
 		}		
 		
 		
-		query.append("and flag = :flag");
+		query.append(" and flag = :flag");
 		values.put("flag", "1");
 		return this.pageBy(query, values, pageNumber, pageSize);
 	
@@ -359,6 +352,40 @@ public class InvoiceSpecialContractBathDaoImpl  extends BaseDao<TmsCrvatInvReqBa
 			list =  findBy(query, values);
 		}
 		return list;
+	}
+	/**
+	 * 取得长江证券数据
+	 */
+	@Override
+	public List<TmsCrvatInvReqBatInf> analyzeTmsCrvatInvReqBatchesParam() {
+		List<TmsCrvatInvReqBatInf> list = null;
+		StringBuffer query=new StringBuffer();
+		Map<String,Object> values=new HashMap<String,Object>();
+			query.append(" from TmsCrvatInvReqBatInf where 1=1 ");
+			list =  findBy(query, values);
+		return list;
+	}
+	/**
+	 * 提交申请单
+	 */
+	@Override
+	public int submitFromPage(String id) {
+		List<TmsCrvatInvReqBatchesH> list = null;
+		StringBuffer query=new StringBuffer();
+		TmsCrvatInvReqBatchesH tmsCrvatInvReqBatchesH = null;
+		query.append(" from TmsCrvatInvReqBatchesH where 1=1 ");
+		query.append(" and id=:id");
+		Map<String,Object> values=new HashMap<String,Object>();
+		values.put("id", id);
+		list =  findBy(query, values);
+		if(list.size()>0){
+			tmsCrvatInvReqBatchesH = list.get(0);
+			tmsCrvatInvReqBatchesH.setStatus("30");
+			update(tmsCrvatInvReqBatchesH);
+			return 1;
+		}
+		
+		return 0;
 	}
 	
 	

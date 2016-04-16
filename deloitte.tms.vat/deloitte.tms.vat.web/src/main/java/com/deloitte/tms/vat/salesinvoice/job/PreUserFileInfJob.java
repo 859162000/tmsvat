@@ -20,7 +20,6 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +47,6 @@ import com.deloitte.tms.pl.core.commons.utils.FileUtils;
 import com.deloitte.tms.pl.core.commons.utils.StringUtils;
 import com.deloitte.tms.pl.job.task.JobTest;
 import com.deloitte.tms.pl.security.dao.IUserDao;
-import com.deloitte.tms.pl.security.model.SecurityUser;
 import com.deloitte.tms.pl.security.model.impl.DefaultUser;
 import com.deloitte.tms.vat.salesinvoice.common.StringPool;
 import com.deloitte.tms.vat.salesinvoice.fileutils.JobDateUtils;
@@ -146,6 +144,7 @@ public class PreUserFileInfJob implements Job, JobTest {
 					batchDefaultUsers.add(user);
 					pageIndex++;
 				}else{
+					batchDefaultUsers.add(user);
 					int sucessnum = fileProcessJob.saveBaseUserList(batchDefaultUsers,orgMap,userOrgMap);
 					//重置计数器
 					totalsucess=totalsucess+sucessnum;

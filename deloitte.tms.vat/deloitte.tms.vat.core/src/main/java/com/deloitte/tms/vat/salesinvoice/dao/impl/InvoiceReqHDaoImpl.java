@@ -17,6 +17,7 @@ import com.deloitte.tms.base.enums.PrintRangeEnums;
 import com.deloitte.tms.base.masterdata.model.BaseOrg;
 import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
+import com.deloitte.tms.pl.core.commons.utils.Assert;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.DateUtils;
 import com.deloitte.tms.pl.core.dao.impl.BaseDao;
@@ -179,6 +180,11 @@ public class InvoiceReqHDaoImpl extends BaseDao<InvoiceReqH> implements InvoiceR
 					values.put("legalEntityCode", legalEntityCode);
 				}
 			}
+			//客户账号
+			if(AssertHelper.isOrNotEmpty_assert(params.get("custBankAccountNum"))){
+				query.append(" and inventoryItemNumber=:inventoryItemNumber");
+				values.put("inventoryItemNumber", params.get("inventoryItemNumber"));
+			}
 		}
 		query.append(" and ( status in :status");
 		String[] status=new String[]{CrvatTaxPoolStatuEnums.OPEN.getValue(),CrvatTaxPoolStatuEnums.APPFORM_REVOKED.getValue(),CrvatTaxPoolStatuEnums.PREP_FORM_REVOKED.getValue()};
@@ -287,7 +293,30 @@ public class InvoiceReqHDaoImpl extends BaseDao<InvoiceReqH> implements InvoiceR
 			query.append(" and crvatInvoiceReqHId=:crvatInvoiceReqHId");
 			values.put("crvatInvoiceReqHId", reqHid);
 		}
+		 query.append(" and flag=1");
 		return findBy(query, values);
+	}
+	/**
+	 * 根据REQid释放交易池状态
+	 */
+	@Override
+	public void updateTrxPoolStatusByReqHid(String reqHid, String status) {
+		AssertHelper.notEmpty_assert(reqHid, "申请单号不能为空");
+		AssertHelper.notEmpty_assert(status, "状态参数不能为空");
+		StringBuffer query=new StringBuffer();
+		Map<String,Object> values=new HashMap<String,Object>();		
+		query.append("update TMS_CRVAT_TRX_POOL_ALL set status = :status  where CRVAT_TRX_POOL_ID in ");
+		query.append("(select reql.CRVAT_TRX_POOL_ID from TMS_CRVAT_INVOICE_REQ_L reql where 1=1 and reql.DELETED_FLAG = 1 ");
+		values.put("status", status);
+		if(AssertHelper.notEmpty(reqHid))
+		{
+			query.append(" and reql.CRVAT_INVOICE_REQ_H_ID=:reqHid)");
+			values.put("reqHid", reqHid);
+		}else {
+			query.append(")");
+		}
+		executeSql(query, values);
+		
 	}
 }
 

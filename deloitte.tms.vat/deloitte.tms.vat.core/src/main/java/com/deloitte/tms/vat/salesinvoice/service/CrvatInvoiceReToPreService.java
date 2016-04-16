@@ -11,5 +11,9 @@ public interface CrvatInvoiceReToPreService extends IService {
 	public void convertCrvaInvoiceReToPre(List<InvoiceReqH> list);
 	public int exeConvertCrvatInvoiceReToPre(InvoiceReqH invoiceReqH,Map params);
 	public List<InvoiceReqH> findInvoiceReqHByParams(Map params);
-
+	/**
+	 * 准备单JOB失败时，重置交易池数据状态
+	 * @param invoiceReqH
+	 */
+	public void exeRevertInvoiceReq(InvoiceReqH invoiceReqH);
 }

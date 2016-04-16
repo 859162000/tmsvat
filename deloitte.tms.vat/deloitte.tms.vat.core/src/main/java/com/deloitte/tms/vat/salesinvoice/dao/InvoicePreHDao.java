@@ -15,4 +15,5 @@ public interface InvoicePreHDao extends IDao<TmsCrvatInvoicePreH>{
 	public TmsCrvatInvoicePreH findTmsCrvatInvoicePreHById(String id);
 	public DaoPage findTmsCrvatInvoicePreLById(String preHid,int pageIndex,int pageNumber);
 	public List<TmsCrvatInvoicePreL> getCrvatInvoicePreLsByPreHId(String preHid);
+	public void updateTrxPoolStatusByPreHid(String prehid,String status);
 }

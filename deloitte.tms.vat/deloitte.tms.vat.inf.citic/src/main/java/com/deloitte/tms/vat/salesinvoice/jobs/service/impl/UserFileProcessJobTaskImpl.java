@@ -48,7 +48,7 @@ public class UserFileProcessJobTaskImpl implements UserFileProcessJobTask {
 	public int saveBaseUserList(List<DefaultUser> fileUsers,
 			Map<String, BaseOrg> orgMap, Map<String, BaseUserOrg> userOrgMap) {
 		Long totalsapstart = System.currentTimeMillis();
-		log.info("********************************************beg process User ******************** ");
+		log.info("********************************************beg batch process User ******************** ");
 		int sucessnum=0;
 		int errocount=0;
 		for (DefaultUser defaultUser : fileUsers) {
@@ -91,7 +91,7 @@ public class UserFileProcessJobTaskImpl implements UserFileProcessJobTask {
 		log.info("sucess read user:"+sucessnum);
 		log.info("fail read user:"+errocount);
 		log.info("costs: " + (System.currentTimeMillis() - totalsapstart) + " ms");
-		log.info("********************************************end process User ******************** ");
+		log.info("********************************************end batch process User ******************** ");
 		return sucessnum;
 	}
 }

@@ -145,6 +145,9 @@ public class InvoiceReqL extends BaseEntity{
 	@ModelProperty(comment = "是否含税")
 	private String isTax;
 	
+	
+
+	
 	public BigDecimal getSourceCode() {
 		return sourceCode;
 	}
@@ -369,5 +372,9 @@ public class InvoiceReqL extends BaseEntity{
 	public void setIsTax(String isTax) {
 		this.isTax = isTax;
 	}
+
+
+	
+	
 	
 }

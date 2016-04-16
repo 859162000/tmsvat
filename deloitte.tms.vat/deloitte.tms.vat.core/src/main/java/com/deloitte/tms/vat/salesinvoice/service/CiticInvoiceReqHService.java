@@ -34,8 +34,8 @@ import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxPoolInParam;
 
 public interface CiticInvoiceReqHService extends IService{
 	public static final String BEAN_ID="citicInvoiceReqHService";
-	public String setUpHead(Map<String, Object>map) throws ParseException;
+	public void setUpHead(Map<String, Object>map) throws ParseException;
 	public InvoiceTrxPoolInParam convertInvoiceTrxPoolToInParam(InvoiceTrxPool pool);
-	public InvoiceTrxPool findInvoiceTrxPoolByParams(Map<String, Object> map);
-	public void saveCustomerAndReq(Map<String, Object> map);
+	public InvoiceTrxPool findInvoiceTrxPoolByParams(Map<String, Object> map)throws Exception;
+	public void saveCustomerAndReq(Map<String, Object> map) throws Exception;
 }

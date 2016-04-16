@@ -18,6 +18,7 @@ import net.sf.json.JsonConfig;
 
 
 
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -64,6 +65,12 @@ public class TmsMdTaxTrxTypeController extends BaseController{
 	@RequestMapping(value = "/loadTmsMdTaxTrxTypePage", method = RequestMethod.GET)
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public DaoPage loadTmsMdTaxTrxTypePage(@RequestParam Map<String,Object> parameter,HttpServletResponse response) throws Exception {
+		String pageNumber= (String) parameter.get("pageNumber");
+		if(pageNumber==null||"".equals(pageNumber)){
+			parameter.put("pageNumber", 1);
+			parameter.put("pageSize", 10);
+			
+		}
 		DaoPage daoPage=tmsMdTaxTrxTypeService.findTmsMdTaxTrxTypeByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
 		JSONObject result = new JSONObject();
 		 JsonConfig jsonConfig = new JsonConfig();
@@ -78,30 +85,7 @@ public class TmsMdTaxTrxTypeController extends BaseController{
 		
 		return null;
 	}
-	/**
-	 * 涉税交易类型下拉列表数据取得
-	 * @param parameter
-	 * @return
-	 * @throws Exception
-	 */
-	@ResponseBody
-	@RequestMapping(value ="/loadTaxTransactionType_id")
-	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
-	public DaoPage loadTaxTransactionType_id(@RequestParam Map<String,Object> parameter,HttpServletResponse response) throws Exception {
-		DaoPage daoPage=tmsMdTaxTrxTypeService.findTmsMdTaxTrxTypeByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
-		JSONObject result = new JSONObject();
-		JsonConfig jsonConfig = new JsonConfig();
-		jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
-		JSONArray jsonArray = JSONArray.fromObject(daoPage.getResult(),jsonConfig);
-		
-		result.put("total", daoPage.getRecordCount());
-		result.put("rows", jsonArray);
-		result.put("pages", daoPage.getPageCount());
-		result.put("success", true);
-		retJson(response, result);
-		
-		return null;
-	}
+
 	
 	/**
 	 * 保存新增信息
@@ -117,7 +101,6 @@ public class TmsMdTaxTrxTypeController extends BaseController{
 		inParam.setModifiedDate(new Date());
 		inParam.setModifiedBy("zhan");
 		inParam.setVersionId(10);
-		inParam.setFlag("0");
 		TmsMdTaxTrxType entity=tmsMdTaxTrxTypeService.convertTmsMdTaxTrxTypeInParamToEntity(inParam);
 		if(AssertHelper.empty(entity.getId())){
 			entity.setId(IdGenerator.getUUID());
@@ -125,6 +108,7 @@ public class TmsMdTaxTrxTypeController extends BaseController{
 			tmsMdTaxTrxTypeService.save(entity);
 		}
 		else{
+			entity.setFlag("1");
 			tmsMdTaxTrxTypeService.update(entity);
 		}
 		DaoPage daoPage=tmsMdTaxTrxTypeService.findTmsMdTaxTrxTypeByParams(null,1,10);
@@ -174,29 +158,6 @@ public class TmsMdTaxTrxTypeController extends BaseController{
 	}
 	
 	
-	/**
-	 * 根据条件检索
-	 * @param map
-	 * @return
-	 * @throws Exception
-	 */
-	@ResponseBody
-	@RequestMapping(value = "/retrievalTmsMdTaxTrxType")
-	public DaoPage retrievalTmsMdTaxTrxType(@RequestParam Map<String,Object> parameter,HttpServletResponse response) throws Exception {
-		DaoPage daoPage = tmsMdTaxTrxTypeService.retrievalTmsMdTaxTrxType(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
-		JSONObject result = new JSONObject();
-		 JsonConfig jsonConfig = new JsonConfig();
-		 jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
-		 JSONArray jsonArray = JSONArray.fromObject(daoPage.getResult(),jsonConfig);
-		
-		result.put("total", daoPage.getRecordCount());
-		result.put("rows", jsonArray);
-		result.put("pages", daoPage.getPageCount());
-		result.put("success", true);
-		retJson(response, result);
-		return null;
-	}
-	
 	public TmsMdTaxTrxTypeInParam loadAddTmsMdTaxTrxType(Map<String, Object> map) throws Exception {
 		TmsMdTaxTrxTypeInParam inParam=new TmsMdTaxTrxTypeInParam();
 		return inParam;
@@ -228,4 +189,16 @@ public class TmsMdTaxTrxTypeController extends BaseController{
 		retJson(response, result);
 
 	}
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "/loadTmsMdTaxTrxTypePageName", method = RequestMethod.POST)
+	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
+	public DaoPage loadTmsMdTaxTrxTypePageName(@RequestParam Map<String,Object> parameter) throws Exception {
+		DaoPage daoPage=tmsMdTaxTrxTypeService.findTmsMdTaxTrxTypeByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
+		return daoPage;
+	}
+	
+	
+	
 }

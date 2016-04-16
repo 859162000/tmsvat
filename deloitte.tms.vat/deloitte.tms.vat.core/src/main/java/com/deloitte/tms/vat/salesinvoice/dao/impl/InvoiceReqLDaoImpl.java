@@ -48,6 +48,7 @@ public class InvoiceReqLDaoImpl extends BaseDao<InvoiceReqL> implements InvoiceR
 			query.append(" and crvatInvoiceReqHId=:crvatInvoiceReqHId");
 			values.put("crvatInvoiceReqHId", params.get("crvatInvoiceReqHId"));
 		}
+		query.append(" and flag=1");
 	}
 	
 	/**   

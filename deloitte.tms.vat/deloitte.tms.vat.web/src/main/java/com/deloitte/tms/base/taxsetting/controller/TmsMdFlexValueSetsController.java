@@ -26,11 +26,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
+import com.deloitte.tms.pl.core.commons.utils.SpringUtil;
 import com.deloitte.tms.pl.core.commons.utils.reflect.ReflectUtils;
 import com.deloitte.tms.pl.core.commons.utils.PageUtils;
 import com.deloitte.tms.vat.controller.BaseController;
 import com.deloitte.tms.vat.core.common.IdGenerator;
 import com.deloitte.tms.vat.core.common.JsonDateValueProcessor;
+import com.deloitte.tms.base.masterdata.dao.impl.CustomerDaoImpl;
+import com.deloitte.tms.base.taxsetting.dao.impl.TmsMdFlexValueSetsDaoImpl;
 import com.deloitte.tms.base.taxsetting.model.TmsMdFlexValueSets;
 import com.deloitte.tms.base.taxsetting.model.TmsMdFlexValueSetsInParam;
 import com.deloitte.tms.base.taxsetting.model.TmsMdFlexValues;
@@ -93,15 +96,18 @@ public class TmsMdFlexValueSetsController extends BaseController{
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public void saveTmsMdFlexValueSets(TmsMdFlexValueSetsInParam inParam,HttpServletResponse response) throws Exception {
 		TmsMdFlexValueSets entity=tmsMdFlexValueSetsService.convertTmsMdFlexValueSetsInParamToEntity(inParam);
+		String id = IdGenerator.getUUID();
 		if(AssertHelper.empty(entity.getId())){
-			entity.setId(IdGenerator.getUUID());
+			entity.setId(id);
 			tmsMdFlexValueSetsService.save(entity);
 		}
 		else{
+			id=entity.getId();
 			tmsMdFlexValueSetsService.update(entity);
 		}
 		JSONObject result = new JSONObject();
 		result.put("success", true);
+		result.put("id", entity.getId());
 		retJson(response, result);
 		
 	}	
@@ -228,6 +234,7 @@ public class TmsMdFlexValueSetsController extends BaseController{
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public void saveTmsMdFlexValues(TmsMdFlexValuesInParam inParam,HttpServletResponse response) throws Exception {
 		TmsMdFlexValues entity=tmsMdFlexValueSetsService.convertTmsMdFlexValuesInParamToEntity(inParam);
+		
 		if(AssertHelper.empty(entity.getId())){
 			entity.setId(IdGenerator.getUUID());
 			tmsMdFlexValueSetsService.save(entity);

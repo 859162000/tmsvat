@@ -41,6 +41,13 @@ public class TmsCrvatInvReqBatchesLDaoImpl extends BaseDao<TmsCrvatInvReqBatches
 			query.append(" and status=:status");
 			values.put("status", value);
 		}
+		value=params.get("crvatInvReqBatchesHId");
+		if((value!=null)&&(!"".equals(value)))
+		{
+			query.append(" and crvatInvReqBatchesHId=:crvatInvReqBatchesHId");
+			values.put("crvatInvReqBatchesHId", value);
+		}
+		
 	}
 }
 

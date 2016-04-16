@@ -233,8 +233,8 @@ public class InvoiceTrxPoolServiceImpl extends BaseService implements InvoiceTrx
 		// TODO Auto-generated method stub
 		for(InvoiceTrxPoolInParam inParam:list){
 			TempTmsCrvatInvoiceReqL temp = new TempTmsCrvatInvoiceReqL();
-			temp.setId(IdGenerator.getUUID());
-			temp.setInvoiceTrxId(inParam.getId());			
+			temp.setId(IdGenerator.getUUID());		
+			temp.setInvoiceTrxId(inParam.getId());		
 			temp.setInventoryItemDescription(inParam.getInventoryItemDescripton());
 			temp.setInventoryItemNumber(inParam.getInventoryItemNumber());
 			if(inParam.getInvoiceAmount()!=null){
@@ -244,8 +244,13 @@ public class InvoiceTrxPoolServiceImpl extends BaseService implements InvoiceTrx
 			temp.setLegalEntityCode(inParam.getLegalEntityCode());
 			temp.setLegalEntityName(inParam.getLegalEntityName());
 			temp.setOperatorUser(inParam.getOperatorUser());
-			temp.setOrgCode(inParam.getOrgCode());
-			temp.setOrgName(inParam.getOrgName());
+			if(AssertHelper.isOrNotEmpty_assert(inParam.getOrgId())){
+				BizOrgNode node=OrgCacheUtils.getNodeByOrgId(inParam.getOrgId());
+				if(null!=node){
+					temp.setOrgName(node.getName());
+					temp.setOrgCode(node.getCode());	
+				}
+			}
 			if(inParam.getTaxRate()!=null){
 			    temp.setTaxRate(inParam.getTaxRate().toString());	
 			}
@@ -284,8 +289,14 @@ public class InvoiceTrxPoolServiceImpl extends BaseService implements InvoiceTrx
 		String invoicereqhid = (String) map.get("crvatInvoiceReqHId");
 		for(InvoiceTrxPool pool:pools){
 			InvoiceReqL invoiceReqL = convertInvoiceTrxPoolToInvoiceReqL(pool);
+			invoiceReqL.setId(IdGenerator.getUUID());
 			invoiceReqL.setCrvatInvoiceReqHId(invoicereqhid);
 			invoiceReqL.setCrvatTrxPoolId(pool.getId());
+			BigDecimal exchangeAmount = pool.getExchangeAmount();
+			if(exchangeAmount!=null){
+				String exchangeAmountStr = exchangeAmount.toString();
+				invoiceReqL.setAttribute1(exchangeAmountStr);
+			}
 			invoiceTrxPoolDao.save(invoiceReqL);
 			pool.setStatus(CrvatTaxPoolStatuEnums.APPFORM_USED.getValue());
 			invoiceTrxPoolDao.update(pool);
@@ -337,8 +348,8 @@ public class InvoiceTrxPoolServiceImpl extends BaseService implements InvoiceTrx
 	public void addTrxPoolToTempTmsCrvatReqL(Map<String, Object> map) {
 		// TODO Auto-generated method stub
 		List<InvoiceTrxPoolInParam> list= getAlltransaction(map);
-		String invoicereqhid = (String) map.get("invoicereqhid");
-		String operatorUser = (String) map.get("operatorUser");		
+		String invoicereqhid = (String) map.get("crvatInvoiceReqHId");
+		String operatorUser = (String) map.get("operatoruser");		
 		for(InvoiceTrxPoolInParam inParam:list){
 			inParam.setInvoicereqhid(invoicereqhid);
 			inParam.setOperatorUser(operatorUser);
@@ -353,8 +364,14 @@ public class InvoiceTrxPoolServiceImpl extends BaseService implements InvoiceTrx
 			TempTmsCrvatInvoiceReqL tempTmsCrvatInvoiceReqL = (TempTmsCrvatInvoiceReqL) get(TempTmsCrvatInvoiceReqL.class, id);
 			InvoiceTrxPool invoiceTrxPool = (InvoiceTrxPool) get(InvoiceTrxPool.class, tempTmsCrvatInvoiceReqL.getInvoiceTrxId());
 			invoiceTrxPool.setStatus(CrvatTaxPoolStatuEnums.APPFORM_FREE.getValue());
-			invoiceTrxPoolDao.deleteTempCrvatInvoiceReqLByReqHid(id);
+			invoiceTrxPoolDao.deleteTempCrvatInvoiceReqLById(id);
 		}
+	}
+
+	@Override
+	public void deleteTempCrvatInvoiceRelByUserName(String currentUseName) {
+		// TODO Auto-generated method stub
+		invoiceTrxPoolDao.deleteTempCrvatInvoiceReqLByUserName(currentUseName);
 	}
 	
 }

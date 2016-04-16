@@ -16,15 +16,12 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.deloitte.tms.pl.cache.ApplicationCache;
+import com.deloitte.tms.pl.cache.CacheUtils;
 import com.deloitte.tms.pl.core.context.utils.ContextUtils;
-import com.deloitte.tms.pl.core.dao.IDao;
 import com.deloitte.tms.pl.security.exception.NoneLoginException;
 import com.deloitte.tms.pl.security.model.SecurityUser;
 import com.deloitte.tms.pl.security.model.impl.DefaultUrl;
@@ -190,9 +187,7 @@ public class MainframeController extends BaseController {
 		}
 	}
 	public static final String URL_FOR_NAVI_CACHE_KEY="url_for_navi_cache_key_";
-	@Autowired
-	@Qualifier(ApplicationCache.BEAN_ID)
-	private ApplicationCache applicationCache;
+
 	@Resource
 	IUrlService iUrlService;
 
@@ -249,10 +244,10 @@ public class MainframeController extends BaseController {
 			throw new NoneLoginException("Please login first");
 		}
 		String companyId=user.getCompanyId();
-		List<DefaultUrl> cacheUrls=(List<DefaultUrl>)this.applicationCache.getCacheObject(URL_FOR_NAVI_CACHE_KEY);
+		List<DefaultUrl> cacheUrls=(List<DefaultUrl>)CacheUtils.getCacheObject(URL_FOR_NAVI_CACHE_KEY);
 		if(cacheUrls==null){
 			cacheNavigatorUrls();
-			cacheUrls=(List<DefaultUrl>)this.applicationCache.getCacheObject(URL_FOR_NAVI_CACHE_KEY);
+			cacheUrls=(List<DefaultUrl>)CacheUtils.getCacheObject(URL_FOR_NAVI_CACHE_KEY);
 		}
 		Collection<DefaultUrl> urls = getCacheUrls(cacheUrls,companyId,parentId);
 		UserAuthentication authentication = new UserAuthentication(user);
@@ -288,7 +283,7 @@ public class MainframeController extends BaseController {
 	}
 	public void cacheNavigatorUrls(){
 		Collection<DefaultUrl> urls = loadUrls();
-		this.applicationCache.putCacheObject(URL_FOR_NAVI_CACHE_KEY, urls);
+		CacheUtils.putCacheObject(URL_FOR_NAVI_CACHE_KEY, urls);
 	}
 	private Collection<DefaultUrl> loadUrls(){
 		List<DefaultUrl> allurls=getAllDefaultUrls();

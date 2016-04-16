@@ -121,7 +121,6 @@ $(function(){
 				pagination : false,
 				rownumbers : true,
 				singleSelect : true,
-				fitColumns : true,
 				striped : true,
 				idField : 'id', //主键字段  
 				columns : [ [
@@ -306,6 +305,7 @@ $(function(){
 					
 					
 				} else {
+					$("#addEqu_dataGrid").datagrid("loaded");
 					return;
 				}
 			}, 
@@ -735,7 +735,6 @@ $(function(){
 			pagination : true,
 			rownumbers : true,
 			singleSelect : false,
-			fitColumns : true,
 			striped : true,
 			idField : 'id', //主键字段  
 			columns : [ [

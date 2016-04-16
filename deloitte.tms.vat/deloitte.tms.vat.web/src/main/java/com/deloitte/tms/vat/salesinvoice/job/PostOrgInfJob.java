@@ -36,6 +36,7 @@ import com.deloitte.tms.base.masterdata.model.TmsMdLegalEnablePrint;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
 import com.deloitte.tms.base.masterdata.model.TmsMdOrgLegalEntity;
 import com.deloitte.tms.base.masterdata.model.TmsMdUsageLocalLegal;
+import com.deloitte.tms.pl.core.commons.constant.PageConstant;
 import com.deloitte.tms.pl.core.commons.exception.BusinessException;
 import com.deloitte.tms.pl.job.task.JobTest;
 import com.deloitte.tms.vat.salesinvoice.common.StringPool;
@@ -77,46 +78,51 @@ public class PostOrgInfJob implements Job, JobTest {
 	
 	@Resource
 	private TmsMdOrgLegalEntityDao tmsMdOrgLegalEntityDao;
+	
 	/**
 	 * @see 详细参考父方法
 	 */
 	@Override
 	public void execute() {
-		
+		log.info("******************************start at "+System.currentTimeMillis()+"*****************************");
 		int pageIndex=0;
-		int pageSize=5;
+		int pageSize=PageConstant.PAGE_SIZE;
 		int totalsucess=0;
 		
 		List<BaseLegalEntityInf> listTmsMdCustomersInf = getToRunBaseLegalEntityInf();
 		
 		Map<String,Object> mapProcess = getAllRelatedObjects();
 		
+		//批提交处理数据
 		List<BaseLegalEntityInf> batchBaseLegalEntityInf = new ArrayList<BaseLegalEntityInf>();
-	
+		Long start = System.currentTimeMillis();
+		log.info("******************************begin processing baseLegalEntityInf at "+start+"*****************************");
 		for (BaseLegalEntityInf baseLegalEntityInf : listTmsMdCustomersInf) {
 			if ((StringPool.READY).equals(baseLegalEntityInf.getInterfaceTrxFlag())) {
 				if(pageIndex<pageSize) {
 					batchBaseLegalEntityInf.add(baseLegalEntityInf);
 					pageIndex++;
 				} else {
+					log.info("*****************************processing "+pageIndex+" numbers*****************************");
 					mapProcess.put("batchBaseLegalEntityInf", batchBaseLegalEntityInf);
 					int processSucess = 0;
-					processSucess = processList(mapProcess);//
+					processSucess = processList(mapProcess);//返回处理成功数量
 					batchBaseLegalEntityInf = new ArrayList<BaseLegalEntityInf>();	
 					pageIndex = 0;
 					totalsucess = totalsucess + processSucess;
 				}
 			}
 		}
-		mapProcess.put("batchBaseLegalEntityInf", batchBaseLegalEntityInf);
+		totalsucess = processList(mapProcess);
+		Long end = System.currentTimeMillis();
+		log.info("******************************end processing baseLegalEntityInf at "+end+"*****************************");
 	}
 
 	
 	
 	
 	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
+	 * 处理数据
 	 * @param mapProcess
 	 * @return
 	 * @see [相关类/方法]（可选）
@@ -137,14 +143,16 @@ public class PostOrgInfJob implements Job, JobTest {
 
 
 	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
+	 * 查出所有相关的全部数据并做缓存
 	 * @return
 	 * @see [相关类/方法]（可选）
 	 * @since [产品/模块版本] （可选）
 	 */
 	
 	private Map<String, Object> getAllRelatedObjects() {
+		
+		Long start = System.currentTimeMillis();
+		log.info("$$$$$$$$$$$$$$$$$$$$$$begin to cache data at "+start+"$$$$$$$$$$$$$$$$$$$$$$");
 		List<TmsMdLegalEntity> allTmsMdLegalEntity = tmsMdLegalEntityDao.findAllTmsMdLegalEntity();
 		List<TmsMdLegalEnablePrint> allTmsMdLegalEnablePrint = tmsMdLegalEnablePrintDao.findAllTmsMdLegalEnablePrint();
 		List<BaseOrg> allBaseOrg = baseOrgDao.findAllBaseOrg();
@@ -158,14 +166,14 @@ public class PostOrgInfJob implements Job, JobTest {
 		mapProcess.put("allTmsMdUsageLocalLegal",allTmsMdUsageLocalLegal);
 		mapProcess.put("allTmsMdOrgLegalEntity", allTmsMdOrgLegalEntity);
 		
+		log.info("$$$$$$$$$$$$$$$$$$$$$$begin to cache data at "+ System.currentTimeMillis()+"$$$$$$$$$$$$$$$$$$$$$$");
 		return mapProcess;
 		
 	}
 
 
 	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
+	 * 从接口表中查出所有符合条件的数据
 	 * @return 
 	 * @see [相关类/方法]（可选）
 	 * @since [产品/模块版本] （可选）
@@ -174,7 +182,7 @@ public class PostOrgInfJob implements Job, JobTest {
 	private List<BaseLegalEntityInf> getToRunBaseLegalEntityInf() {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("interfaceTrxFlag", StringPool.READY);
-		map.put("startDate", new Date());// 处理生效日期为当天的
+//		map.put("startDate", new Date());// 处理生效日期为当天的
 		map.put("legalEntityType", "BILL");
 		List<BaseLegalEntityInf> listTmsMdCustomersInf = baseLegalEntityInfService.findBaseLegalEntityInf(map);
 		if (listTmsMdCustomersInf.size() > 0) {

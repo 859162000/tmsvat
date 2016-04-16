@@ -12,6 +12,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.xml.sax.SAXException;
 
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
@@ -22,7 +24,6 @@ import com.deloitte.tms.pl.security.service.impl.DefaultUserService;
 import edu.yale.its.tp.cas.client.ProxyTicketValidator;
 import edu.yale.its.tp.cas.client.Util;
 
-@Component(CJSCFilter.BEAN_ID)
 public class CJSCFilter implements Filter {
 	public static final String BEAN_ID="cjscFilter";
 	
@@ -39,11 +40,11 @@ public class CJSCFilter implements Filter {
 
 	private Logger logger = Logger.getLogger(CJSCFilter.class);
 	
-	@Resource
-	DefaultUserService defaultUserService;
+	//@Resource
+	private DefaultUserService defaultUserService;
 	
-	@Resource
-	ISecurityInterceptor securityInterceptor;
+	//@Resource
+	private ISecurityInterceptor securityInterceptor;
 	
 	/**
 	 * 根据WEB.xml配置，初始化CAS SEERVER接口信息
@@ -57,6 +58,10 @@ public class CJSCFilter implements Filter {
 
 		// 客户端应用的“服务名称”，默认端口为80，可以在XML文件中指定
 		casServerName = config.getInitParameter("com.cjsc.sso.serverName");
+		
+		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
+		defaultUserService= (DefaultUserService) wac.getBean("ling2.userService");
+		securityInterceptor= (ISecurityInterceptor) wac.getBean("securityInterceptor");
 	}
 
 	/**
@@ -87,6 +92,7 @@ public class CJSCFilter implements Filter {
 				throw new ServletException(
 						"应用系统的web.xml中缺少统一认证登录界面的接口参数： com.cjsc.sso.loginUrl。");
 			}
+			
 			// 重定向到长江证券统一登录界面
 			((HttpServletResponse) response).sendRedirect(casLogin
 					+ "?service=" + getService((HttpServletRequest) request));
@@ -116,7 +122,7 @@ public class CJSCFilter implements Filter {
 	public void login3rdApp(String userName, HttpServletRequest request, HttpServletResponse response) {
 		// TODO 此处可扩展完成与第三方JAVA应用登录集成,调用登录接口
 		
-		SecurityUser securityUser =  this.defaultUserService.getByUserName(userName);
+		SecurityUser securityUser =  defaultUserService.getByUserName(userName);
 		
 		
 		logger.info("from our DB get > userName:"+securityUser.getUsername()+";password:"+securityUser.getPassword()+";authorities:"+securityUser.getAuthorities());

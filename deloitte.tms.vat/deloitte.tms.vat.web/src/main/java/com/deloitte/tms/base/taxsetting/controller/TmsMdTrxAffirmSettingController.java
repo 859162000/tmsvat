@@ -13,12 +13,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 
-
-
-
-
-
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -69,7 +63,7 @@ DaoPage daoPage=tmsMdTrxAffirmSettingService.findTmsMdTrxAffirmSettingByParams(p
 		
 		JSONObject result = new JSONObject();
 		 JsonConfig jsonConfig = new JsonConfig();
-		 jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor()); 
+		 jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
 		 JSONArray jsonArray = JSONArray.fromObject(daoPage.getResult(),jsonConfig);
 		result.put("total", daoPage.getRecordCount());
 		result.put("rows", jsonArray);// daoPage.getr
@@ -89,7 +83,7 @@ DaoPage daoPage=tmsMdTrxAffirmSettingService.findTmsMdTrxAffirmSettingByParams(p
 	@RequestMapping(value = "/loadTaxTransactionType_id", method = RequestMethod.GET)
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public DaoPage loadTaxTransactionType_id(@RequestParam Map<String,Object> parameter,HttpServletResponse response) throws Exception {
-		System.out.println(PageUtils.getPageNumber(parameter)+PageUtils.getPageSize(parameter));
+	
 		DaoPage daoPage=tmsMdTaxTrxTypeService.findTmsMdTaxTrxTypeByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
 		JSONObject result = new JSONObject();
 		JsonConfig jsonConfig = new JsonConfig();
@@ -109,13 +103,13 @@ DaoPage daoPage=tmsMdTrxAffirmSettingService.findTmsMdTrxAffirmSettingByParams(p
 	@RequestMapping(value = "/saveTmsMdTrxAffirmSetting",method = RequestMethod.POST)
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public void saveTmsMdTrxAffirmSetting(TmsMdTrxAffirmSettingInParam inParam,HttpServletResponse response) throws Exception {
-		
+
 		TmsMdTrxAffirmSetting entity=tmsMdTrxAffirmSettingService.convertTmsMdTrxAffirmSettingInParamToEntity(inParam);
 		if(AssertHelper.empty(entity.getId())){
-			entity.setId(IdGenerator.getUUID());
+			entity.setId(IdGenerator.getUUID());	
 			tmsMdTaxTrxTypeService.save(entity);
 		}
-		else{
+		else{		
 			tmsMdTaxTrxTypeService.update(entity);
 		}
 		inParam.setId(entity.getId());
@@ -134,17 +128,14 @@ DaoPage daoPage=tmsMdTrxAffirmSettingService.findTmsMdTrxAffirmSettingByParams(p
 	@RequestMapping(value = "/saveTmsMdTaxTrxType")
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public void saveTmsMdTaxTrxType(TmsMdTaxTrxTypeInParam inParam,HttpServletResponse response) throws Exception {
-		inParam.setBizOrgCode("机构");
-		inParam.setCreatedBy("测试");
-		inParam.setModifiedDate(new Date());
-		inParam.setModifiedBy("zhan");
-		inParam.setVersionId(10);
-		inParam.setFlag("0");
+
+	    
 		TmsMdTaxTrxType entity=tmsMdTaxTrxTypeService.convertTmsMdTaxTrxTypeInParamToEntity(inParam);
 		if(entity.getId()==null){
-			tmsMdTaxTrxTypeService.save(entity);
+									
+			tmsMdTaxTrxTypeService.save(entity);													
 		}
-		else{
+		else{			
 			tmsMdTaxTrxTypeService.update(entity);
 		}
 		inParam.setId(entity.getId());
@@ -177,13 +168,28 @@ DaoPage daoPage=tmsMdTrxAffirmSettingService.findTmsMdTrxAffirmSettingByParams(p
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/loadTmsMdTrxAffirmSetting", method = RequestMethod.GET)
-	public TmsMdTrxAffirmSettingInParam loadTmsMdTrxAffirmSetting(@RequestParam Map<String, Object> map) throws Exception {
+	@RequestMapping(value = "/loadTmsMdTrxAffirmSetting", method = RequestMethod.POST)
+	public TmsMdTrxAffirmSettingInParam loadTmsMdTrxAffirmSetting(@RequestParam Map<String, Object> map,HttpServletResponse response) throws Exception {
 		Object id=map.get("id");
 		AssertHelper.notEmpty_assert(id,"编辑的主键不能为空");
 		TmsMdTrxAffirmSetting entity=(TmsMdTrxAffirmSetting)tmsMdTrxAffirmSettingService.get(TmsMdTrxAffirmSetting.class,id.toString());
+		entity.getBaseOrg().setId((String)map.get("orgId"));
+		entity.getTmsMdInventoryItems().setId((String)map.get("inventoryItemId"));
+		entity.getTaxCategory().setId((String)map.get("taxCategoryId"));
+		entity.getItems().setId((String)map.get("taxItemId"));
+		entity.getTmsMdTaxTrxType().setId((String)map.get("taxTrxTypeId"));
 		TmsMdTrxAffirmSettingInParam inParam=tmsMdTrxAffirmSettingService.convertTmsMdTrxAffirmSettingToInParam(entity);
-		return inParam;
+		JSONObject result = new JSONObject();
+		JsonConfig jsonConfig = new JsonConfig();
+		jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
+		JSONArray jsonArray = JSONArray.fromObject(inParam,jsonConfig);
+		result.put("rows", jsonArray);
+		result.put("success", true);
+		retJson(response, result);
+		
+		
+		
+		return null;
 	}
 	
 	
@@ -193,4 +199,9 @@ DaoPage daoPage=tmsMdTrxAffirmSettingService.findTmsMdTrxAffirmSettingByParams(p
 		ReflectUtils.copyProperties(inParam, entity);
 		tmsMdTaxTrxTypeService.update(entity);
 	}
+	
+	
+	
+	
+	
 }

@@ -227,4 +227,14 @@ public class CrvatInvoiceReToPreServiceImpl extends BaseService implements
 		return map.keySet().size();
 	}
 
+	/**
+	 * 
+	 */
+	@Override
+	public void exeRevertInvoiceReq(InvoiceReqH invoiceReqH) {
+		invoiceReqH.setStatus(AppFormStatuEnums.PREP_FORM_ERRO.getValue());
+		invoiceReqHDao.update(invoiceReqH);
+		invoiceReqHDao.updateTrxPoolStatusByReqHid(invoiceReqH.getId(),CrvatTaxPoolStatuEnums.OPEN.getValue());
+	}
+
 }

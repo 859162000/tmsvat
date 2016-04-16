@@ -77,10 +77,10 @@ public class InvoicePrintPoolH extends BaseEntity{
 	@ModelProperty(comment = "开票准备单头ID")
 	String crvatInvoicePreHId;
 	
-	@Cascade(CascadeType.REFRESH)
+	/*@Cascade(CascadeType.REFRESH)
 	@JoinColumn(name="CRVAT_INVOICE_PRE_H_ID",insertable=false,updatable=false,nullable=true)
-	@ManyToOne
-	TmsCrvatInvoicePreH crvatInvoicePreH;
+	@ManyToOne*/
+	//TmsCrvatInvoicePreH crvatInvoicePreH;
 	
 	@Column(name = "INVENTORY_INVOICE_ID",length=36)
 	@ModelProperty(comment = "发票库存ID")
@@ -573,13 +573,13 @@ public class InvoicePrintPoolH extends BaseEntity{
 		this.totalAmount = totalAmount;
 	}
 
-	public TmsCrvatInvoicePreH getCrvatInvoicePreH() {
+/*	public TmsCrvatInvoicePreH getCrvatInvoicePreH() {
 		return crvatInvoicePreH;
 	}
 
 	public void setCrvatInvoicePreH(TmsCrvatInvoicePreH crvatInvoicePreH) {
 		this.crvatInvoicePreH = crvatInvoicePreH;
-	}
+	}*/
 
 	public Customer getCustomer() {
 		return customer;

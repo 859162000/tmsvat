@@ -27,11 +27,15 @@ public class InvoiceResToPre implements Job,JobTest{
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("status", AppFormStatuEnums.SUBMITTED.getValue());
 		List<InvoiceReqH> list =  crvatInvoiceReToPreService.findInvoiceReqHByParams(params);
-		for(InvoiceReqH invoiceReqH:list){
+		
+		/*for(InvoiceReqH invoiceReqH:list){
 			invoiceReqH.setStatus(AppFormStatuEnums.PREP_FORM_GENERATING.getValue());
 			crvatInvoiceReToPreService.update(invoiceReqH);
-		}
-		for(InvoiceReqH invoiceReqH:list){				
+		}*/
+		for(InvoiceReqH invoiceReqH:list){	
+			invoiceReqH.setStatus(AppFormStatuEnums.PREP_FORM_GENERATING.getValue());
+			crvatInvoiceReToPreService.update(invoiceReqH);
+			
 			try {				
 				int i =crvatInvoiceReToPreService.exeConvertCrvatInvoiceReToPre(invoiceReqH, new HashMap());
 				invoiceReqH.setQtyOfPreInvoice(i);
@@ -39,8 +43,11 @@ public class InvoiceResToPre implements Job,JobTest{
 				crvatInvoiceReToPreService.update(invoiceReqH);
 			} catch (Exception e) {
 				e.printStackTrace();
-				invoiceReqH.setStatus(AppFormStatuEnums.PREP_FORM_ERRO.getValue());
-				crvatInvoiceReToPreService.update(invoiceReqH);
+				/*invoiceReqH.setStatus(AppFormStatuEnums.PREP_FORM_ERRO.getValue());
+				crvatInvoiceReToPreService.update(invoiceReqH);*/
+				
+				//申请单出现异常时，回滚当前操作的申请单,并且释放当前占用的交易池数据
+				crvatInvoiceReToPreService.exeRevertInvoiceReq(invoiceReqH);
 			}	
 			
 		}

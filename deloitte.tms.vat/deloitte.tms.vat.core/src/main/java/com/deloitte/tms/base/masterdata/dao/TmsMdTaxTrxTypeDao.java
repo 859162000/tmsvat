@@ -17,7 +17,5 @@ public interface TmsMdTaxTrxTypeDao extends IDao<TmsMdTaxTrxType>{
 	public DaoPage findTmsMdTaxTrxTypeByParams(Map params, Integer pageIndex,Integer pageSize);
 	public List<TmsMdTaxTrxType> findTmsMdTaxTrxTypeByParams(Map params);
 	public int removeTmsMdTaxTrxTypes(String tmsMdTaxTrxTypeId);
-	public DaoPage retrievalTmsMdTaxTrxType(Map<String, Object> parameter,
-			Integer pageIndex, Integer pageSize);
 }
 

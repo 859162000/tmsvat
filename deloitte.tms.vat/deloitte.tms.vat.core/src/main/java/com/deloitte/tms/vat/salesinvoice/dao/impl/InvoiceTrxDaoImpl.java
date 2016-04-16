@@ -31,10 +31,12 @@ public class InvoiceTrxDaoImpl extends BaseDao<InvoiceTrxH> implements InvoiceTr
 	{
 		StringBuffer query=new StringBuffer();
 		Map values=new HashMap();
-		Date date = new Date();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");  
+		Date dd=new Date();
+		String invoiceTrxDate = sdf.format(dd);
 		query.append(" from InvoiceTrxH where 1=1 and  flag = 1 ");
-		query.append(" and invoiceTrxDate=:invoiceTrxDate order by crvatInvoiceTrxNumber desc");
-		values.put("invoiceTrxDate", date);
+		query.append(" and to_char(invoiceTrxDate,'yyyyMMdd')=:invoiceTrxDate order by crvatInvoiceTrxNumber desc");
+		values.put("invoiceTrxDate", invoiceTrxDate);
 		return findBy(query, values);
 	}
 	

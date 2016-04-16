@@ -71,7 +71,7 @@
 				    						
 					</tr>
 					<tr>
-						<td >
+						<td>
 								<a href="#" id="searchbtn" class="easyui-linkbutton"
 									data-options="iconCls:'icon-search'" style="width: 80px"
 									onclick="Search()"><spring:message code='button.Search' /></a>
@@ -266,9 +266,9 @@
 				 
 				 {field:'taxSettingMethodName',title:"<spring:message code='invoiceTrxPool.taxSettingMethod'/>",width:80,align:'center'},
 				 
-				 {field:'taxRate',title:"<spring:message code='invoiceTrxPool.taxRate'/>",width:80,align:'right',
+				 {field:'taxRate',title:"<spring:message code='invoiceTrxPool.taxRate'/>%",width:80,align:'right',
 					 formatter: function(value,row,index){
-						return fmoney(value,6);
+						return fmoney(value,0);
 					 }
 				 },
 				 
@@ -290,12 +290,12 @@
 				 
 				 {field:'accountRate',title:"<spring:message code='invoiceTrxPool.accountRate'/>",width:80,align:'right',
 					 formatter: function(value,row,index){
-						return fmoney(value,6);
+						return fmoney(value,2);
 					 }
 				 },
 				 {field:'exchangeRate',title:"<spring:message code='invoiceTrxPool.exchangeRate'/>",width:80,align:'right',
 					formatter: function(value,row,index){
-							return fmoney(value,6);
+							return fmoney(value,2);
 					}
 				 },
 				 {field:'rateDate',title:"<spring:message code='invoiceTrxPool.rateDate'/>",width:80,align:'center'},
@@ -305,7 +305,7 @@
 					 formatter: function(value,row,index){
 						    
 						    if(value!=''){
-						    	return fmoney(value,3);
+						    	return fmoney(value,2);
 						    }
 							
 						 }
@@ -314,7 +314,7 @@
 				 {field:'currentAmount',title:"本位币金额",width:120,align:'right',
 					 formatter: function(value,row,index){
 						 if(value!=''){
-						    	return fmoney(value,3);
+						    	return fmoney(value,2);
 						    }
 						 }
 				 },
@@ -322,21 +322,21 @@
 				 {field:'totalAmount',title:"开票交易金额",width:80,align:'right',
 					 formatter: function(value,row,index){
 						 if(value!=''){
-						    	return fmoney(value,3);
+						    	return fmoney(value,2);
 						    }
 						 }
 				 },
 				 {field:'haveTotalAmount',title:"已开票金额",width:80,align:'right',
 					 formatter: function(value,row,index){
 						 if(value!=''){
-						    	return fmoney(value,3);
+						    	return fmoney(value,2);
 						    }
 						 }
 				 },
 				 {field:'remainAmount',title:"未开票金额",width:80,align:'right',
 					 formatter: function(value,row,index){
 						 if(value!=''){
-						    	return fmoney(value,3);
+						    	return fmoney(value,2);
 						    }
 						 }
 				 },

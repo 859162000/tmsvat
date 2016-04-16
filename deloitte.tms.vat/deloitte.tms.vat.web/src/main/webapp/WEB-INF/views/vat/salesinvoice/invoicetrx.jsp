@@ -41,7 +41,7 @@
 		    	             <a href="#" id="searchbtn"  class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px;" onclick="search_h()">查询</a>
 		    			</td>
 		    			<td>
-	    					<a href="#" class="easyui-linkbutton" style="width:80px" onclick="clearSearchForm()">清除</a>
+	    					<a href="#" class="easyui-linkbutton" style="width:80px" onclick="clearSearchForm()">重置</a>
 		    			</td>
 		    		</tr>
 		    		<tr style="display:none">
@@ -254,7 +254,7 @@
 														}, 'json');											
 													}
 												}, '-', {
-													text : "清除",
+													text : "重置",
 													iconCls : 'icon-remove',
 													handler : function() {
 														$('#querylegalEntityCode').val('');

@@ -82,6 +82,10 @@ public class InvoiceTrxPoolInParam extends InvoiceTrxPool {
 	
 	private String isTax;
 	
+
+	
+
+	
 	
 	
 	
@@ -238,6 +242,11 @@ public class InvoiceTrxPoolInParam extends InvoiceTrxPool {
 	public void setRemainAmount(String remainAmount) {
 		this.remainAmount = remainAmount;
 	}
+	
+	
+	
+
+	
 	private String taxSettingMethodName;
 	
 	private String invoiceTypeName;

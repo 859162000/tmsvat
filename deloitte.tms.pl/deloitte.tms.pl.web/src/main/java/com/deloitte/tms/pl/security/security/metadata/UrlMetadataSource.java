@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 
-import com.deloitte.tms.pl.cache.ApplicationCache;
+import com.deloitte.tms.pl.cache.CacheUtils;
 import com.deloitte.tms.pl.core.commons.utils.SpringUtil;
 import com.deloitte.tms.pl.core.context.utils.ContextUtils;
 import com.deloitte.tms.pl.security.exception.NoneLoginException;
@@ -30,7 +30,6 @@ import com.deloitte.tms.pl.security.model.SecurityUser;
 import com.deloitte.tms.pl.security.model.impl.DefaultRole;
 import com.deloitte.tms.pl.security.model.impl.DefaultUrl;
 import com.deloitte.tms.pl.security.model.impl.DefaultUser;
-import com.deloitte.tms.pl.security.model.impl.RoleMember;
 import com.deloitte.tms.pl.security.security.attribute.AttributeType;
 import com.deloitte.tms.pl.security.security.attribute.SecurityConfigAttribute;
 import com.deloitte.tms.pl.security.service.IRoleService;
@@ -47,8 +46,6 @@ public class UrlMetadataSource implements FilterInvocationSecurityMetadataSource
 	private IRoleService roleService;
 	@Resource
 	private IUrlService urlService;
-	@Resource
-	private ApplicationCache applicationCache;
 	@Value("${ling2.useConservativeAuthorityStrategy}")
 	private boolean useConservativeAuthorityStrategy;
 	private String urlMetadataCacheKey="url_metadata_";
@@ -150,10 +147,10 @@ public class UrlMetadataSource implements FilterInvocationSecurityMetadataSource
 	
 	@SuppressWarnings("unchecked")
 	private Map<String,Map<String,List<ConfigAttribute>>> loadMetaData(){
-		Map<String,Map<String,List<ConfigAttribute>>> metaData= (Map<String,Map<String,List<ConfigAttribute>>>)applicationCache.getCacheObject(urlMetadataCacheKey);
+		Map<String,Map<String,List<ConfigAttribute>>> metaData= (Map<String,Map<String,List<ConfigAttribute>>>)CacheUtils.getCacheObject(urlMetadataCacheKey);
 		if(metaData==null){
 			initUrlMetaData();
-			metaData= (Map<String,Map<String,List<ConfigAttribute>>>)applicationCache.getCacheObject(urlMetadataCacheKey);
+			metaData= (Map<String,Map<String,List<ConfigAttribute>>>)CacheUtils.getCacheObject(urlMetadataCacheKey);
 		}
 		return metaData;
 	}
@@ -189,7 +186,7 @@ public class UrlMetadataSource implements FilterInvocationSecurityMetadataSource
 				//System.out.println("initUrlMetaData:"+targetUrl+" attributes size "+attributes.size());
 			}
 		}
-		applicationCache.putCacheObject(urlMetadataCacheKey, metaData);
+		CacheUtils.putCacheObject(urlMetadataCacheKey, metaData);
 	}
 	
     private String getRequestPath(HttpServletRequest request) {
@@ -260,9 +257,6 @@ public class UrlMetadataSource implements FilterInvocationSecurityMetadataSource
 	}
 	public void setUrlService(IUrlService urlService) {
 		this.urlService = urlService;
-	}
-	public void setApplicationCache(ApplicationCache applicationCache) {
-		this.applicationCache = applicationCache;
 	}
 
 	public boolean isUseConservativeAuthorityStrategy() {

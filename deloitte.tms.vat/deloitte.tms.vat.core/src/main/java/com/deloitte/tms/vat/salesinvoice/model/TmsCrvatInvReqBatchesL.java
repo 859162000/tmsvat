@@ -20,7 +20,9 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
+import com.deloitte.tms.base.taxsetting.model.TmsMdInventoryItems;
 import com.deloitte.tms.pl.core.commons.annotation.ModelProperty;
 import com.deloitte.tms.pl.core.hibernate.identifier.Ling2UUIDGenerator;
 import com.deloitte.tms.pl.core.model.impl.BaseEntity;
@@ -120,14 +122,51 @@ public class TmsCrvatInvReqBatchesL extends BaseEntity {
 	@ModelProperty(comment="组织ID")
 	private String orgId;
     
+    @Column(name="INVENTORY_ITEM_ID", length=36)
+   	@ModelProperty(comment="商品及服务编码ID")
+   	private String inventoryItemId;
+    
     @ManyToOne
+	@Cascade(CascadeType.REFRESH)
+	@JoinColumn(name="INVENTORY_ITEM_ID",insertable=false,updatable=false,nullable=true)
+    private TmsMdInventoryItems tmsMdInventoryItems;
+    
+    public TmsMdInventoryItems getTmsMdInventoryItems() {
+		return tmsMdInventoryItems;
+	}
+
+	public void setTmsMdInventoryItems(TmsMdInventoryItems tmsMdInventoryItems) {
+		this.tmsMdInventoryItems = tmsMdInventoryItems;
+	}
+
+	public String getInventoryItemId() {
+		return inventoryItemId;
+	}
+
+	public void setInventoryItemId(String inventoryItemId) {
+		this.inventoryItemId = inventoryItemId;
+	}
+
+	@ManyToOne
 	@Cascade(CascadeType.REFRESH)
 	@JoinColumn(name="CRVAT_INV_REQ_BATCHES_H_ID",insertable=false,updatable=false,nullable=true)
     private TmsCrvatInvReqBatchesH tmsCrvatInvReqBatchesH;
     
+    @ManyToOne
+   	@Cascade(CascadeType.REFRESH)
+   	@JoinColumn(name="CUSTOMER_ID",insertable=false,updatable=false,nullable=true)
+    private Customer customer;
+       
+    
+    
+	public Customer getCustomer() {
+		return customer;
+	}
 
-    
-    
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
+
 	public String getId() {
 		return id;
 	}

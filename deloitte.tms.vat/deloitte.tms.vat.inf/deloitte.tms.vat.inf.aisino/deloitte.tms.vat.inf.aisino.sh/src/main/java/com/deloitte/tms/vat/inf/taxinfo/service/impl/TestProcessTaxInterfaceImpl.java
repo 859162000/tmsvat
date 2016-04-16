@@ -1,6 +1,7 @@
 package com.deloitte.tms.vat.inf.taxinfo.service.impl;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import javax.management.RuntimeErrorException;
 
@@ -13,6 +14,7 @@ import sajt.webservice.ws.service.xsd.SajtIssueInvoiceResponse;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.ObjectToXMLUtils;
 import com.deloitte.tms.vat.inf.taxinfo.aisino.service.AisinoSHTaxObjectSerializeImpl;
+import com.deloitte.tms.vat.inf.taxinfo.model.invoiceprint.issue.InvoiceIssue;
 import com.deloitte.tms.vat.inf.taxinfo.model.invoiceprint.issue.InvoiceIssueRequest;
 import com.deloitte.tms.vat.inf.taxinfo.model.invoiceprint.issue.InvoiceIssueResponse;
 import com.deloitte.tms.vat.inf.taxinfo.model.invoiceprint.issue.InvoiceIssueResult;
@@ -50,13 +52,16 @@ public class TestProcessTaxInterfaceImpl implements ProcessTaxInterface{
 			System.out.println(sajtResponse.getStatus());
 			
 			//打印发票成功
-			if( "S".equals(sajtResponse.getStatus())||"s".equals(sajtResponse.getStatus())){
+			if( "S".equalsIgnoreCase(sajtResponse.getStatus()) ){
 				//获取开具代码和开局号码
 				String cmdMessageString = sajtResponse.getCmdMessage();
 				String strCode = getINVInformation(cmdMessageString,"<binvcode>","</binvcode>");
 				String strNum = getINVInformation(cmdMessageString,"<binvnr>","</binvnr>");
 				
-				String printCommand = GeneratPrintCommand(strCode,strNum,2);
+				
+				/*String invoiceType = request.getRecord().get(0).getHead().getInvoiceType();
+				System.out.println("发票类型："+invoiceType);
+				String printCommand = GeneratPrintCommand(strCode,strNum,Integer.parseInt(invoiceType));
 				System.out.println(printCommand);
 				
 				sajtResponse = service.saveDocument(printCommand);
@@ -65,7 +70,7 @@ public class TestProcessTaxInterfaceImpl implements ProcessTaxInterface{
 					System.out.println("发票打印成功！！");
 				}else{
 					System.out.println("发票打印失败！！"+sajtResponse.getCmdMessage());
-				}
+				}*/
 				
 			}else{
 				System.out.println(sajtResponse.getCmdMessage());

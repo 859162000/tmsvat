@@ -37,7 +37,8 @@ public class CustomerDaoImpl extends BaseDao<Customer> implements CustomerDao{
 	private void buildCustomerQuery(StringBuffer query,Map values,Map params) {
 		query.append(" from Customer where 1=1 ");
 		Object value=params.get("status");
-		
+		query.append(" and flag=:flag");
+		values.put("flag", "1");
 		if(AssertHelper.notEmpty(value))
 		{
 			query.append(" and status=:status");

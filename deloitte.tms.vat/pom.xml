@@ -12,7 +12,6 @@
   	<module>deloitte.tms.vat.web</module>
   	<module>deloitte.tms.vat.inf.citic</module>
   	<module>deloitte.tms.vat.inf.cjsecurity</module>
-  	<module>deloitte.tms.vat.inf.aisino</module>
   	<module>deloitte.tms.vat.inf</module>
   </modules>
 </project>

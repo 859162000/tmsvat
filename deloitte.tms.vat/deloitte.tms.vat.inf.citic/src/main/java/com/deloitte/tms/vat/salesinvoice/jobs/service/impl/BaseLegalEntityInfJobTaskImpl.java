@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -62,6 +63,8 @@ import com.deloitte.tms.vat.salesinvoice.jobs.service.TrxFileProcessJobTask;
 @Component(BaseLegalEntityInfJobTask.BEAN_ID)
 public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask {
 
+	private final static Logger log = Logger.getLogger(BaseLegalEntityInfJobTaskImpl.class);
+	
 	@Resource
 	private BaseLegalEntityInfDao baseLegalEntityInfDao;
 
@@ -140,9 +143,10 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 		List<TmsMdOrgLegalEntity> allTmsMdOrgLegalEntity = (List<TmsMdOrgLegalEntity>) map.get("allTmsMdOrgLegalEntity");
 		
 		try {
-			
+			log.info("***********begin processing TmsMdLegalEntity at " + System.currentTimeMillis() + "**********");
 			TmsMdLegalEntity tmsMdLegalEntityChild = processTmsMdLegalEntityChild(allTmsMdLegalEntity, baseLegalEntityInf);
 			TmsMdLegalEntity tmsMdLegalEntityParent = processTmsMdLegalEntityParent(allTmsMdLegalEntity, baseLegalEntityInf);
+			log.info("***********end processing TmsMdLegalEntity at " + System.currentTimeMillis() + "**********");
 			//取得父子TmsMdLegalEntity的uuid
 			String childLegalEntityId = tmsMdLegalEntityChild.getId();
 			String parentLegalEntityId = tmsMdLegalEntityParent.getId();
@@ -151,12 +155,20 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 			mapPrint.put("childLegalEntityId", childLegalEntityId);
 			mapPrint.put("parentLegalEntityId", parentLegalEntityId);
 			
+			log.info("***********begin processing TmsMdLegalEnablePrint at " + System.currentTimeMillis() + "**********");
 			processTmsMdLegalEnablePrintChild(allTmsMdLegalEnablePrint, mapPrint);
 			processTmsMdLegalEnablePrintParent(allTmsMdLegalEnablePrint, mapPrint);
+			log.info("***********end processing TmsMdLegalEnablePrint at " + System.currentTimeMillis() + "**********");
+			
+			log.info("***********begin processing BaseOrg at " + System.currentTimeMillis() + "**********");
 			BaseOrg baseOrgParent = processBaseOrgParent(allBaseOrg, baseLegalEntityInf);
 			BaseOrg baseOrgChild = processBaseOrgChild(allBaseOrg, baseLegalEntityInf, baseOrgParent);
+			log.info("***********end processing BaseOrg at " + System.currentTimeMillis() + "**********");
+			
+			log.info("***********begin processing TmsMdUsageLocalLegal at " + System.currentTimeMillis() + "**********");
 			processTmsMdUsageLocalLegal(allTmsMdUsageLocalLegal, tmsMdLegalEntityChild, tmsMdLegalEntityParent);
 			processTmsMdOrgLegalEntity(allTmsMdOrgLegalEntity, baseLegalEntityInf, tmsMdLegalEntityChild, baseOrgChild);
+			log.info("***********end processing TmsMdUsageLocalLegal at " + System.currentTimeMillis() + "**********");
 			
 			baseLegalEntityInf.setInterfaceTrxFlag(StringPool.FINISH);
 			baseLegalEntityInfDao.update(baseLegalEntityInf);
@@ -166,7 +178,7 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 			
 			baseLegalEntityInf.setInterfaceTrxFlag(StringPool.ERRO);
 			baseLegalEntityInfDao.update(baseLegalEntityInf);
-			//log.error("处理数据"+tmsCrvatTrxInf.toString()+"出错,原因:"+e.getMessage()+" 堆栈信息如下:");
+			log.error("处理数据"+baseLegalEntityInf.toString()+"出错,原因:"+e.getMessage()+" 堆栈信息如下:");
 			e.printStackTrace();
 			return false;
 		}
@@ -211,9 +223,9 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 	 */
 	
 	private void processTmsMdUsageLocalLegal(List<TmsMdUsageLocalLegal> allTmsMdUsageLocalLegal, TmsMdLegalEntity tmsMdLegalEntityChild,TmsMdLegalEntity tmsMdLegalEntityParent) {
-		String legalEntityId = tmsMdLegalEntityChild.getId();
-		String legalEntityCode = tmsMdLegalEntityChild.getLegalEntityCode();
-		String parentId = tmsMdLegalEntityParent.getId();
+		String legalEntityId = StringUtils.trim(tmsMdLegalEntityChild.getId());
+		String legalEntityCode = StringUtils.trim(tmsMdLegalEntityChild.getLegalEntityCode());
+		String parentId = StringUtils.trim(tmsMdLegalEntityParent.getId());
 		TmsMdUsageLocalLegal tmsMdUsageLocalLegal = getTmsMdUsageLocalLegal(allTmsMdUsageLocalLegal, legalEntityId);
 		if(tmsMdUsageLocalLegal==null) {
 			tmsMdUsageLocalLegal=new TmsMdUsageLocalLegal();
@@ -221,7 +233,12 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 			tmsMdUsageLocalLegal.setDes(legalEntityCode);
 			tmsMdUsageLocalLegal.setEnabledFlag(true);
 			tmsMdUsageLocalLegal.setIsUsageLocalRegNo(false);
+			tmsMdUsageLocalLegal.setParentId(parentId);
 			tmsMdUsageLocalLegalDao.save(tmsMdUsageLocalLegal);
+			allTmsMdUsageLocalLegal.add(tmsMdUsageLocalLegal);
+		} else {
+			tmsMdUsageLocalLegal.setParentId(parentId);
+			tmsMdUsageLocalLegalDao.update(tmsMdUsageLocalLegal);
 		}
 	}
 
@@ -273,6 +290,7 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 			tmsMdOrgLegalEntity.setEnabledFlag("Y");
 			tmsMdOrgLegalEntity.setId(IdGenerator.getUUID());
 			tmsMdOrgLegalEntityDao.saveOrUpdate(tmsMdOrgLegalEntity);
+			allTmsMdOrgLegalEntity.add(tmsMdOrgLegalEntity);
 		}
 	}
 
@@ -310,7 +328,7 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 	 */
 	
 	private BaseOrg processBaseOrgParent(List<BaseOrg> allBaseOrg, BaseLegalEntityInf baseLegalEntityInf) {
-		String legalEntityCode = baseLegalEntityInf.getParentId();
+		String legalEntityCode = StringUtils.trim(baseLegalEntityInf.getParentId());
 		BaseOrg baseOrg = getBaseOrgParent(allBaseOrg,legalEntityCode);
 
 		if(baseOrg==null) {
@@ -318,6 +336,7 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 			baseOrg.setOrgCode(legalEntityCode);
 			baseOrg.setOrgName(legalEntityCode);
 			baseOrgDao.save(baseOrg);
+			allBaseOrg.add(baseOrg);
 		}
 		
 		return baseOrg;
@@ -355,8 +374,8 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 	
 	private BaseOrg processBaseOrgChild(List<BaseOrg> allBaseOrg,BaseLegalEntityInf baseLegalEntityInf, BaseOrg baseOrgParent) {
 
-		String legalEntityCode = baseLegalEntityInf.getLegalEntityId();// 机构号
-		String parentId = baseOrgParent.getId();
+		String legalEntityCode = StringUtils.trim(baseLegalEntityInf.getLegalEntityId());// 机构号
+		String parentId = StringUtils.trim(baseOrgParent.getId());
 		BaseOrg baseOrg = getBaseOrgChild(allBaseOrg,legalEntityCode,parentId);
 		
 		if(baseOrg==null) {
@@ -365,6 +384,7 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 			baseOrg.setOrgName(legalEntityCode);
 			baseOrg.setParentId(parentId);
 			baseOrgDao.save(baseOrg);
+			allBaseOrg.add(baseOrg);
 		} else {
 			baseOrg.setParentId(parentId);
 			baseOrgDao.update(baseOrg);
@@ -405,10 +425,11 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 	 */
 	
 	private TmsMdLegalEntity processTmsMdLegalEntityParent(List<TmsMdLegalEntity> allTmsMdLegalEntity, BaseLegalEntityInf baseLegalEntityInf) {
+		
 		String parentId = StringUtils.trim(baseLegalEntityInf.getParentId());// 机构号
+		String legalEntityLevel = baseLegalEntityInf.getLegalEntityLevel();// 实法人实体层级
 		
 		TmsMdLegalEntity tmsMdLegalEntityParent = getTmsMdLegalEntity(allTmsMdLegalEntity,parentId);
-		String legalEntityLevel = baseLegalEntityInf.getLegalEntityLevel();// 实法人实体层级
 		
 		if(tmsMdLegalEntityParent==null){
 			tmsMdLegalEntityParent = new TmsMdLegalEntity();
@@ -514,8 +535,8 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 	
 	private TmsMdLegalEntity processTmsMdLegalEntityChild(List<TmsMdLegalEntity> allTmsMdLegalEntity, BaseLegalEntityInf baseLegalEntityInf) {
 		
-		String legalEntityCode = baseLegalEntityInf.getLegalEntityId();// 机构号
-		String legalEntityLevel = baseLegalEntityInf.getLegalEntityLevel();// 实法人实体层级
+		String legalEntityCode = StringUtils.trim(baseLegalEntityInf.getLegalEntityId());// 机构号
+		String legalEntityLevel = StringUtils.trim(baseLegalEntityInf.getLegalEntityLevel());// 实法人实体层级
 		String parentId = StringUtils.trim(baseLegalEntityInf.getParentId());
 		
 		TmsMdLegalEntity tmsMdLegalEntityChild = getTmsMdLegalEntity(allTmsMdLegalEntity,legalEntityCode);
@@ -550,7 +571,7 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 	
 	private TmsMdLegalEntity getTmsMdLegalEntity(List<TmsMdLegalEntity> allTmsMdLegalEntity, String legalEntityCode) {
 		for(TmsMdLegalEntity tmsMdLegalEntity:allTmsMdLegalEntity){
-			if(legalEntityCode.equals(tmsMdLegalEntity.getLegalEntityCode())){
+			if(legalEntityCode.equals(StringUtils.trim(tmsMdLegalEntity.getLegalEntityCode()))){
 				return tmsMdLegalEntity;
 			}
 		}

@@ -91,38 +91,42 @@ public class InvoicePrintPoolHDaoImpl extends BaseDao<InvoicePrintPoolH> impleme
 			values.put("invoicePrintStatus", value);
 		}
 		
-		Object invoiceReqNumber=params.get("invoiceReqNumber");
-		Object sBeginDate=params.get("sBeginDate"); 
-		Object sEndDate=params.get("sEndDate");
-		Object appOrgCode=params.get("appOrgCode");
-		if(AssertHelper.notEmpty(appOrgCode)||AssertHelper.notEmpty(invoiceReqNumber)||AssertHelper.notEmpty(sBeginDate)||AssertHelper.notEmpty(sEndDate))
-		{//准备单
-			query.append(" and exists (select 1 from TmsCrvatInvoicePreH ci,InvoiceReqH invoice where ci.id=t.crvatInvoicePreHId and ci.crvatInvoiceReqHId=invoice.id");
-			if(AssertHelper.notEmpty(invoiceReqNumber)){
-				query.append(" and invoice.crvatInvoiceReqNumber=:crvatInvoiceReqNumber");
-				values.put("crvatInvoiceReqNumber", invoiceReqNumber);
-			}
-			if(AssertHelper.notEmpty(sBeginDate)){
-				query.append(" and invoice.invoiceReqDate>=:sBeginDate");
-				values.put("sBeginDate", DateUtils.parse(sBeginDate.toString(), "yyyy-MM-dd"));
-			}
-			if(AssertHelper.notEmpty(sEndDate)){
-				query.append(" and invoice.invoiceReqDate<=:sEndDate");
-				
-				Date tempdDate=DateUtils.parse(sEndDate.toString(), "yyyy-MM-dd");
-				tempdDate.setHours(23);
-				tempdDate.setMinutes(59);
-				tempdDate.setSeconds(59);
-				
-				values.put("sEndDate", tempdDate);
-			}
-			if(AssertHelper.notEmpty(appOrgCode)){
-				query.append(" and invoice.orgId=:appOrgCode");
-				values.put("appOrgCode", appOrgCode);
-			}
-			query.append(") ");
-		}
 		
+		//长江证券项目   不需要查询准备单和申请单
+		value=params.get("project");
+		if(AssertHelper.empty(value)){
+			Object invoiceReqNumber=params.get("invoiceReqNumber");
+			Object sBeginDate=params.get("sBeginDate"); 
+			Object sEndDate=params.get("sEndDate");
+			Object appOrgCode=params.get("appOrgCode");
+			if(AssertHelper.notEmpty(appOrgCode)||AssertHelper.notEmpty(invoiceReqNumber)||AssertHelper.notEmpty(sBeginDate)||AssertHelper.notEmpty(sEndDate))
+			{//准备单
+				query.append(" and exists (select 1 from TmsCrvatInvoicePreH ci,InvoiceReqH invoice where ci.id=t.crvatInvoicePreHId and ci.crvatInvoiceReqHId=invoice.id");
+				if(AssertHelper.notEmpty(invoiceReqNumber)){
+					query.append(" and invoice.crvatInvoiceReqNumber=:crvatInvoiceReqNumber");
+					values.put("crvatInvoiceReqNumber", invoiceReqNumber);
+				}
+				if(AssertHelper.notEmpty(sBeginDate)){
+					query.append(" and invoice.invoiceReqDate>=:sBeginDate");
+					values.put("sBeginDate", DateUtils.parse(sBeginDate.toString(), "yyyy-MM-dd"));
+				}
+				if(AssertHelper.notEmpty(sEndDate)){
+					query.append(" and invoice.invoiceReqDate<=:sEndDate");
+					
+					Date tempdDate=DateUtils.parse(sEndDate.toString(), "yyyy-MM-dd");
+					tempdDate.setHours(23);
+					tempdDate.setMinutes(59);
+					tempdDate.setSeconds(59);
+					
+					values.put("sEndDate", tempdDate);
+				}
+				if(AssertHelper.notEmpty(appOrgCode)){
+					query.append(" and invoice.orgId=:appOrgCode");
+					values.put("appOrgCode", appOrgCode);
+				}
+				query.append(") ");
+			}
+		}
 		query.append(" and flag=:deletedFlag");
 		values.put("deletedFlag", "1");
 		
@@ -184,36 +188,41 @@ public class InvoicePrintPoolHDaoImpl extends BaseDao<InvoicePrintPoolH> impleme
 			query.append(" and invoicePrintStatus!=:invoicePrintStatus");
 			values.put("invoicePrintStatus", value);
 		}
-		
-		Object invoiceReqNumber=params.get("invoiceReqNumber");
-		Object sBeginDate=params.get("sBeginDate"); 
-		Object sEndDate=params.get("sEndDate");
-		Object appOrgCode=params.get("appOrgCode");
-		if(AssertHelper.notEmpty(appOrgCode)||AssertHelper.notEmpty(invoiceReqNumber)||AssertHelper.notEmpty(sBeginDate)||AssertHelper.notEmpty(sEndDate))
-		{//准备单
-			query.append(" and exists (select 1 from TmsCrvatInvoicePreH ci,InvoiceReqH invoice where ci.id=t.crvatInvoicePreHId and ci.crvatInvoiceReqHId=invoice.id");
-			if(AssertHelper.notEmpty(invoiceReqNumber)){
-				query.append(" and invoice.crvatInvoiceReqNumber=:crvatInvoiceReqNumber");
-				values.put("crvatInvoiceReqNumber", invoiceReqNumber);
+
+		//长江证券项目   不需要查询准备单和申请单
+		value=params.get("project");
+		if(AssertHelper.empty(value)){
+			Object invoiceReqNumber=params.get("invoiceReqNumber");
+			Object sBeginDate=params.get("sBeginDate"); 
+			Object sEndDate=params.get("sEndDate");
+			Object appOrgCode=params.get("appOrgCode");
+			if(AssertHelper.notEmpty(appOrgCode)||AssertHelper.notEmpty(invoiceReqNumber)||AssertHelper.notEmpty(sBeginDate)||AssertHelper.notEmpty(sEndDate))
+			{//准备单
+				query.append(" and exists (select 1 from TmsCrvatInvoicePreH ci,InvoiceReqH invoice where ci.id=t.crvatInvoicePreHId and ci.crvatInvoiceReqHId=invoice.id");
+				if(AssertHelper.notEmpty(invoiceReqNumber)){
+					query.append(" and invoice.crvatInvoiceReqNumber=:crvatInvoiceReqNumber");
+					values.put("crvatInvoiceReqNumber", invoiceReqNumber);
+				}
+				if(AssertHelper.notEmpty(sBeginDate)){
+					query.append(" and invoice.invoiceReqDate>=:sBeginDate");
+					values.put("sBeginDate", DateUtils.parse(sBeginDate.toString(), "yyyy-MM-dd"));
+				}
+				if(AssertHelper.notEmpty(sEndDate)){
+					query.append(" and invoice.invoiceReqDate<=:sEndDate");
+					Date tempdDate=DateUtils.parse(sEndDate.toString(), "yyyy-MM-dd");
+					tempdDate.setHours(23);
+					tempdDate.setMinutes(59);
+					tempdDate.setSeconds(59);
+					values.put("sEndDate", tempdDate);
+				}
+				if(AssertHelper.notEmpty(appOrgCode)){
+					query.append(" and invoice.orgId=:appOrgCode");
+					values.put("appOrgCode", appOrgCode);
+				}
+				query.append(") ");
 			}
-			if(AssertHelper.notEmpty(sBeginDate)){
-				query.append(" and invoice.invoiceReqDate>=:sBeginDate");
-				values.put("sBeginDate", DateUtils.parse(sBeginDate.toString(), "yyyy-MM-dd"));
-			}
-			if(AssertHelper.notEmpty(sEndDate)){
-				query.append(" and invoice.invoiceReqDate<=:sEndDate");
-				Date tempdDate=DateUtils.parse(sEndDate.toString(), "yyyy-MM-dd");
-				tempdDate.setHours(23);
-				tempdDate.setMinutes(59);
-				tempdDate.setSeconds(59);
-				values.put("sEndDate", tempdDate);
-			}
-			if(AssertHelper.notEmpty(appOrgCode)){
-				query.append(" and invoice.orgId=:appOrgCode");
-				values.put("appOrgCode", appOrgCode);
-			}
-			query.append(") ");
 		}
+		
 		query.append(" and flag=:deletedFlag");
 		values.put("deletedFlag", "1");
 	}

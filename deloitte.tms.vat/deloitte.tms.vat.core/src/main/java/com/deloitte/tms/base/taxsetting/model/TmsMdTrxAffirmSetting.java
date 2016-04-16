@@ -17,6 +17,8 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.deloitte.tms.base.masterdata.model.BaseOrg;
+import com.deloitte.tms.base.masterdata.model.TmsMdTaxTrxType;
 import com.deloitte.tms.pl.core.commons.annotation.ModelProperty;
 import com.deloitte.tms.pl.core.hibernate.identifier.Ling2UUIDGenerator;
 import com.deloitte.tms.pl.core.model.impl.BaseEntity;
@@ -106,7 +108,7 @@ public class TmsMdTrxAffirmSetting extends BaseEntity {
 
     @Column(name="ENABLED_FLAG")
 	@ModelProperty(comment="是否启用(Y/N)")
-	private Boolean enabledFlag;
+	private String enabledFlag;
 
     @Column(name="LEGAL_ENTITY_ID")
 	@ModelProperty(comment="纳税主体ID")
@@ -128,10 +130,76 @@ public class TmsMdTrxAffirmSetting extends BaseEntity {
 	@ModelProperty(comment="组织ID")
 	private String orgId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-	@Cascade(CascadeType.REFRESH)
+    @Column(name="INVENTORY_ITEM_ID")
+	@ModelProperty(comment="商品及服务编码ID")
+    private String  inventoryItemId;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+	@Cascade(CascadeType.REFRESH) //商品及服务编码
 	@JoinColumn(name="INVENTORY_ITEM_ID",insertable=false,updatable=false,nullable=true)
 	private TmsMdInventoryItems tmsMdInventoryItems;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+ 	@Cascade(CascadeType.REFRESH) //税目
+ 	@JoinColumn(name="TAX_ITEM_ID",insertable=false,updatable=false,nullable=true)
+    private Items items;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+ 	@Cascade(CascadeType.REFRESH) //涉税交易类型
+ 	@JoinColumn(name="TAX_TRX_TYPE_ID",insertable=false,updatable=false,nullable=true)
+    private TmsMdTaxTrxType tmsMdTaxTrxType;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+ 	@Cascade(CascadeType.REFRESH) //税种
+ 	@JoinColumn(name="TAX_CATEGORY_ID",insertable=false,updatable=false,nullable=true)
+    private TaxCategory taxCategory;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+ 	@Cascade(CascadeType.REFRESH) //组织
+ 	@JoinColumn(name="ORG_ID",insertable=false,updatable=false,nullable=true)
+    private BaseOrg baseOrg;
+     
+    
+    
+	public String getInventoryItemId() {
+		return inventoryItemId;
+	}
+
+	public void setInventoryItemId(String inventoryItemId) {
+		this.inventoryItemId = inventoryItemId;
+	}
+
+	public Items getItems() {
+		return items;
+	}
+
+	public void setItems(Items items) {
+		this.items = items;
+	}
+
+	public TmsMdTaxTrxType getTmsMdTaxTrxType() {
+		return tmsMdTaxTrxType;
+	}
+
+	public void setTmsMdTaxTrxType(TmsMdTaxTrxType tmsMdTaxTrxType) {
+		this.tmsMdTaxTrxType = tmsMdTaxTrxType;
+	}
+
+	public TaxCategory getTaxCategory() {
+		return taxCategory;
+	}
+
+	public void setTaxCategory(TaxCategory taxCategory) {
+		this.taxCategory = taxCategory;
+	}
+
+	public BaseOrg getBaseOrg() {
+		return baseOrg;
+	}
+
+	public void setBaseOrg(BaseOrg baseOrg) {
+		this.baseOrg = baseOrg;
+	}
 
 	public String getId() {
 		return id;
@@ -263,11 +331,11 @@ public class TmsMdTrxAffirmSetting extends BaseEntity {
 		this.isTax = isTax;
 	}
 
-	public Boolean getEnabledFlag() {
+	public String getEnabledFlag() {
 		return enabledFlag;
 	}
 
-	public void setEnabledFlag(Boolean enabledFlag) {
+	public void setEnabledFlag(String enabledFlag) {
 		this.enabledFlag = enabledFlag;
 	}
 

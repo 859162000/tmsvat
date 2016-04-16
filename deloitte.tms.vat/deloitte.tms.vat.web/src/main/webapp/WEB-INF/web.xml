@@ -124,28 +124,6 @@
         <url-pattern>*.ljson</url-pattern>
     </filter-mapping>
     
-    <filter>
-        <!-- CJSC SSO Filter -->
-	<filter-name>CJSCFilter</filter-name>
-	<filter-class>com.deloitte.tms.pl.core.filter.CJSCFilter</filter-class>
-	<init-param>
-		<param-name> com.cjsc.sso.loginUrl</param-name>
-		<param-value>https://login.cjsc.com.cn/cas/login</param-value>
-	</init-param>
-	<init-param>
-		<param-name> com.cjsc.sso.validateUrl</param-name>
-		<param-value> https://login.cjsc.com.cn/cas/serviceValidate</param-value>
-	</init-param>
-	<init-param>
-		<param-name> com.cjsc.sso.serverName</param-name>
-		<param-value>testapp.cjsc.com.cn:443</param-value>
-	</init-param>
-	</filter>
-
-	<filter-mapping>
-		<filter-name>CJSCFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
 	
 	
 	<!-- spring监听器 -->

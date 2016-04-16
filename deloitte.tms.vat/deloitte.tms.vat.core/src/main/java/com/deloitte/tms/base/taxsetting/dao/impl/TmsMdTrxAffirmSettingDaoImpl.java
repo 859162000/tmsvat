@@ -36,11 +36,30 @@ public class TmsMdTrxAffirmSettingDaoImpl extends BaseDao<TmsMdTrxAffirmSetting>
 	private void buildTmsMdTrxAffirmSettingQuery(StringBuffer query,Map values,Map params) {
 		query.append(" from TmsMdTrxAffirmSetting where 1=1 ");
 		Object value=params.get("status");
+		Object enabledFlag= params.get("enabledFlag");
+		Object orgId=params.get("orgId");
+		Object taxTrxTypeId=params.get("taxTrxTypeId");
 		if(value!=null)
 		{
 			query.append(" and status=:status");
 			values.put("status", value);
 		}
+		if(enabledFlag != null && !"".equals(enabledFlag)){
+			
+			query.append(" and enabledFlag=:enabledFlag");
+			values.put("enabledFlag", enabledFlag);
+		}
+	    if(orgId != null && !"".equals(orgId)){
+			
+			query.append(" and orgId=:orgId");
+			values.put("orgId", orgId);
+		}
+	    if(taxTrxTypeId != null && !"".equals(taxTrxTypeId)){
+			
+	 			query.append(" and taxTrxTypeId=:taxTrxTypeId");
+	 			values.put("taxTrxTypeId", taxTrxTypeId);
+	 		}
+		
 	}
 }
 

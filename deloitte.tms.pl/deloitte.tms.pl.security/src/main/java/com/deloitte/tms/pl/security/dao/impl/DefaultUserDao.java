@@ -197,8 +197,7 @@ public class DefaultUserDao extends BaseDao implements IUserDao {
 		do {
 			//分批查询数据			
 			List<DefaultUser> users= findByPage(query, values, pageIndex, pageSize);
-			allusers.addAll(users);
-			
+			allusers.addAll(users);		
 			
 			size = users.size();
 			pageIndex++;

@@ -70,8 +70,6 @@ public class TmsMdTaxTrxType implements Serializable {
 	@ModelProperty(comment="失效日期")
 	private Date endDate;
     
-    
-    
     @Column(name = "CREATED_BY",  length = 50)
 	@ModelProperty(comment="创建人")
 	String createdBy;

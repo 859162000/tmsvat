@@ -1333,7 +1333,7 @@ function contactNameChange(){
 			  $.messager.alert('<spring:message code="system.alert"/>','纳税人识别号不能为空');
 			  sign = -1;			  		  
 		  }else if(sign == 2){
-			  $.messager.alert('<spring:message code="system.alert"/>','统一社会征集号码不能为空');
+			  $.messager.alert('<spring:message code="system.alert"/>','统一社会信用代码不能为空');
 			  sign = -1;
 		  }else if(sign == 3){
 			  $.messager.alert('<spring:message code="system.alert"/>','开户银行不能为空');			 

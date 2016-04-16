@@ -13,6 +13,10 @@
 
 package com.deloitte.tms.vat.salesinvoice.jobs.service;
 
+import java.util.List;
+
+import com.deloitte.tms.vat.salesinvoice.jobs.model.BaseLegalEntityInf;
+
 /**  
  * 组织机构关联
  * @author stonshi
@@ -33,5 +37,5 @@ public interface OrgFileProcessJobTask {
 	 * @see [相关类/方法]（可选）
 	 * @since [产品/模块版本] （可选）
 	 */
-	public int executeProcessFile(String filePath, String fileType,String fileOutPath);
+	public int executeProcessPreOrg(List<BaseLegalEntityInf> legalEntityInfs);
 }

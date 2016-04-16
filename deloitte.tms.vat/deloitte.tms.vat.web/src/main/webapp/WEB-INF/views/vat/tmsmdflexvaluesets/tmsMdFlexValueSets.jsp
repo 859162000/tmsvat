@@ -80,6 +80,9 @@
 						<td>值集说明：</td>
 						<td><input id="description_id" class="easyui-textbox"
 							type="text" style="width: 150px;" name="description" value=""></input></td>
+								<td>值集名称：</td>
+						<td><input id="flexValueSetName_id" class="easyui-textbox"
+							type="text" style="width: 150px;" name="flexValueSetName" value=""></input></td>
 						<td>数据来源：</td>
 						<td><select id="sourceCode_id" name="sourceCode"
 							class="easyui-combobox" style="width: 150px;">
@@ -127,12 +130,7 @@
 		
          </div>
          
-         <div class="easyui-dialog"  id="values_dialog" style="height: 100%;">
-         
-      <div class="easyui-layout" style="width: 100%; height: 100%;">
-      
-      <div region="north" split="true" border="false"
-			style="overflow: hidden; height: 23%;">
+         <div class="easyui-dialog"  id="values_dialog" style=" width: 800px; height: 300px;">
          <div class="easyui-panel" title="值"
 				style="width: 100%; height:100%; background-color: #E0ECFF">
          <form id="tmsMdFlexValues_editAddform" method="post" scroll="no">
@@ -155,6 +153,10 @@
 						</select></td>
 					</tr>
 					<tr>
+					<td>值：</td>
+						<td>
+						<input id="flexValue_id" class="easyui-textbox"
+							type="text" style="width: 150px;" name="flexValue" value=""></input></td>
 						<td>开始日期：</td>
 						<td><input id="valuesstartDateActive_id" class="easyui-datebox"
 							type="text" style="width: 150px;" name="startDateActive" value=""  data-options="editable:false"></input></td>
@@ -176,16 +178,6 @@
 					</tr>
 				</table>
 			</form>
-			</div>
-			</div>
-			
-			<div data-options="region:'center',border:false"
-				style="background-color: #E0ECFF">
-          <div class="easyui-panel" title="值导入" style="width: 100%; height:100%;">
-           <table class="easyui-datagrid" id="values_datagrid" style="width: 100%; height: 100%"></table>
-       </div>
-         </div>
-         
          </div>
          
 	</div>
@@ -304,19 +296,6 @@
 					sortable:true
 				}, 
 				] ],
-				toolbar: [{
-					text:'导入',
-					iconCls: 'icon-edit',
-					handler: function(){
-						alert('edit')
-						}
-				},'-',{
-					text:'下载导入模板',
-					iconCls: 'icon-edit',
-					handler: function(){
-						alert('edit')
-						}
-				}]
 	});
 }
 /**
@@ -335,7 +314,6 @@
 function tmsMdFlexValuesAdd(){
 	
 	var flexValueSetId_id = $("#id").val();//值集设置id
-	alert(flexValueSetId_id);
 	
 	$("#values_dialog").dialog('open');//打开弹出框
 
@@ -354,22 +332,23 @@ function tmsMdFlexValuesEdit(){
 				'getChecked');//得到选中行
 				
 		var flexValueSetId_id = $("#id").val();//值集设置id
-		alert(flexValueSetId_id);
 		var flexValuesId_id = row_list[0].id;//设置值集值id
+		var flexValue_id = row_list[0].flexValue;//设置值集值id
 		var flexValueSetCode = row_list[0].flexValueCode;//设置值集值编码
 		var description = row_list[0].description;//设置值集值说明
 		var startDateActive = row_list[0].startDateActive;//设置开始日期
 		var endDateActive = row_list[0].endDateActive;//设置结束
 		var enabledFlag = row_list[0].enabledFlag;//设置是否启用
 
-		$("#flexValueSetId_id").val(flexValueSetId_id)//值集设置id
+		$("#flexValueSetId_id").val(flexValueSetId_id);//值集设置id
 		
-		$("#flexValuesId_id").val(flexValuesId_id)//设置值集值id
-		$("#flexValuesCode_id").textbox('setValue', flexValueSetCode)//设置值集值编码
-		$("#valuesdescription_id").textbox('setValue', description)//设置值集值说明
-		$("#valuesenabledFlag_id").textbox('setValue', enabledFlag)//设置是否启用
-		$("#valuesstartDateActive_id").textbox('setValue', startDateActive)//设置开始日期
-		$("#valuesendDateActive_id").textbox('setValue', endDateActive)//设置结束日期
+		$("#flexValuesId_id").val(flexValuesId_id);//设置值集值id
+		$("#flexValue_id").textbox('setValue',flexValue_id);//设置值集值id
+		$("#flexValuesCode_id").textbox('setValue', flexValueSetCode);//设置值集值编码
+		$("#valuesdescription_id").textbox('setValue', description);//设置值集值说明
+		$("#valuesenabledFlag_id").textbox('setValue', enabledFlag);//设置是否启用
+		$("#valuesstartDateActive_id").textbox('setValue', startDateActive);//设置开始日期
+		$("#valuesendDateActive_id").textbox('setValue', endDateActive);//设置结束日期
 
 	}
 }
@@ -401,7 +380,6 @@ function addUpdateValues(){
 											var temp = result.status;
 											if (temp === 'aaa') {
 												clearTmsMdFlexValues_editAddform();
-												alert('');
 												$("#values_dialog").dialog('close');
 												addInvoiceList_datagrid('') ;
 												$(
@@ -594,6 +572,12 @@ function setsearchvaluesetthat_id(obj){
 										width : 120,
 										align : 'center',
 										sortable:true
+									},{
+										field : 'flexValueSetName',
+										title : '值集名称',
+										width : 120,
+										align : 'center',
+										sortable:true
 									},
 									{
 										field : 'description',
@@ -628,13 +612,6 @@ function setsearchvaluesetthat_id(obj){
 										title : '<spring:message code="TmsMdFlexValueSets.endDateActive"/>',
 										width : 120,
 										align : 'center',
-										sortable:true
-									},{
-										field : 'flexValueSetName',
-										title : '值集名',
-										width : 120,
-										align : 'center',
-										hidden:true,
 										sortable:true
 									},{
 										field : 'sourceHeaderId',
@@ -875,8 +852,9 @@ function setsearchvaluesetthat_id(obj){
 				var result = $.parseJSON(result);//将数据格式化成json
 				if(result.success==true){//判断是否成功
 					$.messager.alert("操作提示", "添加成功");
-					//$("#layoutid").layout('collapse', 'east');//关闭右侧面板
 					inittmsmdflexvaluesetsinit_datagrid();//刷新值集设置数据表格
+					alert(result.id);
+					$("#id").val(result.id)//设置值集编码
 				}
 			}
 		});
@@ -901,6 +879,9 @@ function setsearchvaluesetthat_id(obj){
 			var endDateActive = row_list[0].endDateActive;
 			var enabledFlag = row_list[0].enabledFlag;
 
+
+			var flexValueSetName_id = row_list[0].flexValueSetName;//设置值集值id
+			$("#flexValueSetName_id").textbox('setValue',flexValueSetName_id);//设置值集值id
 			$("#id").val(id)//设置值集编码
 			$("#flexValueSetCode_id").textbox('setValue', flexValueSetCode)//设置值集编码
 			$("#description_id").textbox('setValue', description)//设置值集说明

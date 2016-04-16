@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.dao.impl.BaseDao;
+import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.base.masterdata.model.CustomerSite;
 import com.deloitte.tms.base.masterdata.dao.CustomerSiteDao;
 /**
@@ -62,5 +63,6 @@ public class CustomerSiteDaoImpl extends BaseDao<CustomerSite> implements Custom
 			values.put("deleteFlag", value);
 		}
 	}
+	
 }
 

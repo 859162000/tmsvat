@@ -44,6 +44,7 @@ import com.deloitte.tms.pl.core.commons.utils.PageUtils;
 import com.deloitte.tms.pl.core.context.utils.ContextUtils;
 import com.deloitte.tms.pl.dictionary.service.DictionaryService;
 import com.deloitte.tms.vat.base.enums.AppFormStatuEnums;
+import com.deloitte.tms.vat.core.common.IdGenerator;
 import com.deloitte.tms.vat.core.common.JsonDateValueProcessor;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqH;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqHInParam;
@@ -78,6 +79,7 @@ public class CiticInvoiceReqHController extends BaseController{
 	CiticInvoiceReqHService citicInvoiceReqHService;
 	@RequestMapping(value = "/getCiticInvoiceReqIndex")
 	public String getIndex() throws Exception{
+		invoiceTrxPoolService.deleteTempCrvatInvoiceRelByUserName(ContextUtils.getCurrentUserName());
 		return "invoiceprint/citicinvoicereq";
 		/*return "invoiceprint/nocustomer";*/
 	}
@@ -112,6 +114,7 @@ public class CiticInvoiceReqHController extends BaseController{
 		inParam.setStatus(getMessage(AppFormStatuEnums.DRAFT.getValue()));
 		//inParam.setStatus(AppFormStatuEnums.DRAFT.getValue());
 		inParam.setCreatedBy(ContextUtils.getCurrentUserName());
+		inParam.setId(IdGenerator.getUUID());
 		//inParam.setOperationOrgCode("0001");
 		JSONObject object=new JSONObject();
 		JSONObject object1=JSONObject.fromObject(inParam, jsonConfig);
@@ -162,6 +165,39 @@ public class CiticInvoiceReqHController extends BaseController{
 		}
 		retJson(response,result);
 	}
+	
+	@RequestMapping(value = "citicInvoiceReq/addtransactionlisttotemp")
+	public void addTransactionlist(@RequestParam Map<String, Object> map,HttpServletResponse response) throws Exception {
+		map.put("orgId", ContextUtils.getCurrentOrgId());
+		JSONObject result=new JSONObject();
+		try {
+			map.put("operatoruser", ContextUtils.getCurrentUserName());
+			invoiceTrxPoolService.addTrxPoolToTempTmsCrvatReqL(map);						 			
+			result.put("success", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("success", false);
+			result.put("errorMessage", e.getLocalizedMessage());
+		}
+		retJson(response,result);
+	}
+	
+	@RequestMapping(value = "citicInvoiceReq/addtransactionlisttoreh")
+	public void addTransactionlistToReh(@RequestParam Map<String, Object> map,HttpServletResponse response) throws Exception {
+		map.put("orgId", ContextUtils.getCurrentOrgId());
+		JSONObject result=new JSONObject();
+		try {	
+			invoiceTrxPoolService.addTrxPoolToReqH(map);							 			
+			result.put("success", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("success", false);
+			result.put("errorMessage", e.getLocalizedMessage());
+		}
+		retJson(response,result);
+	}
+	
+	
 	@RequestMapping(value = "citicInvoiceReq/getAlltransaction")
 	public void getAlltransaction(@RequestParam Map<String, Object> map,HttpServletResponse response) throws Exception {
 		//List<InvoiceTrxPool>list=invoiceTrxPoolService.getAlltransaction(map);
@@ -174,7 +210,7 @@ public class CiticInvoiceReqHController extends BaseController{
 		result.put("rows", jsonArray1.toString());
 		retJson(response, result);
 	}
-	@RequestMapping(value = "citicInvoiceReq/saveCustomerAndReq")
+	/*@RequestMapping(value = "citicInvoiceReq/saveCustomerAndReq")*/
 	public void saveCustomerAndReq(@RequestParam Map<String, Object> map,HttpServletResponse response) throws Exception {
 		JSONObject object=new JSONObject();
 		try {
@@ -223,32 +259,86 @@ public class CiticInvoiceReqHController extends BaseController{
 	//申请单查询页面
 	@RequestMapping(value = "citicInvoiceReq/getInvoiceReqAll", method = RequestMethod.POST)
 	public void getInvoiceReqAll(@RequestParam Map<String, Object>map,HttpServletResponse response) throws Exception{
-		DaoPage page=invoiceReqHService.findInvoiceReqAll(map, PageUtils.getPageNumber(map),PageUtils.getPageSize(map));
+		
 		JSONObject result=new JSONObject();
 		JsonConfig jsonConfig = new JsonConfig();  
-		jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
-		JSONArray jsonArray1 = JSONArray.fromObject(page.getResult(),jsonConfig);
-		result.put("total", page.getRecordCount());
-		result.put("rows", jsonArray1.toString());
+		try {
+			DaoPage page=invoiceReqHService.findInvoiceReqAll(map, PageUtils.getPageNumber(map),PageUtils.getPageSize(map));
+			jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
+			JSONArray jsonArray1 = JSONArray.fromObject(page.getResult(),jsonConfig);
+			result.put("total", page.getRecordCount());
+			result.put("rows", jsonArray1.toString());
+			result.put("success", true);
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("errorMessage", e.getLocalizedMessage());
+		}
 		retJson(response,result);
 	}
 	//编辑申请单
 	@RequestMapping(value = "citicInvoiceReq/getEditInfo", method = RequestMethod.POST)
 	public void getEditInfo(@RequestParam Map<String, Object>map,HttpServletResponse response) throws IOException{
 		JSONObject result=new JSONObject();
-		DaoPage page=invoiceReqLService.findInvoiceReqLByParams(map, PageUtils.getPageNumber(map),PageUtils.getPageSize(map));
-		//InvoiceReqH invoiceReqH= (InvoiceReqH) invoiceReqHService.findById(InvoiceReqH.class, map.get("crvatInvoiceReqHId").toString());
+		DaoPage page=invoiceReqLService.findInvoiceReqLByParams(map, PageUtils.getPageNumber(map),PageUtils.getPageSize(map));	
+		JsonConfig jsonConfig = new JsonConfig();  
+		jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
+		JSONArray jsonArray1 = JSONArray.fromObject(page.getResult(),jsonConfig);
+		result.put("total", page.getRecordCount());
+		result.put("rows", jsonArray1.toString());		
+		retJson(response,result);
+	}
+	
+	
+	
+	
+	
+	@RequestMapping(value = "citicInvoiceReq/gettempEditInfo", method = RequestMethod.POST)
+	public void getTempEditInfo(@RequestParam Map<String, Object>map,HttpServletResponse response) throws IOException{
+		JSONObject result=new JSONObject();
+		DaoPage page=invoiceTrxPoolService.findInvoiceTempReqLByParams(map, PageUtils.getPageNumber(map),PageUtils.getPageSize(map));	
 		JsonConfig jsonConfig = new JsonConfig();  
 		jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
 		JSONArray jsonArray1 = JSONArray.fromObject(page.getResult(),jsonConfig);
 		result.put("total", page.getRecordCount());
 		result.put("rows", jsonArray1.toString());
-		/*InvoiceReqHInParam inParam=invoiceReqHService.getEditInfo(invoiceReqH.getId());
-		JSONObject object1= JSONObject.fromObject(inParam,jsonConfig);
-		result.put("reqH", object1.toString());*/
 		retJson(response,result);
 	}
-	@RequestMapping(value = "citicInvoiceReq/updateCommitStatus", method = RequestMethod.POST)
+	
+	@RequestMapping(value = "citicInvoiceReq/deletetempreql", method = RequestMethod.POST)
+	public void getDeleteTempReql(@RequestParam Map<String, Object>map,HttpServletResponse response) throws IOException{
+		JSONObject result=new JSONObject();
+		String id = (String) map.get("tempids");
+		String[] ids = id.split(",");
+		invoiceTrxPoolService.deleteTempCrvatInvoiceRelById(ids);						
+		DaoPage page=invoiceTrxPoolService.findInvoiceTempReqLByParams(map, PageUtils.getPageNumber(map),PageUtils.getPageSize(map));
+		JsonConfig jsonConfig = new JsonConfig();  
+		jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
+		JSONArray jsonArray1 = JSONArray.fromObject(page.getResult(),jsonConfig);
+		result.put("total", page.getRecordCount());
+		result.put("rows", jsonArray1.toString());		
+		retJson(response,result);
+	}
+	@RequestMapping(value = "citicInvoiceReq/deletereql", method = RequestMethod.POST)
+	public void getDeleteReql(@RequestParam Map<String, Object>map,HttpServletResponse response) throws IOException{
+		JSONObject result=new JSONObject();
+		String id = (String) map.get("reqlids");
+		String[] ids = id.split(",");
+		invoiceReqLService.deleteFromReq(ids);
+		DaoPage page=invoiceReqLService.findInvoiceReqLByParams(map, PageUtils.getPageNumber(map),PageUtils.getPageSize(map));	
+		JsonConfig jsonConfig = new JsonConfig();  
+		jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
+		JSONArray jsonArray1 = JSONArray.fromObject(page.getResult(),jsonConfig);
+		result.put("total", page.getRecordCount());
+		result.put("rows", jsonArray1.toString());		
+		retJson(response,result);
+	}
+	
+	
+	@RequestMapping(value = "citicInvoiceReq/deletetempbyusername", method = RequestMethod.POST)
+	public void deleteTempCrvatReql() throws IOException{		
+		invoiceTrxPoolService.deleteTempCrvatInvoiceRelByUserName(ContextUtils.getCurrentUserName());	
+	}
+	/*@RequestMapping(value = "citicInvoiceReq/updateCommitStatus", method = RequestMethod.POST)
 	public void updateCommitStatus(InvoiceReqHInParam inParam,HttpServletResponse response) throws IOException{
 		JSONObject object = new JSONObject();
 		String id = inParam.getId();
@@ -277,7 +367,30 @@ public class CiticInvoiceReqHController extends BaseController{
 			e.printStackTrace();
 		}
 		retJson(response, object);
+	}*/
+	
+	@RequestMapping(value = "citicInvoiceReq/updateCommitStatus", method = RequestMethod.POST)
+	public void updateCommitStatus(@RequestParam Map<String, Object>map,HttpServletResponse response) throws IOException{
+		JSONObject object = new JSONObject();
+		
+		try {
+			map.put("status",AppFormStatuEnums.SUBMITTED.getValue());
+			map.put("orgId", ContextUtils.getCurrentOrgId());
+			map.put("name", ContextUtils.getCurrentUserName());
+			citicInvoiceReqHService.setUpHead(map);			
+			object.put("msg", "提交成功");
+			object.put("success", "true");
+		} catch (Exception e) {
+			object.put("msg", "提交失败");
+			object.put("success", "false");
+			e.printStackTrace();
+		}
+		retJson(response, object);
 	}
+	
+	
+	
+	
 	@RequestMapping(value="citicInvoiceReq/submitFromPage",method=RequestMethod.POST)
 	public void submitFromPage(@RequestParam Map<String,Object>map,HttpServletResponse response) throws IOException{
 		String allId=map.get("ids").toString();
@@ -287,11 +400,7 @@ public class CiticInvoiceReqHController extends BaseController{
 		List<InvoiceReqL>list=new ArrayList<InvoiceReqL>();
 		try {
 			for (int i = 0; i < ids.length; i++) {
-				InvoiceReqH entity=(InvoiceReqH) invoiceReqHService.get(InvoiceReqH.class, ids[i]);
-				/*pMap.put("id", ids[i]);
-				String rowsids=invoiceReqHService.getRowsids(ids[i]);
-				pMap.put("rowsids", rowsids);
-				this.setUpHead(pMap);*/
+				InvoiceReqH entity=(InvoiceReqH) invoiceReqHService.get(InvoiceReqH.class, ids[i]);			
 				invoiceReqHService.updateCommit(ids[i],new HashMap());
 			}
 			object.put("msg", "提交成功");

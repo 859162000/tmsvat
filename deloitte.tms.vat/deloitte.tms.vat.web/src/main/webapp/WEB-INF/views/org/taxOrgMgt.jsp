@@ -27,10 +27,13 @@
 		    <form id="searchform" method="post" >
 		    	<table cellpadding="5">
 		    		<tr>
+		    		
+		    			<td>纳税人名称:</td>
+				    	<td><input class="easyui-textbox" type="text" style="width:150px;" name="legalEntityName"></input></td>
+		    		
 		    			<td>纳税人识别号:</td>
 				    	<td><input class="easyui-textbox" type="text" style="width:150px;" name="registrationNumber" ></input></td>
-				    	<td>纳税人名称:</td>
-				    	<td><input class="easyui-textbox" type="text" style="width:150px;" name="legalEntityName"></input></td>    				    				    		
+				    	    				    				    		
 			    		<td>
 			    		  <div style="text-align:center;padding:10px">
 			    	          <a href="#" id="searchbtn"  class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px" onclick="Search()"><spring:message code="button.Search"/></a>
@@ -95,43 +98,66 @@
 				    		<tr>			   		
 				    			<td>纳税主体代码:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;"  name="legalEntityCode" ></input></td>
+				    			
+				    			
+				    			 
 				    			<td>纳税主体类型:</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="legalEntityType"　></input></td>
+				    			<td>
+				    			<select name="legalEntityType"　>
+				    			<option value="1">一般增值税纳税人</option>
+				    			<option value="2">小规模增值税纳税人</option>
+				    			<option value="3">非增值税纳税人</option>
+				    			
+				    			</select>
+				    			
+				    		<!-- 	<input class="easyui-textbox" type="text" style="width:150px;" name="legalEntityType"　></input>
+				    			 -->
+				    			</td>
+				    			
+				    			
 				    			<td>组织代码:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="orgCode2" ></input></td>				    		
 				    		
 				    		</tr>
 				    		
-				    		<tr>			   		
+				    <!-- 		<tr>			   		
+				    			
 				    			<td>描述:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;"  name="description" ></input></td>
 				    			
-				    			<td></td>
-				    			<td></td>
-				    			<!-- 
-				    			<td>是否打印点:</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="isEnablePrint"　></input></td>
-				    			 -->
 				    			
-				    			<td>发票开取限额:</td>
+				    			
+				    		 	<td>发票开取限额:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="invoiceLimitAmount" ></input></td>				    		
+				    		 
+				    		</tr> -->
 				    		
-				    		</tr>
-				    		
-				    		<tr>			   		
+			<!-- 	    		<tr>			   		
+				    			
 				    			<td>是否缴纳汇总:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;"  name="isPaymentCollect" ></input></td>
-				    			<td>纳税人名称(寄件人姓名):</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="taxPayerName"　 data-options="required:true"></input></td>
+				    			
+				    			
+				    			
+				    			<td>描述:</td>
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;"  name="description" ></input></td>
+				    			
+				    			
+				    			 
 				    			<td>纳税识别号类型:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="registrationCode" ></input></td>				    		
 				    		
-				    		</tr>
+				    		</tr> -->
 				    		
 				    		
 				    		<tr>			   		
-				    			<td>年度缴纳税额:</td>
+				    		<!-- 	<td>年度缴纳税额:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="annualPaymentAmount"></input></td>
+				    			 -->
+				    			 <td>纳税人名称(寄件人姓名):</td>
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="taxPayerName"　 data-options="required:true"></input></td>
+				    			
+				    			 
 				    			<td>注册地址:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="registrationContactAddress" data-options="required:true"></input></td>
 				    			<td>邮政编码:</td>
@@ -143,8 +169,14 @@
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="registrationContactPhone"  data-options="required:true"></input></td>
 				    			<td>生产经营地址:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="contactAddress" ></input></td>
+				    	<!-- 		
 				    			<td>开业设定日期:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="dateOfEstablish"></input></td>
+				    			 -->
+				    			<td>描述:</td>
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;"  name="description" ></input></td>
+				    			
+				    			
 				    		</tr>
 				    		
 				    		<tr>			   		
@@ -171,12 +203,12 @@
 				    			<td>注册资本投资总额:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="registCapitalInvestmen" ></input></td>
 				    			<td>开户银行:</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="bankBranchName"></input></td>
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="bankBranchName"  data-options="required:true"></input></td>
 				    		</tr>
 				    		
 				    		<tr>			   		
 				    			<td>开户银行账号:</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="bankAccountNum"  ></input></td>
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="bankAccountNum"  data-options="required:true"></input></td>
 				    			<td>是否为增值税(一般纳税人):</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="isVat" ></input></td>
 				    			<td>是否独立申报缴税:</td>
@@ -215,11 +247,16 @@
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="stateAcgency"  ></input></td>
 				    			<td>地税主管税务机关:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="loalAcgency" ></input></td>
-				    			<td>是否启用:</td>
+				    			
+				    			<td></td>
+				    			<td></td>
+				    			
+				    			<!-- <td>是否启用:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="enabledFlag"></input></td>
+				    			 -->
 				    		</tr>
 				    		
-				    		
+<!-- 				    		
 				    		<tr>			   		
 				    			<td>有效日期:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="startDate"  ></input></td>
@@ -228,7 +265,7 @@
 				    			<td></td>
 				    			<td><</td>
 				    		</tr>
-				    		
+				    		 -->
 
 				
 				    		<tr style="display: none">
@@ -402,7 +439,7 @@
     }
 	function addTo(){
 		
-		//$('#saveform').form('clear');
+		clearSaveForm();
 		
 		$('#id').textbox('setValue', '');
 		

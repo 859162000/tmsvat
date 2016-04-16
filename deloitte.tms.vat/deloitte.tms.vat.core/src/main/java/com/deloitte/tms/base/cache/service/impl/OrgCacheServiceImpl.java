@@ -12,7 +12,7 @@ import com.deloitte.tms.base.cache.model.BizOrgNode;
 import com.deloitte.tms.base.cache.service.CacheProvider;
 import com.deloitte.tms.base.cache.service.OrgCacheService;
 import com.deloitte.tms.base.cache.utils.OrgCacheUtils;
-import com.deloitte.tms.pl.cache.ApplicationCache;
+import com.deloitte.tms.pl.cache.CacheUtils;
 import com.deloitte.tms.pl.core.commons.constant.TableColnumDef;
 import com.deloitte.tms.pl.core.commons.exception.BusinessException;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
@@ -27,9 +27,6 @@ import com.deloitte.tms.pl.version.party.model.organization.node.Node;
 public class OrgCacheServiceImpl implements OrgCacheService{
 	@Resource
 	IDeptDao deptDao;
-	
-	@Resource
-	ApplicationCache applicationCache;
 	
 	@Resource(name=OrgCacheProvider.BEAN_ID)
 	CacheProvider deptProvider;
@@ -53,7 +50,7 @@ public class OrgCacheServiceImpl implements OrgCacheService{
 	}
 	@Override
 	public void flushDeptCacheTree() {
-		applicationCache.putCacheObject(DEPT_CACHE_ID,null);	
+		CacheUtils.putCacheObject(DEPT_CACHE_ID,null);	
 	}
 	@Override
 	public List<SecurityRole> getRoleCacheTree() {

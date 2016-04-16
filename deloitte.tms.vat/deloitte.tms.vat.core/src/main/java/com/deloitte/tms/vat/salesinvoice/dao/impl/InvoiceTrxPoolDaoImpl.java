@@ -224,6 +224,11 @@ public class InvoiceTrxPoolDaoImpl extends BaseDao<InvoiceTrxPool> implements In
 					values.put("legalEntityCode", legalEntityCode);
 				}
 			}
+			//客户账号
+			if(AssertHelper.isOrNotEmpty_assert(params.get("custBankAccountNum"))){
+				query.append(" and inventoryItemNumber=:inventoryItemNumber");
+				values.put("inventoryItemNumber", params.get("inventoryItemNumber"));
+			}
 		}
 		query.append(" and ( status in :status");
 		String[] status=new String[]{CrvatTaxPoolStatuEnums.OPEN.getValue(),CrvatTaxPoolStatuEnums.APPFORM_REVOKED.getValue(),CrvatTaxPoolStatuEnums.PREP_FORM_REVOKED.getValue()};
@@ -268,10 +273,9 @@ public class InvoiceTrxPoolDaoImpl extends BaseDao<InvoiceTrxPool> implements In
 		Object value=params.get("crvatInvoiceReqHId");
 		if(AssertHelper.notEmpty(value))
 		{
-			query.append(" and invoiceReqlId=:invoiceReqlId");
-			values.put("invoiceReqlId", value);
+			query.append(" and invoiceReqhId=:invoiceReqhId");
+			values.put("invoiceReqhId", value);
 		}
-		
 		
 		return pageBy(query, values, pageIndex, pageSize);
 	}
@@ -285,8 +289,8 @@ public class InvoiceTrxPoolDaoImpl extends BaseDao<InvoiceTrxPool> implements In
 		query.append(" from TempTmsCrvatInvoiceReqL where 1=1 ");		
 		if(AssertHelper.notEmpty(reHid))
 		{
-			query.append(" and invoiceReqlId=:invoiceReqlId");
-			values.put("invoiceReqlId", reHid);
+			query.append(" and invoiceReqhId=:invoiceReqhId");
+			values.put("invoiceReqhId", reHid);
 		}
 		return findBy(query, values);
 	}
@@ -299,17 +303,21 @@ public class InvoiceTrxPoolDaoImpl extends BaseDao<InvoiceTrxPool> implements In
 		query.append("delete from TempTmsCrvatInvoiceReqL where 1=1 ");		
 		if(AssertHelper.notEmpty(reqHid))
 		{
-			query.append(" and invoiceReqlId=:invoiceReqlId");
-			values.put("invoiceReqlId", reqHid);
+			query.append(" and invoiceReqhId=:invoiceReqhId");
+			values.put("invoiceReqhId", reqHid);
 		}
 		executeHqlProduce(query.toString(), values);
 	}
 
 	@Override
-	public void deleteTempCrvatInvoiceReqLByReqlById(String id) {
+	public void deleteTempCrvatInvoiceReqLById(String id) {
 		// TODO Auto-generated method stub
 		StringBuffer query=new StringBuffer();
 		Map<String,Object> values=new HashMap<String,Object>();
+		TempTmsCrvatInvoiceReqL tempTmsCrvatInvoiceReqL = (TempTmsCrvatInvoiceReqL) get(TempTmsCrvatInvoiceReqL.class, id);
+		InvoiceTrxPool pool = (InvoiceTrxPool) get(InvoiceTrxPool.class, tempTmsCrvatInvoiceReqL.getInvoiceTrxId());
+		pool.setStatus(null);
+		this.update(pool);
 		query.append("delete from TempTmsCrvatInvoiceReqL where 1=1 ");		
 		if(AssertHelper.notEmpty(id))
 		{
@@ -317,6 +325,40 @@ public class InvoiceTrxPoolDaoImpl extends BaseDao<InvoiceTrxPool> implements In
 			values.put("id", id);
 		}
 		executeHqlProduce(query.toString(), values);
+	}
+
+	@Override
+	public void deleteTempCrvatInvoiceReqLByUserName(String userName) {
+		// TODO Auto-generated method stub
+		realeasePoolStatusTempCrvatInvoiceRelUserName(userName);
+		StringBuffer query=new StringBuffer();
+		Map<String,Object> values=new HashMap<String,Object>();
+		
+		query.append("delete from TempTmsCrvatInvoiceReqL where 1=1 ");		
+		if(AssertHelper.notEmpty(userName))
+		{
+			query.append(" and operatorUser=:operatorUser");
+			values.put("operatorUser", userName);
+		}
+		executeHqlProduce(query.toString(), values);
+		
+	}
+	
+	private void realeasePoolStatusTempCrvatInvoiceRelUserName(String userName){
+		StringBuffer query=new StringBuffer();
+		Map<String,Object> values=new HashMap<String,Object>();		
+		query.append("update TMS_CRVAT_TRX_POOL_ALL set status = null  where CRVAT_TRX_POOL_ID in ");
+		query.append("(select temp.INVOICE_TRX_ID from TEMP_TMS_CRVAT_INVOICE_REQ_L temp where 1=1 ");
+		if(AssertHelper.notEmpty(userName))
+		{
+			query.append(" and temp.OPERATOR_USER=:operatorUser)");
+			values.put("operatorUser", userName);
+		}else {
+			query.append(")");
+		}
+		executeSql(query, values);
+		//executeProduce(query, values);
+		
 	}
 
 	

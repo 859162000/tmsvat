@@ -13,6 +13,10 @@
 
 package com.deloitte.tms.vat.salesinvoice.jobs.service;
 
+import java.util.List;
+
+import com.deloitte.tms.vat.salesinvoice.jobs.model.TmsCrvatTrxInf;
+
 /**  
  *〈一句话功能简述〉
  * 功能详细描述
@@ -26,14 +30,5 @@ public interface TrxFileProcessJobTask {
 	
 	public static final String BEAN_ID = "TrxFileProcessJobTask";
 
-	/**
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param filePath
-	 * @param fileOutPath
-	 * @return
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	public int executeProcessFile(String filePath, String fileOutPath);
+	public int processSaveTmsCrvatTrxInf(List<TmsCrvatTrxInf> list);
 }

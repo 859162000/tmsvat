@@ -41,7 +41,12 @@
 	                                 textField:'text',
 	                                 panelHeight:'auto'
 	                               ">
-                                </td>								
+                                </td>
+                                <td>客户账号：</td>
+								<td><input class="easyui-textbox"
+								id="invoice_print_newSearch_custBankAccountNum"
+								name="custBankAccountNum"
+								style="width: 120px;"></td>										
 							</tr>
 							<tr>
 								<td><spring:message code="invoiceprint.level" />：</td>
@@ -120,6 +125,8 @@
 									type="text" style="width: 0px;" name="pageNumber" value=""></input></td>
 								<td><input id="newpageSize" class="easyui-textbox"
 									type="text" style="width: 0px;" name="pageSize" value=""></input></td>
+								<td><input id="newformflag" class="easyui-textbox"
+									type="text" style="width: 0px;" name="newformflag" value=""></input></td>
 							</tr>
 							<tr style="display: none">
 								<td input id="detail_Hid" name="id" class="easyui-textbox"
@@ -386,7 +393,7 @@
 								<td align="left"><spring:message code="invoiceTrxPool.customerCode" />:</td>
 								<td align="left"><input id="invoice_print_newSearch_Code"
 									class="easyui-textbox" style="width: 120px;"
-									name="customerNumber" /></input></td>			
+									name="customerId" /></input></td>			
 								
 							</tr>
 							<tr>
@@ -459,17 +466,12 @@
 	</div>
 </body>
 <script type="text/javascript">
-
-
-$(function(){
-	
-});
-
-
-
 	$.extend($.messager.defaults, {
 		ok : '<spring:message code="confirm"/>',
 		cancel : '<spring:message code="cancel"/>'
+	});
+	$(function(){
+		init_common_combo_customer("#invoice_print_newSearch_Code");
 	});
     
 	$(function() {
@@ -500,13 +502,13 @@ $(function(){
 									{
 										field : 'status',
 										title : '<spring:message code="invoiceprint.search.bootStatus"/>',
-										width : 150,
+										width : 130,
 										align : 'center'
 									},
 									{
 										field : 'orgName',
 										title : '<spring:message code="invoiceprint.dept"/>',
-										width : 100,
+										width : 180,
 										align : 'center'
 									},
 									{
@@ -530,7 +532,7 @@ $(function(){
 									{
 										field : 'custRegistrationNumber',
 										title : '<spring:message code="invoiceprint.validName"/>',
-										width : 120,
+										width : 150,
 										align : 'center'
 									},
 									{
@@ -550,13 +552,19 @@ $(function(){
 										field : 'reqAmount',
 										title : '<spring:message code="invoiceprint.amountAll"/>',
 										width : 100,
-										align : 'center'
+										align : 'right',
+										formatter: function(value,row,index){
+											return fmoney(value,2);
+										 }
 									},
 									{
 										field : 'acctdAmountCr',
 										title : '<spring:message code="invoiceprint.amount"/>',
 										width : 100,
-										align : 'center'
+										align : 'right',
+										formatter: function(value,row,index){
+											return fmoney(value,2);
+										 }
 									}, ] ],
 							toolbar : [ {
 								text : '添加申请单',
@@ -975,7 +983,7 @@ $(function(){
 							afterPageText : '<spring:message code="pagination.afterPageText"/>',
 							displayMsg : '<spring:message code="pagination.displayMsg"/>',
 							onSelectPage : function(pageNumber, pageSize) {//分页触发		
-								editDetail(pageNumber, pageSize);
+								findDetail(pageNumber, pageSize);
 								//searchDetails(); 
 								//clearSaveForm();
 							}
@@ -1002,6 +1010,7 @@ $(function(){
 
 	$(document).ready(function() {
 		$("#layoutid").layout('collapse', 'east');
+		
 		$('#newDetailForm').form('load', {
 			pageNumber : $('#dgrequestdetail').datagrid('options').pageNumber,
 			pageSize : $('#dgrequestdetail').datagrid('options').pageSize
@@ -1145,15 +1154,53 @@ $(function(){
 			url : 'citicInvoiceReq/getInvoiceReqAll.do',
 			success : function(result) {
 				var result = $.parseJSON(result);
-				$("#dg").datagrid('loadData', result);
+				if(result.success){
+					$("#dg").datagrid('loadData', result);
+					
+				}else{
+					$.messager.alert('提示信息',result.errorMessage,'info');
+				}
 				$("#dg").datagrid("loaded");
 			}
 		});
 
 	}
+	function findDetail(pageNumber, pageSize){
+		var id = $('#detail_Hid').val();
+		var flag = $('#newformflag').val();		
+		if(flag=='edit'){
+			$('#dgrequestdetail').datagrid('loading');
+			$.post('${vat}/citicInvoiceReq/getEditInfo.do',
+					{
+						crvatInvoiceReqHId : id,				
+						pageNumber : pageNumber,
+						pageSize : pageSize
+					}, function(result) {					
+						$("#dgrequestdetail").datagrid('loadData', result);																	
+						$('#dgrequestdetail').datagrid('loaded');
+					}, 'json');
+		}
+		if(flag=='add'){
+			$('#dgrequestdetail').datagrid('loading');
+			$.post('${vat}/citicInvoiceReq/gettempEditInfo.do',
+					{
+						crvatInvoiceReqHId : id,				
+						pageNumber : pageNumber,
+						pageSize : pageSize
+					}, function(result) {					
+						$("#dgrequestdetail").datagrid('loadData', result);																	
+						$('#dgrequestdetail').datagrid('loaded');
+					}, 'json');
+		}
+		
+	}
 	function editDetail(pageNumber,pageSize) {
 		//var rows = $('#dg').datagrid('getChRecked');
-		var rows = $('#dg').datagrid('getSelections');
+		$('#dgrequestdetail').datagrid('loadData', {
+				total : 0,
+				rows : []
+		});
+		var rows = $('#dg').datagrid('getSelections');		
 		if (rows.length == 1) {
 			var row = $('#dg').datagrid('getSelected');
 			if ("10" == row.reqStatus) {
@@ -1174,12 +1221,15 @@ $(function(){
 					custRegistrationCode : row.custRegistrationCode,
 					custRegistrationNumber : row.custRegistrationNumber,
 					customerNumber : row.customerNumber,
-					reqAmount : row.reqAmount
+					reqAmount : row.reqAmount,
+					newformflag : 'edit'				
 					/* pageNumber : 1,
 					pageSize : 10 */
 				});  
-				
+				var flag = $('#newformflag').textbox('getValue');	
 				$('#newclearbtn').hide();
+				$('#saveHeadbtn').hide();
+				$('#submitHeadbtn').linkbutton('enable');
 				$('#dgrequestdetailaddbtn').linkbutton('enable');
 				$('#dgrequestdetaildelbtn').linkbutton('enable');
 				$('#dgrequestdetail').datagrid('loading');
@@ -1192,13 +1242,8 @@ $(function(){
 									'options').pageNumber,
 							pageSize : $('#dgrequestdetail')
 									.datagrid('options').pageSize
-						}, function(result) {
-							
-							$("#dgrequestdetail").datagrid('loadData', result);							
-							$('#saveHeadbtn').linkbutton('enable');
-							$('#submitHeadbtn').linkbutton('enable');
-							
-							
+						}, function(result) {							
+							$("#dgrequestdetail").datagrid('loadData', result);																																		
 							$('#dgrequestdetail').datagrid('loaded');
 						}, 'json');
 			 } else {
@@ -1214,6 +1259,10 @@ $(function(){
 	
 	function lookDetail(){
 		//var rows = $('#dg').datagrid('getChRecked');
+		$('#dgrequestdetail').datagrid('loadData', {
+				total : 0,
+				rows : []
+		});
 		var rows = $('#dg').datagrid('getSelections');
 		if (rows.length == 1) {
 			var row = $('#dg').datagrid('getSelected');			
@@ -1222,6 +1271,7 @@ $(function(){
 			enableOrdisable(true);	
 			$('#dgrequestdetailaddbtn').linkbutton('disable');
 			$('#dgrequestdetaildelbtn').linkbutton('disable');
+			$('#saveHeadbtn').show();
 			$('#saveHeadbtn').linkbutton('disable');
 			$('#submitHeadbtn').linkbutton('disable');
 			
@@ -1240,13 +1290,14 @@ $(function(){
 					custRegistrationNumber : row.custRegistrationNumber,
 					customerNumber : row.customerNumber,
 					reqAmount : row.reqAmount,
+					newformflag : 'edit',	
 					pageNumber : 1,
 					pageSize : 10
 			});  
 				
-			$('#newclearbtn').hide();	
-			$('#dgrequestdetail').datagrid('loading');
+			$('#newclearbtn').hide();				
 			var id = row.id;
+			$('#dgrequestdetail').datagrid('loading');
 			$.post('citicInvoiceReq/getEditInfo.do',
 				{
 							crvatInvoiceReqHId : id,
@@ -1276,7 +1327,7 @@ $(function(){
 				total : 0,
 				rows : []
 			});
-			//$("#dlg_hid").textbox('setValue',$('#detail_Hid').val());
+			$("#dlg_hid").textbox('setValue',$('#detail_Hid').val());			
 			$('#invoice_req_dlg_cardNO').textbox('setValue',
 					$('#invoice_print_newSearch_validNo').val());
 			$('#invoice_req_dlg_cardType').textbox('setValue',
@@ -1293,6 +1344,7 @@ $(function(){
 					$('#invoice_print_newSearch_reqStatus').val());
 			$('#invoice_req_dlg_bornTime').textbox('setValue',
 					$('#invoice_print_newSearch_applyTime').val());
+			
 			$('#dlg_reqInvoiceRange').textbox('setValue',$('#invoice_print_newSearch_level').combobox('getValue'));
 			//$('#reqForm').form('load',$('#newDetailForm'));
 			$("#tax_req_dlg").dialog('open').dialog('setTitle',
@@ -1303,37 +1355,67 @@ $(function(){
 	}
 	//从选择框页面里面选中数据进入申请单流水列表
 	function addNo() {
-		var rows = $('#dlgDetial').datagrid('getChecked');
-		for (var i = 0; i < rows.length; i++) {
-			$("#dgrequestdetail").datagrid('insertRow', {
-				index : 0,
-				row : rows[i]
+		var flag = $('#newformflag').textbox('getValue');	
+		if(flag=='add'){
+			$("#dlgDetial").datagrid("loading");			
+			$('#reqForm').form('submit', {
+				url : 'citicInvoiceReq/addtransactionlisttotemp.do',
+				success : function(result) {
+					var result = $.parseJSON(result);				
+					if(result.success){
+						$('#dgrequestdetail').datagrid('loading');
+						var id = $('#detail_Hid').val();
+						
+						$.post('citicInvoiceReq/gettempEditInfo.do',
+								{
+									crvatInvoiceReqHId : id,									
+									pageNumber : $('#dgrequestdetail').datagrid(
+											'options').pageNumber,
+									pageSize : $('#dgrequestdetail')
+											.datagrid('options').pageSize
+								}, function(result) {
+									//var result = $.parseJSON(result);
+									$("#dgrequestdetail").datagrid('loadData', result);							
+									$('#saveHeadbtn').linkbutton('enable');
+									$('#submitHeadbtn').linkbutton('enable');															
+									$('#dgrequestdetail').datagrid('loaded');
+								}, 'json');
+					}
+					$("#dlgDetial").datagrid("loaded");
+				}
 			});
 		}
-		$('#tax_req_dlg').dialog('close');
-		/* $('#tax_req_dlg').dialog('close'); */
-		var ids=$('#rowsid').textbox('getValue');
-		/* var ss = [];
-		var rows = $('#dgrequestdetail').datagrid('getRows');
-		for (var i = 0; i < rows.length; i++) {
-			var r = rows[i];
-			ss.push(r.trxid);
+		if(flag=='edit'){
+			$("#dlgDetial").datagrid("loading");
+			$('#reqForm').form('submit', {
+				url : 'citicInvoiceReq/addtransactionlisttoreh.do',
+				success : function(result) {
+					var result = $.parseJSON(result);	
+					if(result.success){
+						$('#dgrequestdetail').datagrid('loading');
+						var id = $('#detail_Hid').val();						
+						$.post('citicInvoiceReq/getEditInfo.do',
+								{
+									crvatInvoiceReqHId : id,								
+									pageNumber : $('#dgrequestdetail').datagrid(
+											'options').pageNumber,
+									pageSize : $('#dgrequestdetail')
+											.datagrid('options').pageSize
+								}, function(result) {									
+									$("#dgrequestdetail").datagrid('loadData', result);																																		
+									$('#dgrequestdetail').datagrid('loaded');
+								}, 'json');
+					}
+					$("#dlgDetial").datagrid("loaded");
+				}
+			});
 		}
-		var ids = ss.join(","); */
-		$.ajax({
-			url : "invoiceReqL/changeStatus.do?ids=" + ids,
-			type : 'POST',
-			dataType : "json",
-			cache : false,
-			success : function(object) {
-			}
-		});
-		$('#saveHeadbtn').linkbutton('enable');
-		$('#submitHeadbtn').linkbutton('enable');
-	}
-	/* function editPre(){
-		$('#layoutid').layout('expand', 'east');
-	} */
+		$("#tax_req_dlg").dialog('close');	
+		
+	}	
+		
+
+
 
 	function detail() {
 		$('#layoutid').layout('expand', 'east');
@@ -1343,26 +1425,59 @@ $(function(){
 	}
 	function back(){
 		$("#layoutid").layout('collapse', 'east');
+		$.post('citicInvoiceReq/deletetempbyusername.do',
+				 function(result) {																			
+				}, 'json');
 	}
 	function remove() {
 		$.messager.confirm('<spring:message code="system.alert"/>','确定删除该交易流水？',function(result){  
 			  if (result){
-				 var rows = $('#dgrequestdetail').datagrid('getSelections');
-				 var copyRows = [];
-				 for (var j = 0; j < rows.length; j++) {
-					 copyRows.push(rows[j]);
-				 }
-				 for (var i = 0; i < copyRows.length; i++) {
-					 var index = $('#dgrequestdetail').datagrid('getRowIndex',
-							 copyRows[i]);
-					 $('#dgrequestdetail').datagrid('deleteRow', index);
-				 }
+				 var rows = $('#dgrequestdetail').datagrid('getSelections');				
+				 var ps = "";
+					$.each(rows, function(i, n) {
+						if (i == 0)
+							ps += n.id;
+						else
+							ps += "," + n.id;
+					});
+				 var id = $('#detail_Hid').val();
+				 var flag = $('#newformflag').textbox('getValue');
+					if(flag=='add'){
+						$("#dgrequestdetail").datagrid("loading");											
+						$.post('citicInvoiceReq/deletetempreql.do',
+								{
+							        crvatInvoiceReqHId : id,
+									tempids : ps,
+									pageNumber : $('#dgrequestdetail').datagrid(
+											'options').pageNumber,
+									pageSize : $('#dgrequestdetail')
+											.datagrid('options').pageSize
+								}, function(result) {								
+									$("#dgrequestdetail").datagrid('loadData', result);	
+									$("#dgrequestdetail").datagrid("loaded");
+									$('#saveHeadbtn').linkbutton('enable');								
+								}, 'json');
+						
+					}
+					if(flag=='edit'){
+						$("#dgrequestdetail").datagrid("loading");					
+						var id = $('#detail_Hid').val();
+						$.post('citicInvoiceReq/deletereql.do',
+								{
+							        crvatInvoiceReqHId : id,
+									reqlids : ps,
+									pageNumber : $('#dgrequestdetail').datagrid(
+											'options').pageNumber,
+									pageSize : $('#dgrequestdetail')
+											.datagrid('options').pageSize
+								}, function(result) {								
+									$("#dgrequestdetail").datagrid('loadData', result);																												
+									$('#dgrequestdetail').datagrid('loaded');
+								}, 'json');
+					}						
 			  }
 		});
-		/* for(var i =0;i<rows.length;i++){                
-			  var index = $('#dgrequestdetail').datagrid('getRowIndex',rows[i]);//获取某行的行号          
-			  $('#dgrequestdetail').datagrid('deleteRow',index);	//通过行号移除该行        
-		   } */
+		
 	}
 	function removeReq() {
 		var rows = $('#dg').datagrid('getSelections');
@@ -1484,6 +1599,9 @@ $(function(){
 	}
 	function addReq() {
 		clearFormAndData();
+		$('#newDetailForm').form('load', {
+			newformflag : 'add'
+		});
 		enableOrdisable(true);
 		$('#invoice_print_newSearch_level').combobox("enable");
 		$("#invoice_print_searchOut_validType").combobox("enable");
@@ -1511,14 +1629,15 @@ $(function(){
 
           }); 
 		//$('#newsearchbtn').linkbutton('disable');
+		$('#saveHeadbtn').show();
 		$('#dgrequestdetailaddbtn').linkbutton('enable');
-		$('#dgrequestdetaildelbtn').linkbutton('disable');
+		$('#dgrequestdetaildelbtn').linkbutton('enable');
 		$.ajax({
 			url : "citicInvoiceReq/getNewReadyParam.do",
 			dataType : "json",
 			cache : false,
 			success : function(object) {				
-				$("#newDetailForm").form('load', object.invoiceReadyData);
+				$("#newDetailForm").form('load', object.invoiceReadyData);				
 				$('#invoice_print_newSearch_reqStatus').combobox('setValue',
 						object.invoiceReadyData.status);
 				var rows = $('#dgrequestdetail').datagrid('getRows');				
@@ -1645,18 +1764,7 @@ $(function(){
 			});
 		}
 	}
-	function saveHead() {
-		/* var ss = [];
-		var rows = $('#dgrequestdetail').datagrid('getRows');
-		for (var i = 0; i < rows.length; i++) {
-			var r = rows[i];
-			ss.push(r.trxid);
-		}
-		var ids = ss.join(";");
-		$('#newDetailForm').form('load', {
-			rowsids : ids
-		});
- */
+	function saveHead() {		
  		$("#dgrequestdetail").datagrid("loading");
  		//forbiddenPage();
 		$('#newDetailForm').form(
@@ -1738,7 +1846,7 @@ $(function(){
 			$.messager.alert('<spring:message code="invoiceprint.reqinfo"/>','请添加明细！');
 			return;
 		}
-		for (var i = 0; i < rows.length; i++) {
+		/* for (var i = 0; i < rows.length; i++) {
 			var r = rows[i];
 			ss.push(r.trxid);
 		}
@@ -1746,8 +1854,7 @@ $(function(){
 		var ids=$('#rowsid').textbox('getValue');
 		$('#newDetailForm').form('load', {
 			ids : ids
-		});
-		alert(ids);
+		});	 */
 		$('#dgrequestdetail').datagrid('loading');
 		$('#newDetailForm').form(
 				'submit',

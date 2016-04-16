@@ -24,5 +24,6 @@ public interface InvoiceReqHDao extends IDao<InvoiceReqH>{
 	public void updateAdminStatus(String name);
 	public InvoiceTrxPool findWithOutCustomer(Map map);
 	public List<InvoiceReqL> getInvoiceReqLs(String reqHid);
+	public void updateTrxPoolStatusByReqHid(String reqHid,String status);
 }
 

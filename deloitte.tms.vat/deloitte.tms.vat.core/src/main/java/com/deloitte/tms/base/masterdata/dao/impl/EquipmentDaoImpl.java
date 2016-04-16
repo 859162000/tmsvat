@@ -2,12 +2,14 @@ package com.deloitte.tms.base.masterdata.dao.impl;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import com.deloitte.tms.base.masterdata.dao.EquipmentDao;
@@ -15,9 +17,12 @@ import com.deloitte.tms.base.masterdata.model.TmsMdEquipment;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.dao.impl.BaseDao;
+import com.deloitte.tms.pl.security.utils.LittleUtils;
 
 @Component(EquipmentDao.BEAN_ID)
 public class EquipmentDaoImpl extends BaseDao<TmsMdEquipment> implements EquipmentDao{
+	
+	Logger logger = Logger.getLogger(this.getClass());
 	
 	public DaoPage findEquipmentByParams(Map params, Integer pageIndex,Integer pageSize)
 	{
@@ -25,36 +30,69 @@ public class EquipmentDaoImpl extends BaseDao<TmsMdEquipment> implements Equipme
 		Map values=new HashMap();
 		buildEquipmentQuery(query, values, params);
 		return pageBy(query, values, pageIndex, pageSize);
+		
 	}
 	
 	private void buildEquipmentQuery(StringBuffer query,Map values,Map params) {
-		query.append(" from TmsMdEquipment where 1=1 and  flag = 1 ");
+		
+		try{
+		query.append(" from ");
+		query.append(TmsMdEquipment.class.getName());
+		query.append(" where flag =").append(LittleUtils.one);
 		
 		Object value=params.get("id");
-		if(!AssertHelper.empty(value))
+		if(!AssertHelper.empty(value) )
 		{
-			query.append(" and id=:ID");
-			values.put("ID", value);
+			if(value instanceof String){
+				
+				String newV = (String)value;	
+				if(LittleUtils.strEmpty(newV)){
+					
+				}else{
+					query.append(" and id=:ID");
+					values.put("ID", newV.trim());
+				}
+			}
+			
 		}
-		value=params.get("getparent");
+		
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		
+	/*	value=params.get("getparent");
 		if(!AssertHelper.empty(value))
 		{
 			query.append(" and parentEquipmentId is null");
-		}
+		}*/
 	}
 	
 	public List<TmsMdEquipment> loadEquipmentData(Map params)
 	{
+		List<TmsMdEquipment> list=null;
+		try{
 		StringBuffer query=new StringBuffer();
 		Map values=new HashMap();
-		query.append(" from TmsMdEquipment where 1=1 and  flag = 1 ");
-		Object value=params.get("enabledFlag");
+		query.append("  from ");
+		query.append(TmsMdEquipment.class.getName());
+		query.append("  where  flag =" ).append(LittleUtils.one);
+		
+	/*	Object value=params.get("enabledFlag");
 		if(value!=null)
 		{
 			query.append(" and enabledFlag=:enabledFlag");
 			values.put("enabledFlag", value);
+		}*/
+		list = findBy(query, params);
+		
+		if(list == null){
+			list = new ArrayList<TmsMdEquipment>();
 		}
-		return findBy(query, values);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return list;
 	}
 	
 	public DaoPage findLegalEntityByParams(Map params, Integer pageIndex,Integer pageSize)

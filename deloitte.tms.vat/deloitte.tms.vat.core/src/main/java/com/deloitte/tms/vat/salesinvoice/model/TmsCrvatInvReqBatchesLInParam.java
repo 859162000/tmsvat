@@ -28,6 +28,14 @@ public class TmsCrvatInvReqBatchesLInParam extends TmsCrvatInvReqBatchesL{
 	private String custRegistrationAddress;
 	//购方纳税人联系人
 	private String contactName;
+	
+	public String getCustomerType() {
+		return customerType;
+	}
+	public void setCustomerType(String customerType) {
+		this.customerType = customerType;
+	}
+	private String customerType;
 	//购方纳税人联系电话 
 	private String contactPhone;
 	//购方纳税人识别号
@@ -60,8 +68,6 @@ public class TmsCrvatInvReqBatchesLInParam extends TmsCrvatInvReqBatchesL{
 	private String taxTrxTypeName;
 	
 	//---TmsMdInventoryItems--商品及服务编码表----
-	//商品及服务编码ID
-	private String inventoryItemId;
 	//商品及服务编码
 	private String inventoryItemNumber;
     //商品及服务名称
@@ -207,12 +213,7 @@ public class TmsCrvatInvReqBatchesLInParam extends TmsCrvatInvReqBatchesL{
 	public void setTaxTrxTypeName(String taxTrxTypeName) {
 		this.taxTrxTypeName = taxTrxTypeName;
 	}
-	public String getInventoryItemId() {
-		return inventoryItemId;
-	}
-	public void setInventoryItemId(String inventoryItemId) {
-		this.inventoryItemId = inventoryItemId;
-	}
+
 	public String getInventoryItemNumber() {
 		return inventoryItemNumber;
 	}

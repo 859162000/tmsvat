@@ -117,10 +117,10 @@
 										<td colspan="4"><a href="#" id="saveHeadbtn"
 											class="easyui-linkbutton"
 											data-options="iconCls:'icon-large-shapes'"
-											style="width: 120px" onclick="saveHead()">保存申请单</a> <a
+											style="width: 120px" onclick="saveHead('save')">保存申请单</a> <a
 											href="#" id="submitHeadbtn" class="easyui-linkbutton"
 											data-options="iconCls:'icon-large-smartart'"
-											style="width: 120px" onclick="submitHead()">提交申请单</a></td>
+											style="width: 120px" onclick="saveHead('submit')">提交申请单</a></td>
 
 									</tr>
 									<tr style="display: none">
@@ -143,6 +143,9 @@
 											class="easyui-textbox" style="height: 20px"></td>
 										<%--组织id --%>
 										<td input id="orgId_id" name="orgId" class="easyui-textbox"
+											style="height: 20px"></td>
+											<%--提交或者保存标识 --%>
+										<td input id="tips_id" name="tips" class="easyui-textbox"
 											style="height: 20px"></td>
 									</tr>
 								</table>
@@ -260,7 +263,7 @@
 
 	<%--导入弹出框 --%>
 	<div class="easyui-dialog" id="values_dialog"
-		style="height: 80%; width: 70%" title="导入发票明细"
+		style="height: 30%; width: 30%" title="导入发票明细"
 		data-options="				
 				buttons: [{
 					text:'<spring:message code="button.Save"/>',
@@ -272,7 +275,7 @@
 					text:'<spring:message code="button.Close"/>',
 					iconCls:'icon-cancel',
 					handler:function(){
-						$('values_dialog').dialog('close');
+						$('#values_dialog').dialog('close');
 					}
 				}]
 			">
@@ -285,10 +288,36 @@
 		</form>
 
 	</div>
-
-
-
-
+<%--查看明细 --%>
+<div class="easyui-dialog" id="examineList"
+		style="height: 100%; width: 100%" title="查看发票明细"
+		data-options="				
+				buttons: [{
+					text:'<spring:message code="button.Close"/>',
+					iconCls:'icon-cancel',
+					handler:function(){
+						$('#examineList').dialog('close');
+					}
+				}]
+			">
+<div class="easyui-layout" style="width: 100%; height: 100%;">
+			<div data-options="region:'center',border:false"
+				style="background-color: #E0ECFF">
+	<div style="width: 100%; height: 100%">
+<table class="easyui-datagrid" id="dgrequestdetailexamineList"
+								style="width: 100%; height: 100%"  data-options="					
+					singleSelect:true,
+					autoRowHeight:false,
+					pagination:true,
+					pageSize:10,
+					remoteSort:false,
+				    multiSort:true	
+					">
+							</table>
+							</div>
+							</div>
+							</div>
+					</div>
 
 </body>
 <script type="text/javascript">
@@ -369,7 +398,7 @@
 									addPre();//新增申请单方法
 
 								}
-							}, '-',/*  {
+							}, '-',  {
 								text : '删除申请单',
 								iconCls : 'icon-remove',
 								handler : function() {
@@ -394,7 +423,7 @@
 								handler : function() {
 									submitFromPage(); //申请单查询页面提交申请单
 								}
-							}, '-',*/  {
+							}, '-',  {
 								text : '审批',
 								iconCls : 'icon-redo',
 								handler : function() {//
@@ -405,7 +434,7 @@
 											text : '查看明细',
 											iconCls : 'icon-redo',
 											handler : function() {
-												submitFromPage(); //申请单查询页面提交申请单
+												examineList(); //申请单查询页面提交申请单
 											}
 										}, '-'
 							],
@@ -449,6 +478,206 @@
 		Search();
 		initValues_dialog();
 	});
+/**
+ * 查看明细
+ */
+function examineList(){
+		var rows = $('#dg').datagrid('getSelections');//得到选择数据行
+		if (rows.length == 1) {//判断行数
+			var row = $('#dg').datagrid('getSelected');//得到行数据
+		
+				$('#appuseruuid_id').textbox('setValue', row.id);
+				var url = "${vat}/invoiceSpecialContractBathController/listTmsCrvatInvReqBatchesL.do";
+				dgrequestdetailexamineList(url);
+				$("#examineList").dialog('open');//打开弹出框
+			
+		} else {
+			$.messager.confirm('<spring:message code="invoiceprint.reqinfo"/>',
+					'<spring:message code="invoiceprint.error"/>');
+		}
+}
+/**
+ * 查看面板
+ */
+function dgrequestdetailexamineList(url) {
+	$('#dgrequestdetailexamineList').datagrid(
+			{
+				url : url,
+				nowrap : true,
+				rownumbers : true,
+				pagination : true,
+				queryParams : {
+					appuseruuid : $("#appuseruuid_id").textbox('getValue'),
+				},
+				columns : [ [ {
+					colspan : 8,
+					title : '客户基本信息',
+					align : 'center',
+				}, {
+					colspan : 20,
+					title : ' 开票交易信息',
+					align : 'center',
+				}, ], [ {
+					field : 'customerNumber',
+					title : "客户编码",
+					width : 80,
+					editor : 'text',
+				}, {
+					field : 'id',
+					title : "特殊开票申请单行ID",
+					width : 80,
+					editor : 'text',
+					hidden : true,
+				}, {
+					field : 'customerName',
+					title : "客户名称",
+					width : 80,
+					editor : 'text',
+				}, {
+					field : 'custRegistrationNumber',
+					title : "纳税人识别号",
+					width : 90,
+					editor : 'text',
+				}, {
+					field : 'custLegalEntityType',
+					title : "纳税人身份",
+					width : 80,
+					editor : 'text',
+				}, {
+					field : 'custRegistrationAddress',
+					title : "注册地址",
+					width : 80,
+					editor : 'text',
+				}, {
+					field : 'contactPhone',
+					title : "注册电话",
+					width : 80,
+					editor : 'text',
+				}, {
+					field : 'custDepositBankName',
+					title : "开户银行",
+					width : 80,
+					editor : 'text',
+				}, {
+					field : 'custDepositBankAccountNum',
+					title : "开户银行账号",
+					width : 100,
+					editor : 'text',
+				}, {
+					field : 'customerId',
+					title : "购方id",
+					width : 80,
+					hidden : true,
+					editor : 'text',
+				}, {
+					field : 'contractId',
+					title : "合同id",
+					width : 80,
+					hidden : true,
+					editor : 'text',
+				}, {
+					field : 'projectId',
+					title : "项目id",
+					width : 80,
+					hidden : true,
+					editor : 'text',
+				}, {
+					field : 'taxTrxTypeId',
+					title : "涉税交易类型ID",
+					width : 80,
+					hidden : true,
+					editor : 'text',
+				}, {
+					field : 'inventoryItemId',
+					title : "商品及服务编码ID",
+					width : 80,
+					hidden : true,
+					editor : 'text',
+				}, {
+					field : 'trxAffirmSettingId',
+					title : "涉税交易认定设置规则ID",
+					width : 80,
+					hidden : true,
+					editor : 'text',
+				}, {
+					field : 'contractNumber',
+					title : "合同编号",
+					width : 80,
+					editor : 'text',
+				}, {
+					field : 'contractName',
+					title : "合同名称",
+					width : 80,
+					editor : 'text',
+				}, {
+					field : 'projectNumber',
+					title : "项目编号",
+					width : 80,
+					editor : 'text',
+				}, {
+					field : 'projectName',
+					title : "项目名称",
+					width : 80,
+					editor : 'text',
+				}, {
+					field : 'taxTrxTypeCode',
+					title : "涉税交易类型编码",
+					width : 100,
+					editor : 'text',
+				}, {
+					field : 'taxTrxTypeName',
+					title : "涉税交易类型名称",
+					width : 100,
+					editor : 'text',
+				}, {
+					field : 'inventoryItemNumber',
+					title : '商品及服务编码',
+					width : 100,
+					editor : 'combogrid',
+				}, {
+					field : 'inventoryItemDescripton',
+					title : "商品及服务名称",
+					width : 100,
+					editor : 'text',
+				}, {
+					field : 'inventoryItemQty',
+					title : '数量',
+					width : 50,
+					align : 'center',
+					editor : 'text',
+
+				}, {
+					field : 'invoiceCategories',
+					title : '发票类型',
+					width : 80,
+					align : 'center',
+					editor : 'text',
+				}, {
+					field : 'taxRate',
+					title : '税率',
+					width : 80,
+					align : 'center',
+					editor : {
+						type : 'numberbox',
+						options : {
+							precision : "2",
+						}
+					}
+				}, {
+					field : 'isTax',
+					title : '是否含税',
+					width : 80,
+					editor : 'text',
+				}, {
+					field : 'invoiceAmount',
+					title : '开票金额',
+					width : 80,
+					align : 'center',
+					editor : 'numberbox'
+				} ] ],
+			});
+
+}
 	/**
 	 * 左滑面板发票明细表格
 	 */
@@ -687,6 +916,10 @@
 			closed : true,
 			region : 'center',//弹出框位置
 		});
+		$("#examineList").dialog({
+			closed : true,
+			region : 'center',//弹出框位置
+		});
 	}
 
 	/**
@@ -834,7 +1067,7 @@ function downloadExcel(){
 			if ("草稿" == row.status) {//判断申请单状态
 				$('#layoutid').layout('expand', 'east');//关闭右侧滑动面板
 				$("#newDetailForm").form('load', row);
-				$('#appuseruuid_id').textbox('setValue', row.id);//纳税人id
+				$('#appuseruuid_id').textbox('setValue', row.id);//id
 				var url = "${vat}/invoiceSpecialContractBathController/listTmsCrvatInvReqBatchesL.do";
 				rightDgrequestdetail(url);
 				$
@@ -929,10 +1162,30 @@ function downloadExcel(){
  * 审批
  */
  function cautious(){
+		var rows = $('#dg').datagrid('getSelections');//得到选择数据行
+		var id = [];
+		for (var j = 0; j < rows.length; j++) {
+			id.push(rows[j].id);
+			if ("已提交" == rows[j].status) {//判断申请单状态
 	 $.ajax({
 			url : "${vat}/tmsCrvatInvReqBatchesL/batchSaveTmsCrvatInvReqBatchesLToPrintPool.do",
 			type:'post',
+			data:"id="+id,
+			success : function(object) {
+				var result = $.parseJSON(object);
+				if(result.success=="true"){
+				Search();
+				}
+				}
 		});
+			}else {
+				$.messager.confirm(
+						'<spring:message code="invoiceprint.reqinfo"/>',
+						'非已提交数据不允许审批');
+			}
+		
+		}
+			
 }
 	function clearSearchForm() {//清除申请表单
 		$('#searchform').form('clear');
@@ -963,39 +1216,6 @@ function downloadExcel(){
 			total : 0,
 			rows : []
 		});
-	}
-	function commitPaper() { //提交申请表
-		var rows = $('#dgrequestdetail').datagrid("getRows");
-		var id = $('#invoice_print_newSearch_readyNo').val();
-		$('#invoice_print_newSearch_isCommitPaper').textbox('setValue', '1');
-		if (id && typeof (id) != "undefined") {
-			var ps = "";
-			$.each(rows, function(i, n) {
-				if (i == 0)
-					ps += n.id;
-				else
-					ps += "," + n.id;
-			});
-			$('#newDetailForm').form('load', {
-				ids : ps
-			});
-			$('#newDetailForm').form(
-					'submit',
-					{
-						url : 'invoiceReqAll/updateCommitStatus.do',
-						success : function(object) {
-							var object = $.parseJSON(object);
-							clearNewSearchForm();
-							$.messager.alert(
-									'<spring:message code="system.alert"/>',
-									object.msg);
-							Search();
-						}
-					});
-		} else {
-			$.messager.alert('<spring:message code="invoiceprint.reqinfo"/>',
-					'<spring:message code="invoiceprint.info"/>');
-		}
 	}
 	function save() {//保存
 		var time = $('#invoice_print_newSearch_applyTime').val();
@@ -1079,7 +1299,16 @@ function downloadExcel(){
 				});
 	}
 
-	function saveHead() {//保存申请单
+	function saveHead(tips) {//保存申请单或提交申请单
+		if(tips=="save"){
+			
+			$("#tips_id").textbox("setValue","save");
+			alert($("#tips_id").textbox("getValue"));
+			
+		}
+      if(tips=="submit"){
+    	  $("#tips_id").textbox("setValue","submit");
+		}
 		var dgrequestdetaildata = $('#dgrequestdetail').datagrid('getRows');//得到发票明细数据
 		$('#newDetailForm').form('load', {
 			dgrequestdetaildata : JSON.stringify(dgrequestdetaildata),
@@ -1109,7 +1338,7 @@ function downloadExcel(){
 		var isCommit = true;
 		for (var i = 0; i < rows.length; i++) {
 			var r = rows[i];
-			if ('10' != r.pageStatus) {
+			if ("草稿" != r.status) {
 				isCommit = false;
 				$.messager.alert(
 						'<spring:message code="invoiceprint.reqinfo"/>',
@@ -1125,7 +1354,7 @@ function downloadExcel(){
 				ps += "," + n.id;
 		});
 		$.ajax({
-			url : "invoiceReqAll/submitFromPage.do?ids=" + ps,
+			url : "${vat}/invoiceSpecialContractBathController/submitFromPage.do?ids=" + ps,
 			dataType : "json",
 			type : "POST",
 			cache : false,
@@ -1133,44 +1362,12 @@ function downloadExcel(){
 				if (object.success) {
 					Search();
 				}
-				$.messager.alert('<spring:message code="system.alert"/>',
-						object.msg);
+				/* $.messager.alert('<spring:message code="system.alert"/>',
+						object.msg); */
 			}
 		});
 	}
-	//交易明细页面提交申请单
-	function submitHead() {
-		var hid = $('#detail_Hid').val();
-		/* if(hid){ */
-		var ss = [];
-		var rows = $('#dgrequestdetail').datagrid('getRows');
-		for (var i = 0; i < rows.length; i++) {
-			var r = rows[i];
-			ss.push(r.trxid);
-		}
-		var ids = ss.join(";");
-		$('#newDetailForm').form('load', {
-			ids : ids
-		});
-		$('#newDetailForm').form(
-				'submit',
-				{
-					url : 'invoiceReqAll/updateCommitStatus.do',
-					success : function(object) {
-						var object = $.parseJSON(object);
-						//clearNewSearchForm();
-						$.messager.alert(
-								'<spring:message code="system.alert"/>',
-								object.msg);
-						$("#layoutid").layout('collapse', 'east');
-						Search();
-					}
-				});
-		/* }else{
-			$.messager.alert('<spring:message code="invoiceprint.reqinfo"/>','<spring:message code="invoiceprint.info"/>' );
-		} */
-	}
-
+	
 	function addTo() {
 		$('#saveform').form('clear');
 		initProjdg('');

@@ -94,25 +94,34 @@ public class InvoiceSpecialContractBathController extends BaseController {
 			e.printStackTrace();
 		}
 		List<String[]>  list = new ExcelReader(inputstream).getAllData();//读取excel数据
-		if(list.size()==1){//读取excel数据错误
+		System.out.println(list.get(0).length);
+		if(list.size()==1&&list.get(0).length==1){//读取excel数据错误
 			JSONObject result=new JSONObject();  
 			JSONArray jsonArray = JSONArray.fromObject(list);
+			result.put("success", "erro");
 			result.put("rows", jsonArray.toString());
 		    retJson(response,result);
 		}else{//读取excel数据完毕
 			//对解析数据进行处理
 			DaoPage daoPage = invoiceSpecialContractBathServiceImpl.findTmsCrvatInvReqBatchesHInParam(list);
+			if(daoPage.getPageIndex()!=-1){
 			List<TmsCrvatInvReqBatchesLInParam> li = (List<TmsCrvatInvReqBatchesLInParam>) daoPage.getResult();
 			JSONObject result=new JSONObject();
 			JsonConfig jsonConfig = new JsonConfig();  
 			jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
-			JSONArray jsonArray1 = JSONArray.fromObject(daoPage.getResult(),jsonConfig);
+			JSONArray jsonArray = JSONArray.fromObject(daoPage.getResult(),jsonConfig);
 			result.put("total", daoPage.getRecordCount());
 			result.put("success", "success");
 			result.put("invoiceAmount", li.get(li.size()-1).getInvoiceAmounts());
-			result.put("rows", jsonArray1.toString());
+			result.put("rows", jsonArray.toString());
 			retJson(response,result);
-		
+			}else{
+				JSONObject result=new JSONObject();  
+				JSONArray jsonArray = JSONArray.fromObject(daoPage.getResult());
+				result.put("success", "erro");
+				result.put("rows", jsonArray.toString());
+			    retJson(response,result);
+			}
 		}
 		
 		
@@ -142,6 +151,7 @@ public class InvoiceSpecialContractBathController extends BaseController {
 	@RequestMapping(value="/saveInvoiceReqHead")
 	public void saveInvoiceReqHead(@RequestParam Map<String, Object>map,HttpServletResponse response) throws ParseException{
 		String appuseruuid = (String) map.get("appuseruuid");//特殊批量开票申请ID
+		String tip = (String) map.get("tips");//特殊批量开票申请ID
 		
 		
 		TmsCrvatInvReqBatchesH tmsCrvatInvReqBatchesH = new TmsCrvatInvReqBatchesH();//特殊批量开票申请行
@@ -156,7 +166,9 @@ public class InvoiceSpecialContractBathController extends BaseController {
 		tmsCrvatInvReqBatchesH.setAttribute1((String) map.get("invoiceAmount"));//总金额
 		
 		int tips = 1;
-		
+      if("submit".equals(tip)){
+    	  tmsCrvatInvReqBatchesH.setStatus("30");//申请状态
+		}
 		if(AssertHelper.empty(appuseruuid)){
 			tmsCrvatInvReqBatchesH.setId(IdGenerator.getUUID());
 			invoiceSpecialContractBathServiceImpl.save(tmsCrvatInvReqBatchesH);
@@ -286,11 +298,11 @@ public class InvoiceSpecialContractBathController extends BaseController {
 	public String getExcel(HttpServletRequest request,HttpServletResponse response) throws IOException{		
 		String webPath =  request.getSession().getServletContext().getRealPath("/")+"/uploadFolder/批量开票测试模板.xlsx";  
 	        File file=new File(webPath);  
-	        String fileName=new String("批量开票测试模板.xlsx".getBytes("UTF-8"),"iso-8859-1");
+	        //String fileName=new String("批量开票测试模板.xlsx".getBytes("UTF-8"),"iso-8859-1");
 	        OutputStream os = response.getOutputStream();  
 	        try {  
 	        	response.reset();  
-	        	response.setHeader("Content-Disposition", "attachment; filename="+fileName);  
+	        	response.setHeader("Content-Disposition", "attachment; filename="+java.net.URLEncoder.encode("批量开票测试模板.xlsx", "UTF-8"));  
 	        	response.setContentType("application/octet-stream; charset=utf-8");  
 	            os.write(FileUtils.readFileToByteArray(file));  
 	            os.flush();  
@@ -318,5 +330,17 @@ public class InvoiceSpecialContractBathController extends BaseController {
 		return null;
 	}
 	
+	/**
+	 * 提交申请单
+	 * @param ps
+	 * @throws IOException 
+	 */
+	@RequestMapping(value="/submitFromPage")
+	public void submitFromPage(@RequestParam String ids,HttpServletResponse response) throws IOException{
+		int count = invoiceSpecialContractBathServiceImpl.submitFromPage(ids);
+		JSONObject result=new JSONObject();
+		result.put("success", true);
+		retJson(response,result);
+	}
 	
 }

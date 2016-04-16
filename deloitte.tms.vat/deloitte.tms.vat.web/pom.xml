@@ -60,7 +60,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.deloitte</groupId>
-			<artifactId>deloitte.tms.vat.inf.aisino.bj</artifactId>
+			<artifactId>deloitte.tms.vat.inf.aisino.sh</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<!-- <dependency> <groupId>com.deloitte</groupId> <artifactId>deloitte.tms.vat.inf.aisino.wh</artifactId> 

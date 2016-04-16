@@ -11,12 +11,15 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
+import com.deloitte.tms.base.masterdata.model.Customer;
+import com.deloitte.tms.base.taxsetting.model.TmsMdInventoryItems;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.BatchUtils;
 import com.deloitte.tms.pl.core.commons.utils.reflect.ReflectUtils;
 import com.deloitte.tms.pl.core.dao.IDao;
 import com.deloitte.tms.pl.core.service.impl.BaseService;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesH;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesL;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesLInParam;
 import com.deloitte.tms.vat.salesinvoice.dao.TmsCrvatInvReqBatchesLDao;
@@ -97,6 +100,35 @@ public class TmsCrvatInvReqBatchesLServiceImpl extends BaseService implements Tm
 	public TmsCrvatInvReqBatchesLInParam convertTmsCrvatInvReqBatchesLToInParam(TmsCrvatInvReqBatchesL model){
 		TmsCrvatInvReqBatchesLInParam inparam=new TmsCrvatInvReqBatchesLInParam();
 		ReflectUtils.copyProperties(model, inparam);
+		if(model.getCustomer()!=null)
+		{
+			Customer customer =model.getCustomer();//customer.getCustDepositBankNumber()
+			inparam.setCustomerType(customer.getCustomerType());
+			inparam.setCustomerName(customer.getCustomerName());//类型
+			inparam.setCustomerNumber(customer.getCustomerNumber());//编号
+			inparam.setContactPhone(customer.getContactPhone());//电话
+			inparam.setCustRegistrationAddress(customer.getCustRegistrationAddress());//地址
+			inparam.setCustDepositBankNumber(customer.getCustDepositBankNumber());//开户行代码
+			inparam.setCustDepositBankName(customer.getCustDepositBankName());//开户行名称
+			inparam.setCustDepositBankAccountNum(customer.getCustDepositBankAccountNum());//账号
+			inparam.setCustRegistrationNumber(customer.getCustRegistrationNumber());//证件编号
+			inparam.setContactName(customer.getCustRegistrationNumber());//联系人
+		}
+		if(model.getTmsCrvatInvReqBatchesH()!=null)
+		{
+			TmsCrvatInvReqBatchesH tmsCrvatInvReqBatchesH =model.getTmsCrvatInvReqBatchesH();
+			inparam.setLegalEntityId(tmsCrvatInvReqBatchesH.getLegalEntityId());//纳税人实体ID
+			inparam.setCrvatInvoiceReqNumber(tmsCrvatInvReqBatchesH.getCrvatInvoiceReqNumber());//申请单编号
+			
+		}
+		
+		if(model.getTmsMdInventoryItems()!=null)
+		{
+			TmsMdInventoryItems tmsMdInventoryItems =model.getTmsMdInventoryItems();
+			inparam.setInventoryItemId(tmsMdInventoryItems.getId());//商品及服务ID
+			inparam.setInventoryItemNumber(tmsMdInventoryItems.getInventoryItemNumber());//商品编号
+			inparam.setInventoryItemDescripton(tmsMdInventoryItems.getInventoryItemDescripton());//商品服务名称
+		}
 		return inparam;
 	}
 	public TmsCrvatInvReqBatchesL convertTmsCrvatInvReqBatchesLInParamToEntity(TmsCrvatInvReqBatchesLInParam inParam){

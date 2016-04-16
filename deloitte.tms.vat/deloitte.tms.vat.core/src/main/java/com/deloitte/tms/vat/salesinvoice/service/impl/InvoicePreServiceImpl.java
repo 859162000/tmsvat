@@ -189,12 +189,14 @@ public class InvoicePreServiceImpl extends BaseService implements InvoicePreServ
 		tmsCrvatInvoicePreHForUpdate.setApprovalStatus(tmsCrvatInvoicePreH.getApprovalStatus());
 		tmsCrvatInvoicePreHForUpdate.setOrgId(tmsCrvatInvoicePreH.getOrgId());
 		tmsCrvatInvoicePreHForUpdate.setApprovalBy(tmsCrvatInvoicePreH.getApprovalBy());
-		Hibernate.initialize(tmsCrvatInvoicePreHForUpdate.getTmsCrvatInvoicePreLs());
-		for(TmsCrvatInvoicePreL tmsCrvatInvoicePreL:tmsCrvatInvoicePreHForUpdate.getTmsCrvatInvoicePreLs()){	
+		invoicePreHDao.updateTrxPoolStatusByPreHid(tmsCrvatInvoicePreHForUpdate.getId(), CrvatTaxPoolStatuEnums.PREP_FORM_APPROVED.getValue());
+		//Hibernate.initialize(tmsCrvatInvoicePreHForUpdate.getTmsCrvatInvoicePreLs());
+		//tmsCrvatInvoicePreHForUpdate.setTmsCrvatInvoicePreLs(invoicePreHDao.getCrvatInvoicePreLsByPreHId(tmsCrvatInvoicePreH.getId()));
+		/*for(TmsCrvatInvoicePreL tmsCrvatInvoicePreL:tmsCrvatInvoicePreHForUpdate.getTmsCrvatInvoicePreLs()){	
 			InvoiceTrxPool invoiceTrxPool = tmsCrvatInvoicePreL.getInvoiceTrxPool();
 			invoiceTrxPool.setStatus(CrvatTaxPoolStatuEnums.PREP_FORM_APPROVED.getValue());
 			update(invoiceTrxPool);
-		}
+		}*/
 		String taskId = tmsCrvatInvoicePreHForUpdate.getWfTaskId();
 		if(!AssertHelper.empty(taskId)){
 			long id = Long.valueOf(taskId.trim());
@@ -211,7 +213,8 @@ public class InvoicePreServiceImpl extends BaseService implements InvoicePreServ
 		tmsCrvatInvoicePreHForUpdate.setApprovalStatus(CrvaInvoicePreStatusEnums.REVOKED.getValue());
 		tmsCrvatInvoicePreHForUpdate.setApproveDate(null);
 		tmsCrvatInvoicePreHForUpdate.setApprovalBy(null);				
-		Hibernate.initialize(tmsCrvatInvoicePreHForUpdate.getTmsCrvatInvoicePreLs());
+		//Hibernate.initialize(tmsCrvatInvoicePreHForUpdate.getTmsCrvatInvoicePreLs());
+		tmsCrvatInvoicePreHForUpdate.setTmsCrvatInvoicePreLs(invoicePreHDao.getCrvatInvoicePreLsByPreHId(tmsCrvatInvoicePreH.getId()));
 		for(TmsCrvatInvoicePreL tmsCrvatInvoicePreL:tmsCrvatInvoicePreHForUpdate.getTmsCrvatInvoicePreLs()){	
 			InvoiceTrxPool invoiceTrxPool = tmsCrvatInvoicePreL.getInvoiceTrxPool();
 			invoiceTrxPool.setStatus(CrvatTaxPoolStatuEnums.PREP_FORM_REVOKED.getValue());

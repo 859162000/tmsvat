@@ -21,10 +21,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.base.taxsetting.model.TmsMdContract;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
+import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.PageUtils;
 import com.deloitte.tms.pl.core.context.utils.ContextUtils;
 import com.deloitte.tms.pl.dictionary.model.DictionaryEntity;
@@ -226,5 +228,22 @@ public class InvoiceSpecialController extends BaseController{
 		//TODO
 
 		retJson(response,result);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "removeInvoiceReqPs", method = RequestMethod.POST)
+	public void removeInvoiceReqPs(@RequestParam String ids,HttpServletResponse response) throws IOException {
+		AssertHelper.notEmpty_assert(ids,"需要删除的发票不能为空");
+		String[] invoiceReqHIds=ids.split(",");
+		JSONObject object=new JSONObject();
+		try {
+			invoiceSpecialServiceImpl.deleteFromReqAll(invoiceReqHIds);
+			object.put("msg", "删除成功");
+			object.put("success", "true");
+		} catch (Exception e) {
+			object.put("msg", "删除失败");
+			object.put("success", "false");
+		}
+		retJson(response, object);
 	}
 }

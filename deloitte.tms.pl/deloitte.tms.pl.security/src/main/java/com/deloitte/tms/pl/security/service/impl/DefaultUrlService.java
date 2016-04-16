@@ -1,18 +1,13 @@
 package com.deloitte.tms.pl.security.service.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import com.deloitte.tms.pl.cache.ApplicationCache;
 import com.deloitte.tms.pl.core.dao.IDao;
 import com.deloitte.tms.pl.core.service.impl.BaseService;
 import com.deloitte.tms.pl.security.dao.IUrlDao;

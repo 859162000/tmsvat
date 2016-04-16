@@ -112,14 +112,6 @@ public class TmsMdTaxTrxTypeServiceImpl extends BaseService implements TmsMdTaxT
 		tmsMdTaxTrxTypeDao.update(entity);
 		
 	}
-/**
- * 根据条件查询
- */
-	@Override
-	public DaoPage retrievalTmsMdTaxTrxType(Map<String, Object> parameter,
-			Integer pageIndex, Integer pageSize) {
-		DaoPage daoPage = tmsMdTaxTrxTypeDao.retrievalTmsMdTaxTrxType(parameter,pageIndex,pageSize);
-		return daoPage;
-	}
+
 }
 

@@ -42,5 +42,7 @@ public interface InvoiceTrxPoolService extends IService {
 	public DaoPage findInvoiceTempReqLByParams(Map<String,Object> params, Integer pageIndex,Integer pageSize);
 	
 	public void deleteTempCrvatInvoiceRelById(String[] id);
+	
+	public void deleteTempCrvatInvoiceRelByUserName(String currentUseName);
 }
 

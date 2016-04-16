@@ -26,9 +26,14 @@ public class VatCenterContextHolder extends SecurityContextHolder{
 			super.initUserDetail(user, request, response);
 			Map userCache=user.getCachedProperties();
 			//这里还不能直接从contextutils获取数据
-			LegalEntityNode legalEntityNode=LegalEntityCacheUtils.getLegalNodeByOrgCode((String) userCache.get(ContextDef.DIVISIONCODE));
-			if(legalEntityNode!=null){
-				userCache.put(VatContextDef.CURRENT_LEGAL_ENTITY_ID,legalEntityNode.getId());
+			try {
+				LegalEntityNode legalEntityNode=LegalEntityCacheUtils.getLegalNodeByOrgCode((String) userCache.get(ContextDef.DIVISIONCODE));
+				if(legalEntityNode!=null){
+					userCache.put(VatContextDef.CURRENT_LEGAL_ENTITY_ID,legalEntityNode.getId());
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

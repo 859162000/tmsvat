@@ -96,6 +96,15 @@ public class TmsMdTrxAffirmSettingServiceImpl extends BaseService implements Tms
 	}
 	public TmsMdTrxAffirmSettingInParam convertTmsMdTrxAffirmSettingToInParam(TmsMdTrxAffirmSetting model){
 		TmsMdTrxAffirmSettingInParam inparam=new TmsMdTrxAffirmSettingInParam();
+		
+		inparam.setOrgName(model.getBaseOrg().getOrgName());
+		inparam.setTaxTrxTypeCode(model.getTmsMdTaxTrxType().getTaxTrxTypeCode());
+		inparam.setTaxTrxTypeName(model.getTmsMdTaxTrxType().getTaxTrxTypeName());
+		inparam.setCategoryName(model.getTaxCategory().getCategoryName());
+		inparam.setItemName(model.getItems().getItemName());
+		inparam.setInventoryItemNumber(model.getTmsMdInventoryItems().getInventoryItemNumber());
+		inparam.setInventoryItemDescripton(model.getTmsMdInventoryItems().getInventoryItemDescripton());
+		
 		ReflectUtils.copyProperties(model, inparam);
 		return inparam;
 	}

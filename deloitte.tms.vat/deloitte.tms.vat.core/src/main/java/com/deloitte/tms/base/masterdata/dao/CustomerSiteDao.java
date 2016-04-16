@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.dao.IDao;
+import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.base.masterdata.model.CustomerSite;
 /**
  * Home object for domain model class CustomerSite.

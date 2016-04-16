@@ -839,7 +839,7 @@
 					ps += "," + n.id;
 			});
 			 $.ajax({
-				url : "${vat}/invoiceReqH/removeInvoiceReqHs.do?ids=" + ps,
+				url : "${vat}/invoiceSpecial/removeInvoiceReqPs.do?ids=" + ps,
 				type : 'POST',
 				dataType : "json",
 				cache : false,

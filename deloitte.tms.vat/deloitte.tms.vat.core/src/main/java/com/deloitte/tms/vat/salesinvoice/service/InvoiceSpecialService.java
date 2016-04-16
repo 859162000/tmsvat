@@ -29,14 +29,13 @@ public interface InvoiceSpecialService extends IService {
 	 * @throws ParseException
 	 */
 	String setUpHead(Map<String, Object>map) throws ParseException;
+	
+	void deleteFromReqAll(String[] ids);
 
 	DaoPage findInvoiceReqHByParams(Map params, Integer pageIndex,
 			Integer pageSize);
 
 	Customer getCustomerParam(Map<String, Object> map);
-
-	public DaoPage findTmsMdContractByParams(Map<String, Object> parameter,
-			Integer pageNumber, Integer pageSize);
 
 	public DaoPage findTmsMdInventoryItemsByParams(Map params, Integer pageIndex,
 			Integer pageSize);

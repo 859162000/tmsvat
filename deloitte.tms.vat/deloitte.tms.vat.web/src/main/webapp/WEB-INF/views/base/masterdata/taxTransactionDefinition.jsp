@@ -8,21 +8,18 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
  <body class="easyui-layout" style="overflow-y: hidden"  scroll="no" id="layoutid">    
-    <div region="north" split="true" border="false" style="overflow: hidden; height:21%;" data-options="region:'west'">  
+    <div region="north" split="true" border="false" style="overflow: hidden; height:12%;" data-options="region:'west'">  
         <div class="easyui-panel" title="查询条件" style="width:100%;height:100%;margin-top:0px;" data-options="collapsible: true">		
 		    <form id="taxTransactionDefinition_searchform" method="get" scroll="no">
-		    	<table cellpadding="5"  id="dga" style="width: 100%">
-		    		<tr style="margin-left:30px;">
+		    	<table id="dga" style="width: 100%">
+		    		<tr >
 		    			<td>涉税交易类型:<select id="taxTransactionType_id"
 								name="taxTransactionType" class="easyui-combogrid"
-								style="width: 300px;" data-options="editable:false"></select></td>
-		    		</tr>	
-		    		<tr style="text-align:center;background-color:#E0ECFF " align="center">
-		    		  <td   align="center"> 
-		    		  <a href="#" id="searchbtn"  class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px" onclick="Searcha()">
-		    		  <spring:message code="button.Search"/>
+								style="width: 300px;" data-options="editable:false"></select>
+		    		  <a href="#" id="searchbtn"  class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px" onclick="Search()">
+		    		  查询
 		    		  </a>
-		    		  <a href="#" class="easyui-linkbutton" onclick="$('#taxTransactionDefinition_searchform').form('reset')" style="width:80px" onclick="">
+		    		  <a href="#" class="easyui-linkbutton" onclick="$('#taxTransactionDefinition_searchform').form('reset')" style="width:80px" >
 		    		  <spring:message code="button.Clear"/>
 		    		  </a>			                     
 		    		   </td>
@@ -43,8 +40,22 @@
 		   </table>  
 	   </div>	 
 		</div>
-<div id="addTaxTransactionDefinition" class="easyui-dialog" title="增加定义" style="width:500px;height:300px;"   
-        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">   
+<div id="addTaxTransactionDefinition" class="easyui-dialog" title="增加定义" style="width:500px;height:300px;"  
+       data-options="	closed:true,			
+				buttons: [{
+					text:'<spring:message code="button.Save"/>',
+					iconCls:'icon-ok',
+					handler:function(){
+						addTaxTransactionDefinition();
+					}
+				},{
+					text:'<spring:message code="button.Close"/>',
+					iconCls:'icon-cancel',
+					handler:function(){
+						$('#addTaxTransactionDefinition').dialog('close');
+					}
+				}]
+			">   
       <form  method="post" id="addTaxTransactionDefinitionForm">
            <table style="text-align:center;line-height:30px;" align="center">
             <tr>
@@ -75,16 +86,6 @@
              </select>
 
             </tr>
-           <tr>
-                     <td colspan="2"  align="center"> 
-		    		  <a href="#"  class="easyui-linkbutton" data-options="iconCls:'icon-save'" style="width:100px" onclick="addTaxTransactionDefinition()">
-		    		  <spring:message code="button.Save"/>
-		    		  </a>
-		    		  <a href="#" class="easyui-linkbutton" style="width:100px" onclick="">
-		    		  <spring:message code="button.Clear"/>
-		    		  </a>			                     
-		    		   </td>
-           </tr>
            </table>
       </form>
 </div>  
@@ -155,7 +156,7 @@ var createGridHeaderContextMenu = function(e, field) {
 	$.fn.datagrid.defaults.onHeaderContextMenu = createGridHeaderContextMenu;  
 	$.fn.treegrid.defaults.onHeaderContextMenu = createGridHeaderContextMenu;  
 
-//初始化异常信息显示表格
+//初始化涉水交易类型信息显示表格
 $("#taxTransactionDefinition_dataGrid").datagrid({
 	loadMsg : "<spring:message code='client.datagrid.dataloding'/>",
 	striped : true,//显示斑马线效果
@@ -181,10 +182,10 @@ $("#taxTransactionDefinition_dataGrid").datagrid({
 					required : true,
 				},
 			},},
-            {field:'taxTrxTypeName',title:'涉税交易类型',width:260,align : 'center',editor:'text',sortable:true},
-            {field:'startDate',title:'生效日期',width:260,align : 'center',editor:'datebox',sortable:true} ,
-            {field:'endDate',title:'失效日期',width:260,align : 'center',editor:'datebox',sortable:true} , 
-            {field:'enabledFlag',title:'是否启用',width:260,align : 'center',editor:'text',sortable:true,formatter:function(value,row,index){
+            {field:'taxTrxTypeName',title:'涉税交易类型',width:260,align : 'left',editor:'text',sortable:true},
+            {field:'startDate',title:'生效日期',width:100,align : 'center',editor:'datebox',sortable:true} ,
+            {field:'endDate',title:'失效日期',width:100,align : 'center',editor:'datebox',sortable:true} , 
+            {field:'enabledFlag',title:'是否启用',width:100,align : 'left',editor:'text',sortable:true,formatter:function(value,row,index){
             	if(value){
             		return "是";
             	}else{
@@ -320,36 +321,19 @@ function Search() {
 		}
 	});
 }
-/**
- * 根据检索条件查询信息
- */
-function Searcha() {
-	$('#taxTransactionDefinition_searchform').form(//读取记录填充到表单中。数据参数可以是一个字符串或一个对象类型，如果是字符串则作为远程URL，否则作为本地记录。
-			'load',
-			{
-				pageNumber : $('#taxTransactionDefinition_dataGrid')
-						.datagrid('options').pageNumber,
-				pageSize : $('#taxTransactionDefinition_dataGrid')
-						.datagrid('options').pageSize
-			});
-	$('#taxTransactionDefinition_searchform').form('submit', {
-		url : '${vat}/tmsMdTaxTrxType/retrievalTmsMdTaxTrxType.do',
-		success : function(result) {
-			var result = $.parseJSON(result);
-			$("#taxTransactionDefinition_dataGrid").datagrid('loadData', result);
-			$("#taxTransactionDefinition_dataGrid").datagrid("loaded");
-		}
-	});
-}
 	/**
 	 * 涉税交易类型下拉列表数据生成
 	 */
-		function taxTransactionType_id(){
+		function taxTransactionType_id(data){
 	$("#taxTransactionType_id").combogrid({
-			panelWidth : 300,
+			panelWidth : 600,
+			panelHeight : 400,
 			pagination:true,//分页
-			url : "",
+			url : "${vat}/tmsMdTaxTrxType/loadTaxTransactionType_id.do",
 			onSelect: function(rec){
+			},
+			queryParams : {
+				customerNameInSendFormid : data,
 			},
 			toolbar : [ {
 				text : '<input type="text" id="taxTransactionTypeInput_id"/>'
@@ -357,37 +341,41 @@ function Searcha() {
 				text : "查询",
 				iconCls : 'icon-search',
 				handler : function() {
+					var taxTransactionTypeInput_id = $(
+					"#taxTransactionTypeInput_id")
+					.val();//得到输入框的值
+					taxTransactionType_id(taxTransactionTypeInput_id);
+			$("#taxTransactionType_id")
+					.combogrid('hidePanel');
+			
+			$("#taxTransactionType_id")
+					.combogrid('showPanel');
+			$("#taxTransactionType_id").combogrid('grid').datagrid(
+			'options').onClickRow = function(index, row) {
+		search = false;
+		$("#taxTransactionType_id").combogrid('hidePanel');
+		$("#taxTransactionType_id").combogrid('setValue',
+				row.id);
+		$("#taxTransactionType_id").combogrid('setText',
+				row.taxTrxTypeName);
+	}
+					
 				}
 			}, '-' ],
 			columns : [ [ {
+				field : 'id',
+				title : "涉税交易类型id",
+				width : 100,
+				hidden:true
+			},{
 				field : 'taxTrxTypeCode',
 				title : "涉税交易类型编码",
-				width : 80
+				width : 300
 			}, {
 				field : 'taxTrxTypeName',
 				title : "涉税交易类型名称",
-				width : 120
+				width : 300
 			} ] ]
-		});
-		var page = $('#taxTransactionType_id').combogrid('options').pageNumber;
-		var pageSizes = $('#taxTransactionType_id').combogrid('options').pageSize;
-		var data = "pageNumber="+page +"&pageSize="+pageSizes +
-		"&taxTransactionTypeInput_id =" + $('#taxTransactionTypeInput_id').val(); 
-		$.ajax({
-			url : "${vat}/tmsMdTaxTrxType/loadTaxTransactionType_id.do",
-			type : "POST",
-			data : data,
-			dataType : "json", 
-			cache : false,
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				 alert(XMLHttpRequest.status);
-				 alert(XMLHttpRequest.readyState);
-				 alert(textStatus);
-				   },
-			success : function(result) {
-				 $('#taxTransactionType_id').combogrid('grid').datagrid(
-						'loadData', result);
-			}
 		});
 		}
 /**
@@ -395,7 +383,7 @@ function Searcha() {
  */
 $(document).ready(
 		function() {
-		taxTransactionType_id();
+		taxTransactionType_id('');
 		$("#taxTransactionType_id").combogrid('grid').datagrid('options').onClickRow = 
 			function(index, row) {
 	          search = false;

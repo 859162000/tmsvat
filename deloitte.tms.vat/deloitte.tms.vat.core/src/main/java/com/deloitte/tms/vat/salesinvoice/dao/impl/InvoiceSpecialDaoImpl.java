@@ -135,13 +135,6 @@ public class InvoiceSpecialDaoImpl extends BaseDao<InvoiceReqH> implements
 	}
 
 	@Override
-	public DaoPage findTmsMdContractByParams(Map params, Integer pageIndex,
-			Integer pageSize) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public InvoiceReqH getInvoiceReqH(String id) {
 		return (InvoiceReqH) this.get(InvoiceReqH.class, id);
 	}

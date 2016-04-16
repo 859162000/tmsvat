@@ -29,6 +29,7 @@ import com.deloitte.tms.pl.core.dao.IDao;
 import com.deloitte.tms.pl.core.service.impl.BaseService;
 import com.deloitte.tms.pl.dictionary.model.DictionaryEntity;
 import com.deloitte.tms.vat.salesinvoice.dao.InvoiceSpecialContractBathDao;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatInf;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesH;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesL;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesLInParam;
@@ -48,14 +49,22 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 	public DaoPage findTmsCrvatInvReqBatchesHInParam(List<String[]> list) {
 		List<TmsCrvatInvReqBatchesLInParam>  listTmsCrvatInvReqBatchesLInParam = new ArrayList<TmsCrvatInvReqBatchesLInParam>();
 		BigDecimal invoiceAmounts = new BigDecimal(0);
+		int i = 0;
 		for(String[] dataExcel:list){
+			i++;
 			TmsCrvatInvReqBatchesLInParam tmsCrvatInvReqBatchesLInParam = new TmsCrvatInvReqBatchesLInParam();
 			
 			String customerNumber = dataExcel[0];//客户编号
 			//根据客户编号查询客户信息
 			List<Customer> listCustomer = invoiceSpecialContractBathDaoImpl.findCustomer(customerNumber,null);
+		
+			if(listCustomer.size()==0||listCustomer==null){
+				 String erro = "请检查第"+i+"行,"+"第"+1+"列客户编号";//提示信息
+				 List<String[]> msg = new ArrayList<String[]>();//数据集合
+				 msg.add(new String[]{erro});//添加提示信息
+				return new DaoPage(list.size(),-1,10,msg);
+			}
 			Customer customer = listCustomer.get(0);
-			
 			tmsCrvatInvReqBatchesLInParam.setCustomerId(customer.getId());//购方id
 			tmsCrvatInvReqBatchesLInParam.setCustomerNumber(customer.getCustomerNumber());//购方编码
 			tmsCrvatInvReqBatchesLInParam.setCustomerName(customer.getCustomerName());//购方名称
@@ -70,6 +79,14 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 			if(AssertHelper.notEmpty(contractNumber)){
 			//根据合同编号查询合同信息
 			List<TmsMdContract> listTmsMdContract = invoiceSpecialContractBathDaoImpl.findTmsMdContract(contractNumber,null);
+			
+			if(listTmsMdContract.size()==0||listTmsMdContract==null){
+				 String erro = "请检查第"+i+"行,"+"第"+2+"列合同编号";//提示信息
+				 List<String[]> msg = new ArrayList<String[]>();//数据集合
+				 msg.add(new String[]{erro});//添加提示信息
+				return new DaoPage(list.size(),-1,10,msg);
+			}
+			
 			TmsMdContract tmsMdContract = listTmsMdContract.get(0);//合同model对象
 			tmsCrvatInvReqBatchesLInParam.setContractId(tmsMdContract.getId());//合同id
 			tmsCrvatInvReqBatchesLInParam.setContractNumber(tmsMdContract.getContractNumber());//合同编号
@@ -81,6 +98,13 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 			if(AssertHelper.notEmpty(projectNumber)){
 			//根据项目编号查询项目信息
 			List<TmsMdProject> listTmsMdProject = invoiceSpecialContractBathDaoImpl.findTmsMdProject(projectNumber,null);
+			if(listTmsMdProject.size()==0||listTmsMdProject==null){
+				 String erro = "请检查第"+i+"行,"+"第"+3+"列项目编号";//提示信息
+				 List<String[]> msg = new ArrayList<String[]>();//数据集合
+				 msg.add(new String[]{erro});//添加提示信息
+				return new DaoPage(list.size(),-1,10,msg);
+			}
+			
 			if(listTmsMdProject.size()!=0){
 			TmsMdProject tmsMdProject = listTmsMdProject.get(0);//项目model对象
 			tmsCrvatInvReqBatchesLInParam.setProjectId(tmsMdProject.getId());//项目编id
@@ -94,6 +118,14 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 			
 			//根据收入类型名称查询涉税交易类型信息
 			List<TmsMdTaxTrxType> listTmsMdTaxTrxType = invoiceSpecialContractBathDaoImpl.findTmsMdTaxTrxType(taxTrxTypeName,null);
+			
+			if(listTmsMdTaxTrxType.size()==0||listTmsMdTaxTrxType==null){
+				 String erro = "请检查第"+i+"行,"+"第"+4+"列涉税交易类型";//提示信息
+				 List<String[]> msg = new ArrayList<String[]>();//数据集合
+				 msg.add(new String[]{erro});//添加提示信息
+				return new DaoPage(list.size(),-1,10,msg);
+			}
+			
 			TmsMdTaxTrxType tmsMdTaxTrxType = listTmsMdTaxTrxType.get(0);
             
 			tmsCrvatInvReqBatchesLInParam.setTaxTrxTypeId(tmsMdTaxTrxType.getId());//涉税交易类型id
@@ -316,6 +348,37 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 		    invoiceSpecialContractBathDaoImpl.removeById(TmsCrvatInvReqBatchesH.class, id);
 		}
 		return 0;
+	}
+	
+	/**
+	 * 取得长江证券数据
+	 */
+	@Override
+	public List<TmsCrvatInvReqBatInf> analyzeTmsCrvatInvReqBatchesParam() {
+		List<TmsCrvatInvReqBatInf>  list = invoiceSpecialContractBathDaoImpl.analyzeTmsCrvatInvReqBatchesParam();
+		for(TmsCrvatInvReqBatInf tmsCrvatInvReqBatInf:list){
+			
+		}
+		
+		
+		
+		
+		
+		
+		return list;
+	}
+	/**
+	 * 提交申请单
+	 */
+	@Override
+	public int submitFromPage(String ids) {
+		String [] idArray = ids.split(",");
+		int count = 0;
+		for(String id:idArray){ 
+			count = invoiceSpecialContractBathDaoImpl.submitFromPage(id);
+			count++;
+		}
+		return count;
 	}
      
 

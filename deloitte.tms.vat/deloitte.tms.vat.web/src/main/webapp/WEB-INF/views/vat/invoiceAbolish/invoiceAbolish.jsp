@@ -13,9 +13,9 @@
 </head>
 	<body class="easyui-layout" style="overflow-y: hidden"  scroll="no">
     <div region="north" split="true" border="false" style="overflow: hidden; height: 23%;">  
-        <div class="easyui-panel" title="查找条件" style="width:100%; background-color: #E0ECFF">		
-		    <form id="searchForm" method="post"  scroll="no">
-		    	<table cellpadding="2" style="width: 1000px; height: 100%"   >
+        <div class="easyui-panel" title="<spring:message code="searchgroup"/>" style="width:100%;height:100%; background-color: #E0ECFF">		
+		    <form id="searchForm" method="post" >
+		    	<table style="width: 1000px; height: 100%" >
 		    		<tr>
 	    				<td>作废类型</td>
 		    			<td>
@@ -61,7 +61,7 @@
 		    	             <a href="#" id="searchbtn"  class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px;" onclick="search_h()">查询</a>
 		    			</td>
 		    			<td>
-	    					<a href="#" class="easyui-linkbutton" style="width:80px" onclick="clearSearchForm()">清除</a>
+	    					<a href="#" class="easyui-linkbutton" style="width:80px" onclick="clearSearchForm()">重置</a>
 		    			</td>
 		    		</tr>
 		    		<tr style="display:none">
@@ -314,7 +314,7 @@
 							success:function(result){
 	    						$.messager.progress('close');
 								var result = $.parseJSON(result);
-								if(result.status=='0'){	
+								if(result!=null){	
 									clearAbolishForm();
 									search_h();
 									$('#abolish_dialog').dialog('close');

@@ -20,6 +20,7 @@ import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.reflect.ReflectUtils;
 import com.deloitte.tms.pl.core.dao.IDao;
 import com.deloitte.tms.pl.core.service.impl.BaseService;
+import com.deloitte.tms.pl.security.utils.LittleUtils;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxH;
 
 
@@ -37,19 +38,37 @@ public class EquipmentServiceImpl extends BaseService implements EquipmentServic
 	
 	@Override
 	public List<TmsMdEquipment> loadAllEquipment() {
-		return equipmentDao.find("from TmsMdEquipment where 1=1 and  flag = 1 ");
+		
+		HashMap<String, String> map = new HashMap<String, String>();
+		return	equipmentDao.loadEquipmentData(map);
+		
+		//return equipmentDao.find("from TmsMdEquipment  flag = 1 ");
 	}
 
 	@Override
 	public DaoPage findEquipmentByParams(Map params, Integer pageIndex, Integer pageSize) {
+		
+		try{
 		if(params==null)
 		{
 			params=new HashMap();
 		}			
 		DaoPage daoPage= equipmentDao.findEquipmentByParams(params, pageIndex, pageSize);
-		daoPage.setResult(convertEquipmentToInParam((List<TmsMdEquipment>) daoPage.getResult()));
+		
+		if(daoPage!=null){
+			
+			daoPage.setResult(convertEquipmentToInParam((List<TmsMdEquipment>) daoPage.getResult()));			
+		}	
+		
+		
 		return daoPage;
+		}catch(Exception ex){
+			ex.printStackTrace();
+			System.out.println("EquipmentServiceImpl > findEquipmentByParams exception will return null");
+			return null;
+		}
 	}
+	
 	public List<TmsMdEquipment> finAllEquipment()
 	{
 		return equipmentDao.find("from TmsMdEquipment where 1=1 and  flag = 1 ");
@@ -93,7 +112,11 @@ public class EquipmentServiceImpl extends BaseService implements EquipmentServic
 			params=new HashMap();
 		}			
 		DaoPage daoPage= equipmentDao.findLegalEntityByParams(params, pageIndex, pageSize);
-		daoPage.setResult(convertLegalEntityToInParam((List<TmsMdLegalEntity>) daoPage.getResult()));
+		
+		if(daoPage!=null){
+			daoPage.setResult(convertLegalEntityToInParam((List<TmsMdLegalEntity>) daoPage.getResult()));
+		}
+		
 		return daoPage;
 	}
 	
@@ -120,6 +143,9 @@ public class EquipmentServiceImpl extends BaseService implements EquipmentServic
 	@Override
 	public void deleteEquipment(String id) {
 		
+		if(LittleUtils.strEmpty(id)){
+			return;
+		}
 		TmsMdEquipment equipment = (TmsMdEquipment) equipmentDao.get(TmsMdEquipment.class, id);
 		Hibernate.initialize(equipment.getTmsMdEquipments());
 		equipmentDao.removeAll(equipment.getTmsMdEquipments());

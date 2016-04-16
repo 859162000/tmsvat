@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.deloitte.tms.base.enums.BaseCustomerCategoryEnums;
+import com.deloitte.tms.base.masterdata.dao.impl.CustomerDaoImpl;
 import com.deloitte.tms.base.masterdata.model.CustBankAccountInParam;
 import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.base.masterdata.model.CustomerInParam;
@@ -35,6 +36,7 @@ import com.deloitte.tms.pl.core.commons.constant.EnableFlagEnums;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.PageUtils;
+import com.deloitte.tms.pl.core.commons.utils.SpringUtil;
 import com.deloitte.tms.pl.core.commons.utils.reflect.ReflectUtils;
 import com.deloitte.tms.pl.dictionary.model.DictionaryEntity;
 import com.deloitte.tms.pl.dictionary.service.DictionaryService;
@@ -171,7 +173,8 @@ public class CustomerController extends BaseController{
 		String[] customerIds=customerKeys.split(",");
 		for(String customerId:customerIds){
 			Customer entity=(Customer)customerService.get(Customer.class,customerId.toString());
-			customerService.remove(entity);
+			CustomerDaoImpl  customerDao = (CustomerDaoImpl)SpringUtil.getBean("customerDao");
+			customerDao.removeById(Customer.class, customerId);
 		}
 	}
 	

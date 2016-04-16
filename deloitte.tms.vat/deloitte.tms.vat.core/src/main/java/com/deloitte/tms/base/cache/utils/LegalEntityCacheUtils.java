@@ -68,7 +68,7 @@ public class LegalEntityCacheUtils {
 	 * @return
 	 */
 	private static LegalEntityNode getLegalNodeByOrgCode(String orgCode,LegalEntityNode legalEntityNode){
-		AssertHelper.notEmpty_assert(orgCode, "登录用户的机构代码不能为空");
+		AssertHelper.notEmpty_assert(orgCode, "登录用户的机构代码不能为空,请联系管理员设置机构后再登录");
 		if(legalEntityNode.getBizOrgNode()!=null&&orgCode.equals(legalEntityNode.getBizOrgNode().getCode())){
 			return legalEntityNode;
 		}

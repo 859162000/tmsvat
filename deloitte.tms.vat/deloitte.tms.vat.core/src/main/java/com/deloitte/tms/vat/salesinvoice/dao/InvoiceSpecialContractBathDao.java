@@ -16,6 +16,7 @@ import com.deloitte.tms.base.taxsetting.model.TmsMdInventoryItems;
 import com.deloitte.tms.base.taxsetting.model.TmsMdTrxAffirmSetting;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.dao.IDao;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatInf;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesL;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesLInParam;
 
@@ -53,5 +54,9 @@ public interface InvoiceSpecialContractBathDao extends IDao<TmsCrvatInvReqBatche
 			String trxAffirmSettingId);
 
 	List<TmsCrvatInvReqBatchesL> findByTmsCrvatInvReqBatchesLId(String id);
+
+	List<TmsCrvatInvReqBatInf> analyzeTmsCrvatInvReqBatchesParam();
+
+	int submitFromPage(String id);
 
 }

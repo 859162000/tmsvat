@@ -27,6 +27,7 @@ import com.deloitte.tms.vat.base.enums.BaseLegalEntityTypeEnums;
 import com.deloitte.tms.vat.base.enums.CrvaInvoicePreStatusEnums;
 import com.deloitte.tms.vat.base.enums.CrvatTaxPoolStatuEnums;
 import com.deloitte.tms.vat.base.enums.InvoicePrintStatusEnums;
+import com.deloitte.tms.vat.base.enums.InvoiceReqTypeEnums;
 import com.deloitte.tms.vat.base.enums.VatCRInvoiceTypeEnums;
 import com.deloitte.tms.vat.core.common.IdGenerator;
 import com.deloitte.tms.vat.salesinvoice.dao.InvoicePreHDao;
@@ -54,14 +55,16 @@ public class CrvatInvoicePreToPrintPoolServiceImpl extends BaseService
 	@Override
 	public List<TmsCrvatInvoicePreH> findInvoicePreHByParams(Map params) {
 		// TODO Auto-generated method stub		
-		params.put("approveStatus", CrvaInvoicePreStatusEnums.APPROVED.getValue());	
+		params.put("approveStatus", CrvaInvoicePreStatusEnums.APPROVED.getValue());
+		params.put("invoiceReqType", InvoiceReqTypeEnums.COUNTER.getValue());
 		params.put("pageNumber", 1);
 		params.put("pageSize", Integer.MAX_VALUE);
 		DaoPage daoPage =  invoicePreHDao.findTmsCrvatInvoicePreHsByParam(params);
 		List<TmsCrvatInvoicePreH> list = (List<TmsCrvatInvoicePreH>) daoPage.getResult();
 		for(TmsCrvatInvoicePreH tmsCrvatInvoicePreH:list){
 			Hibernate.initialize(tmsCrvatInvoicePreH.getCustomer());
-			Hibernate.initialize(tmsCrvatInvoicePreH.getTmsCrvatInvoicePreLs());
+			List<TmsCrvatInvoicePreL> rellist = invoicePreHDao.getCrvatInvoicePreLsByPreHId(tmsCrvatInvoicePreH.getId());
+			tmsCrvatInvoicePreH.setTmsCrvatInvoicePreLs(rellist);
 		}
 		return list;
 	}
@@ -70,7 +73,8 @@ public class CrvatInvoicePreToPrintPoolServiceImpl extends BaseService
 	@Override
 	public int exeConvertCrvatInvoicePreToPrintPool(
 			TmsCrvatInvoicePreH tmsCrvatInvoicePreH) {
-		// TODO Auto-generated method stub		
+		// TODO Auto-generated method stub	
+		
 		Map<String, List<TmsCrvatInvoicePreL>> map = getTmsCrvaInvoicePresByInvoiceCateGory(tmsCrvatInvoicePreH);
 		List<InvoicePrintPoolH> poolHs = new ArrayList<InvoicePrintPoolH>();
 		for(String invoiceCateGory:map.keySet()){

@@ -424,7 +424,7 @@ function getCookie(name) {//取cookies函数
 	<div id="mainPanle" region="center" border="true" border="false">
 		 <div id="tabs" class="easyui-tabs"  fit="true" border="false" >
                 <div title="首页">
-				<iframe scrolling="auto" frameborder="0"  src="invoicePreProcess/invoicePreProcessCheckInit.do" style="width:100%;height:100%;"></iframe>
+				<iframe scrolling="auto" frameborder="0"  src="todoTaskInit.do" style="width:100%;height:100%;"></iframe>
 				</div>
         </div>
 	</div>

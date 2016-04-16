@@ -18,9 +18,6 @@ public interface InvoiceSpecialDao extends IDao<InvoiceReqH>{
 	DaoPage findInvoiceReqHByParams(Map params, Integer pageIndex,
 			Integer pageSize);
 
-	DaoPage findTmsMdContractByParams(Map params, Integer pageIndex,
-			Integer pageSize);
-
 	DaoPage findTmsMdInventoryItemsByParams(Map params, Integer pageIndex,
 			Integer pageSize);
 

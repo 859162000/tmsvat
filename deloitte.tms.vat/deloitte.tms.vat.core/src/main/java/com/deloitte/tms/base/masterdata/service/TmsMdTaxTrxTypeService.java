@@ -29,8 +29,6 @@ public interface TmsMdTaxTrxTypeService extends IService{
 
 	public void removeTmsMdTaxTrxTypes(String tmsMdTaxTrxTypeId);
 
-	public DaoPage retrievalTmsMdTaxTrxType(Map<String, Object> parameter,
-			Integer pageIndex, Integer pageSize);
 
 	
 }

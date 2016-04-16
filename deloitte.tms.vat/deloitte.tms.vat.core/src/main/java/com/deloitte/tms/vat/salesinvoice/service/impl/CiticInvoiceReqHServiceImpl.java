@@ -36,22 +36,28 @@ import com.deloitte.tms.base.masterdata.model.TmsMdTaxTrxType;
 import com.deloitte.tms.base.masterdata.service.CustomerService;
 import com.deloitte.tms.base.taxsetting.model.TmsMdInventoryItems;
 import com.deloitte.tms.pl.cache.utils.DictionaryCacheUtils;
+import com.deloitte.tms.pl.core.commons.exception.BusinessException;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.DateUtils;
 import com.deloitte.tms.pl.core.dao.IDao;
 import com.deloitte.tms.pl.core.service.impl.BaseService;
 import com.deloitte.tms.pl.dictionary.model.DictionaryEntity;
 import com.deloitte.tms.pl.flow.utils.FlowHelper;
+import com.deloitte.tms.vat.base.enums.AppFormStatuEnums;
 import com.deloitte.tms.vat.base.enums.CrvatTaxPoolStatuEnums;
 import com.deloitte.tms.vat.base.enums.InvoiceReqTypeEnums;
+import com.deloitte.tms.vat.base.enums.VatIsAppointIssuInvoiceEnums;
+import com.deloitte.tms.vat.base.enums.VatIsIssueInvoiceEnums;
 import com.deloitte.tms.vat.core.common.IdGenerator;
 import com.deloitte.tms.vat.salesinvoice.dao.InvoiceReqHDao;
 import com.deloitte.tms.vat.salesinvoice.dao.InvoiceReqLDao;
+import com.deloitte.tms.vat.salesinvoice.dao.InvoiceTrxPoolDao;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqH;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqL;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqLInParam;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxPool;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxPoolInParam;
+import com.deloitte.tms.vat.salesinvoice.model.TempTmsCrvatInvoiceReqL;
 import com.deloitte.tms.vat.salesinvoice.service.CiticInvoiceReqHService;
 import com.deloitte.tms.vat.salesinvoice.service.InvoiceReqHService;
 import com.deloitte.tms.vat.salesinvoice.service.InvoiceReqLService;
@@ -78,6 +84,8 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 	 */
 	@Resource
 	InvoiceReqHDao invoiceReqHDao;
+	@Resource
+	InvoiceTrxPoolDao invoiceTrxPoolDao;
 	@Autowired
 	InvoiceReqLDao invoiceReqLDao;
 	@Autowired
@@ -95,13 +103,8 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 		return invoiceReqHDao;
 	}
 	public InvoiceReqL convertInvoiceTrxPoolToInvoiceReqL(InvoiceTrxPool pool){
-		//InvoiceReqL invoiceReqL = invoiceReqLService.findInvoiceReqLByPoolId(pool.getId());
-		/*if(invoiceReqL!=null){
-			return invoiceReqL;
-		}
-		else{*/
-			InvoiceReqL invoiceReqL = new InvoiceReqL();
-			//invoiceReqL.setCrvatInvoiceReqHId(entity.getId());
+
+			InvoiceReqL invoiceReqL = new InvoiceReqL();	
 			invoiceReqL.setLegalEntityId(pool.getLegalEntityId());
 			invoiceReqL.setLegalEntityCode(pool.getLegalEntityCode());
 			invoiceReqL.setLegalEntityName(pool.getLegalEntityName());
@@ -112,7 +115,7 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 			invoiceReqL.setInventoryItemModels(pool.getInventoryItmeModels());
 			invoiceReqL.setInventoryItemNumber(pool.getInventoryItemNumber());
 			invoiceReqL.setInventoryItemQty(pool.getInventoryItemQty());
-			//invoiceReqL.setVatAmount(pool.get);
+			
 			if(!AssertHelper.isOrNotEmpty_assert(pool.getExchangeRate())){
 				pool.setExchangeRate(BigDecimal.ZERO);
 			}
@@ -127,18 +130,35 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 				invoiceReqL.setAcctdAmountCr(pool.getCurrencyAmountCr());
 			}
 			if(AssertHelper.isOrNotEmpty_assert(pool.getCurrencyAmount())&&AssertHelper.isOrNotEmpty_assert(pool.getTaxRate())){
+				
 				invoiceReqL.setVatAmount(pool.getCurrencyAmount().multiply(BigDecimal.valueOf(pool.getTaxRate())));
 			}else{
 				invoiceReqL.setVatAmount(BigDecimal.ZERO);
 			}
 			invoiceReqL.setInvoiceCategory(pool.getInvoiceCategory());
 			invoiceReqL.setInvoiceType(pool.getInvoiceType());
+			BigDecimal realBigDecimal = pool.getExchangeAmount();
+			if(realBigDecimal!=null){
+				String exchangeAmountStr = realBigDecimal.toString();
+				invoiceReqL.setAttribute1(exchangeAmountStr);
+			}
+			
 			/*invoiceReqL.setInvoiceAmount(((BigDecimal) (null!=pool.getCurrencyAmount()?pool.getCurrencyAmount():BigDecimal.valueOf(0.00))));
 			invoiceReqL.setAcctdAmountCr(null!=pool.getCurrencyAmountCr()?pool.getCurrencyAmountCr():BigDecimal.valueOf(0.00));
 			invoiceReqL.setVatAmount(((BigDecimal) (null!=pool.getCurrencyAmount()?pool.getCurrencyAmount():BigDecimal.valueOf(0.00)).multiply(null!=pool.getTaxRate()?BigDecimal.valueOf(pool.getTaxRate()):BigDecimal.valueOf(0.00))));*/
 			return invoiceReqL;
+		
+	}
+	
+	private InvoiceReqL convertInvoiceTrxPoolToInvoiceReqL(TempTmsCrvatInvoiceReqL temp){
+		    InvoiceTrxPool pool = (InvoiceTrxPool) get(InvoiceTrxPool.class, temp.getInvoiceTrxId());
+		    InvoiceReqL invoiceReqL =convertInvoiceTrxPoolToInvoiceReqL(pool);
+			
+			return invoiceReqL;
 		//}
 	}
+	
+	
 	public InvoiceReqH getInvoiceReqH(String id) {
 		// TODO Auto-generated method stub
 		InvoiceReqH invoiceReqH =(InvoiceReqH) invoiceReqLDao.get(InvoiceReqH.class, id);	
@@ -198,7 +218,7 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 	 * @see com.deloitte.tms.vat.salesinvoice.service.CiticInvoiceReqHService#setUpHead(java.util.Map)  
 	 */
 	
-	@Override
+	/*@Override
 	public String setUpHead(Map<String, Object> map) throws ParseException {
 		String trxIds = (String) map.get("rowsids");
 		String trxs[] = trxIds.split(";");
@@ -239,8 +259,8 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 			invoiceReqH.setMappingStatus("0");
 			invoiceReqH.setOrgId(map.get("orgId").toString());
 			invoiceReqH.setCustRegistrationCode(map.get("custRegistrationCode").toString());
-			/*String dateString = map.get("invoiceReqDate").toString();
-			Date date = DateUtils.parse(dateString);*/
+			String dateString = map.get("invoiceReqDate").toString();
+			Date date = DateUtils.parse(dateString);
 			Date date = getDatabaseServerDate();
 			invoiceReqH.setInvoiceReqDate(date);
 			invoiceReqH.setReqInvoiceRange(map.get("reqInvoiceRange").toString());
@@ -261,6 +281,64 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 		}
 		//this.updateAdminStatus(name);
 		return hid;
+	}*/
+	
+	
+	@Override
+	public void setUpHead(Map<String, Object> map) throws ParseException {	
+		String flag = (String) map.get("newformflag");
+		if("add".equals(flag)){
+			String reHid = (String)map.get("id");
+			List<TempTmsCrvatInvoiceReqL> templist = invoiceTrxPoolDao.getTempTmsCrvatInvoiceReqLsByReqHid(reHid);
+					InvoiceReqH invoiceReqH = new InvoiceReqH();
+			invoiceReqH.setId(reHid);
+			invoiceReqH.setCustomerId(map.get("customerId").toString());
+			invoiceReqH.setCustRegistrationNumber(map.get("custRegistrationNumber").toString());
+			String sequece = FlowHelper.getNextFlowNo("INVOICEREQ");
+			invoiceReqH.setCrvatInvoiceReqNumber(sequece);
+			invoiceReqH.setStatus(map.get("status").toString());
+			invoiceReqH.setIsAllMapping("0");
+			invoiceReqH.setMappingStatus("0");
+			invoiceReqH.setOrgId(map.get("orgId").toString());
+			invoiceReqH.setCustRegistrationCode(map.get("custRegistrationCode").toString());			
+			Date date = getDatabaseServerDate();
+			invoiceReqH.setInvoiceReqDate(date);
+			invoiceReqH.setReqInvoiceRange(map.get("reqInvoiceRange").toString());
+			invoiceReqH.setInvoiceReqType(InvoiceReqTypeEnums.COUNTER.getValue());
+			List<InvoiceReqL> invoiceReqLs = new ArrayList<InvoiceReqL>();
+			for(TempTmsCrvatInvoiceReqL temp:templist){
+				InvoiceReqL entity=new InvoiceReqL();
+				entity=convertInvoiceTrxPoolToInvoiceReqL(temp);
+				entity.setId(IdGenerator.getUUID());
+				entity.setCrvatInvoiceReqHId(invoiceReqH.getId());
+				entity.setStatus(map.get("status").toString());
+				entity.setOrgId(map.get("orgId").toString());
+				invoiceReqLs.add(entity);
+			}
+			invoiceReqH.setInvoiceReqLs(invoiceReqLs);
+			this.saveInvoiceReqHeadAndRel(invoiceReqH);
+			invoiceTrxPoolDao.deleteTempCrvatInvoiceReqLByReqHid(reHid);
+		}
+		if("edit".equals(flag)){
+			String reHid = (String)map.get("id");
+			updateCommit(reHid);
+		}
+
+	}
+	
+	private void updateCommit(String id){		
+		InvoiceReqH entity= (InvoiceReqH) this.get(InvoiceReqH.class, id);
+		String status=AppFormStatuEnums.SUBMITTED.getValue();
+		entity.setStatus(status);	
+		List<InvoiceReqL>list=invoiceReqHDao.getInvoiceReqLs(entity.getId());
+		for (InvoiceReqL invoiceReqL:list) {
+			invoiceReqL.setStatus(AppFormStatuEnums.SUBMITTED.getValue());
+			InvoiceTrxPool pool = (InvoiceTrxPool) this.get(InvoiceTrxPool.class, invoiceReqL.getCrvatTrxPoolId());
+			pool.setStatus(CrvatTaxPoolStatuEnums.APPFORM_SUBMITTED.getValue());
+			invoiceReqLDao.update(invoiceReqL);
+			invoiceTrxPoolDao.update(pool);
+		}
+		
 	}
 	
 	/**   
@@ -327,9 +405,14 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 	 */
 	
 	@Override
-	public InvoiceTrxPool findInvoiceTrxPoolByParams(Map<String, Object> map) {
+	public InvoiceTrxPool findInvoiceTrxPoolByParams(Map<String, Object> map) throws Exception{
 		InvoiceTrxPool pool= invoiceReqHDao.findWithOutCustomer(map);
-		return pool;
+		if(AssertHelper.isOrNotEmpty_assert(pool.getId())){
+			return pool;
+		}else {
+			throw new Exception("没有找到交易纪录");
+		}
+		
 	}
 	
 	/**   
@@ -338,7 +421,7 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 	 */
 	
 	@Override
-	public void saveCustomerAndReq(Map<String, Object> map) {
+	public void saveCustomerAndReq(Map<String, Object> map) throws Exception{
 		Customer entity=invoiceReqHService.getCustomerParam(map);
 		String customerId="";
 		if(!AssertHelper.isOrNotEmpty_assert(entity.getId())){
@@ -355,21 +438,22 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 			customer.setCustDepositBankAccountNum(map.get("custDepositBankAccountNum").toString());
 			customer.setContactPhone(map.get("contactPhone").toString());
 			customer.setCustRegistrationAddress(map.get("custRegistrationAddress").toString());
-			customerService.save(customer);
+			customer.setIsInvoiceProviding(VatIsIssueInvoiceEnums.VAT_IS_ISSUE_INVOICEY.getValue());
+			customer.setIsAppointInvoice(VatIsAppointIssuInvoiceEnums.VAT_IS_APPOINT_ISSU_INVOICEN.getValue());
 			customerId=customer.getId();
 		}else{
 			customerId=entity.getId();
 		}
-		String id=map.get("id").toString();
-		InvoiceTrxPool pool=(InvoiceTrxPool) invoiceTrxPoolService.get(InvoiceTrxPool.class, id);
-		InvoiceReqL invoiceReqL=this.convertInvoiceTrxPoolToInvoiceReqL(pool);
+		String id=map.get("reqHID").toString();
+		List<TempTmsCrvatInvoiceReqL>list = invoiceTrxPoolDao.getTempTmsCrvatInvoiceReqLsByReqHid(id);
+		invoiceTrxPoolDao.deleteTempCrvatInvoiceReqLByReqHid(id);
 		InvoiceReqH invoiceReqH = new InvoiceReqH();
 		invoiceReqH.setId(IdGenerator.getUUID());
 		invoiceReqH.setCustomerId(customerId);
 		invoiceReqH.setCustRegistrationNumber(map.get("custRegistrationNumber").toString());
 		String sequece = FlowHelper.getNextFlowNo("INVOICEREQ");
 		invoiceReqH.setCrvatInvoiceReqNumber(sequece);
-		invoiceReqH.setStatus(map.get("status").toString());
+		invoiceReqH.setStatus(CrvatTaxPoolStatuEnums.APPFORM_USED.getValue());
 		invoiceReqH.setIsAllMapping("0");
 		invoiceReqH.setMappingStatus("0");
 		//invoiceReqH.setOrgId(map.get("orgId").toString());
@@ -379,9 +463,14 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 		invoiceReqH.setInvoiceReqDate(new Date());
 		//invoiceReqH.setReqInvoiceRange(map.get("reqInvoiceRange").toString());
 		invoiceReqH.setInvoiceReqType(InvoiceReqTypeEnums.COUNTER.getValue());
-		List<InvoiceReqL> invoiceReqLs = new ArrayList<InvoiceReqL>();
-		invoiceReqLs.add(invoiceReqL);
-		invoiceReqH.setInvoiceReqLs(invoiceReqLs);
-		this.saveInvoiceReqHeadAndRel(invoiceReqH);
+		for (TempTmsCrvatInvoiceReqL reqL:list) {
+			InvoiceTrxPool pool=(InvoiceTrxPool) invoiceTrxPoolService.get(InvoiceTrxPool.class, reqL.getInvoiceTrxId());
+			InvoiceReqL invoiceReqL=this.convertInvoiceTrxPoolToInvoiceReqL(pool);
+			invoiceReqL.setId(IdGenerator.getUUID());
+			List<InvoiceReqL> invoiceReqLs = new ArrayList<InvoiceReqL>();
+			invoiceReqLs.add(invoiceReqL);
+			invoiceReqH.setInvoiceReqLs(invoiceReqLs);
+			this.saveInvoiceReqHeadAndRel(invoiceReqH);
+		}
 	}
 }

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
+import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.PageUtils;
 import com.deloitte.tms.pl.core.context.utils.ContextUtils;
 import com.deloitte.tms.pl.dictionary.model.DictionaryEntity;
@@ -29,6 +30,7 @@ import com.deloitte.tms.pl.security.model.SecurityDept;
 import com.deloitte.tms.pl.security.model.impl.DefaultDept;
 import com.deloitte.tms.pl.security.model.impl.DefaultUser;
 import com.deloitte.tms.pl.security.service.IDeptService;
+import com.deloitte.tms.pl.workflow.utils.WorkFlowUtils;
 import com.deloitte.tms.vat.base.enums.CrvaInvoicePreStatusEnums;
 import com.deloitte.tms.vat.controller.BaseController;
 import com.deloitte.tms.vat.core.common.JsonDateValueProcessor;
@@ -100,7 +102,14 @@ public class CrvatInvoicePreController extends BaseController{
 		tmsCrvatInvoicePreH.setApprovalStatus(CrvaInvoicePreStatusEnums.APPROVED.getValue());
 		tmsCrvatInvoicePreH.setOrgId(ContextUtils.getCurrentOrgId());
 		tmsCrvatInvoicePreH.setApprovalBy(ContextUtils.getCurrentUserName());
-		invoicePreService.setAcceptStatus(tmsCrvatInvoicePreH);
+		String taskId = tmsCrvatInvoicePreH.getWfTaskId();
+		if(!AssertHelper.empty(taskId)){
+			long id_temp = Long.valueOf(taskId.trim());
+			WorkFlowUtils.completeTask(id_temp);
+		}else {
+			invoicePreService.setAcceptStatus(tmsCrvatInvoicePreH);
+		}
+		/*invoicePreService.setAcceptStatus(tmsCrvatInvoicePreH);*/
 		JSONObject result = new JSONObject();
 		result.put("success", true);	
 		result.put("msg", getMessage("accept.sucess"));

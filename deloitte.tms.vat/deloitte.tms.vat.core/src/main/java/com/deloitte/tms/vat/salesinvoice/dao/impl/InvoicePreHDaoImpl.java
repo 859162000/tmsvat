@@ -18,6 +18,8 @@ import java.util.Map;
 
 
 
+
+
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +49,14 @@ public class InvoicePreHDaoImpl extends BaseDao<TmsCrvatInvoicePreH> implements 
 			query.append(" and  preh.custRegistrationCode = :custRegistrationCode");
 			values.put("custRegistrationCode", map.get("custRegistrationCode"));
 		}
+		
+		//新增柜台，预约，特殊开票 
+		
+		if(!AssertHelper.empty(map.get("invoiceReqType"))){
+			query.append(" and  preh.invoiceReqType = :invoiceReqType");
+			values.put("invoiceReqType", map.get("invoiceReqType"));		
+		}
+		
 		if(!AssertHelper.empty(map.get("custRegistrationNumber"))){
 			query.append(" and  preh.custRegistrationNumber = :custRegistrationNumber");
 			values.put("custRegistrationNumber", map.get("custRegistrationNumber"));		
@@ -139,6 +149,28 @@ public class InvoicePreHDaoImpl extends BaseDao<TmsCrvatInvoicePreH> implements 
 		values.put("preHid", preHid);
 		return findBy(query,values);
 	}
+
+	@Override
+	public void updateTrxPoolStatusByPreHid(String prehid,String status) {
+		AssertHelper.notEmpty_assert(prehid, "准备单号不能为空");
+		/*//AssertHelper.notEmpty_assert(status, "状态参数不能为空");
+*/		// TODO Auto-generated method stub
+		StringBuffer query=new StringBuffer();
+		Map<String,Object> values=new HashMap<String,Object>();		
+		query.append("update TMS_CRVAT_TRX_POOL_ALL set status = :status  where CRVAT_TRX_POOL_ID in ");
+		query.append("(select prel.CRVAT_TRX_POOL_ID from TMS_CRVAT_INVOICE_PRE_L prel where 1=1 and DELETED_FLAG = 1 ");
+		values.put("status", status);
+		if(AssertHelper.notEmpty(prehid))
+		{
+			query.append(" and prel.CRVAT_INVOICE_PRE_H_ID=:prehid)");
+			values.put("prehid", prehid);
+		}else {
+			query.append(")");
+		}
+		executeSql(query, values);
+	}
+	
+	
 
 	
 

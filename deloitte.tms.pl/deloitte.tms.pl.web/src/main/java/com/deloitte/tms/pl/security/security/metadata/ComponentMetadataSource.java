@@ -11,7 +11,7 @@ import javax.annotation.Resource;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.stereotype.Component;
 
-import com.deloitte.tms.pl.cache.ApplicationCache;
+import com.deloitte.tms.pl.cache.CacheUtils;
 import com.deloitte.tms.pl.core.context.utils.ContextUtils;
 import com.deloitte.tms.pl.security.model.SecurityUser;
 import com.deloitte.tms.pl.security.model.impl.DefaultRole;
@@ -30,8 +30,6 @@ import com.deloitte.tms.pl.security.service.IUrlService;
 public class ComponentMetadataSource {
 	public static final String BEAN_ID="ling2.componentMetadataSource";
 	private String componentMetadataCacheKey="component_metadata_";
-	@Resource
-	private ApplicationCache applicationCache;
 	@Resource
 	private IRoleService roleService;
 	@Resource
@@ -69,10 +67,10 @@ public class ComponentMetadataSource {
 
 	@SuppressWarnings("unchecked")
 	private Map<String,Collection<Map<String,Collection<ConfigAttribute>>>> getMetadata(){
-		Map<String,Collection<Map<String,Collection<ConfigAttribute>>>> metadata= (Map<String,Collection<Map<String,Collection<ConfigAttribute>>>>)applicationCache.getCacheObject(componentMetadataCacheKey);
+		Map<String,Collection<Map<String,Collection<ConfigAttribute>>>> metadata= (Map<String,Collection<Map<String,Collection<ConfigAttribute>>>>)CacheUtils.getCacheObject(componentMetadataCacheKey);
 		if(metadata==null){
 			initComponentMetadata();
-			metadata= (Map<String,Collection<Map<String,Collection<ConfigAttribute>>>>)applicationCache.getCacheObject(componentMetadataCacheKey);
+			metadata= (Map<String,Collection<Map<String,Collection<ConfigAttribute>>>>)CacheUtils.getCacheObject(componentMetadataCacheKey);
 		}
 		return metadata;
 	}
@@ -117,7 +115,7 @@ public class ComponentMetadataSource {
 				}
 			}
 		}
-		applicationCache.putCacheObject(componentMetadataCacheKey, metadata);
+		CacheUtils.putCacheObject(componentMetadataCacheKey, metadata);
 	}
 	
 	private Collection<ConfigAttribute> buildConfigAttributes(List<RoleMember> members,UrlComponent uc,String companyId){
@@ -147,11 +145,6 @@ public class ComponentMetadataSource {
 		}
 		return attributes;
 	}
-
-	public void setApplicationCache(ApplicationCache applicationCache) {
-		this.applicationCache = applicationCache;
-	}
-	
 	public void setRoleService(IRoleService roleService) {
 		this.roleService = roleService;
 	}

@@ -11,55 +11,41 @@
     <div region="north" split="true" border="false" style="overflow: hidden; height:22%;" data-options="region:'west'">  
         <div class="easyui-panel" title="查询条件" style="width:100%;height:100%;margin-top:0px;" data-options="collapsible: true">		
 		    <form id="trxAffirmSett_searchform" method="get" scroll="no">
-		    	<table>
+		    	<table id="trxAffirmSett_searchtable">
 		    		<tr style="text-align:center;align="center">
-		    			<td>组织:</td>
-		    			<td>					    	<input:select id="_searchform_orgInfoList_select"
-												name="selectOption" value="$invoice_print_newSearch_validType"
-												easyuiClass="easyui-combobox" easyuiStyle="width:120px;">
-												<option value=""></option>
-												<input:systemStatusOption parentCode="BASE_ORG_TYPE"/>
-							</input:select>
-				    	 </div>
-						</td>
-						<td>是否有效:<select id=""
-						name="" class="easyui-combogrid"
-						style="width: 150px;"></select></td>
-						<td>涉税交易类型:</td>
-		    			<td>
-							<div>
-					    	<input:select id="_searchform_taxTrsTypeList_select"name="taxTransactionType" value="$invoice_print_newSearch_validType"easyuiClass="easyui-combobox" easyuiStyle="width:120px;">
-							<option value=""></option>
-							<input:systemStatusOption parentCode="VAT_TAX_BIZ_CATEGORY"/>
-							</input:select>
-				    	 </div>	
+		  	         <td style="display: none;"><input id="org_addEdit_searchId" name="orgId" class="easyui-textbox"  style="width: 150px;" ></input></td>     
+                         <td align="right">组织：</td>
+				         <td><input id="org_addEdit_search" name="orgName" class="easyui-combogrid"  style="width: 150px;" ></input></td>                     
+						 </td> 
+						 <td>是否有效:</td>
+						 <td><input:select id="enabledFlag_search" name="enabledFlag" value="$invoice_print_newSearch_validType" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">				  			
+				         </input:select></td>
+						 <td style="display: none;"><input id="searchform_taxTrsTypeList_select_Id" name="taxTrxTypeId" class="easyui-textbox"  style="width: 150px;" ></input></td>     
+						 <td>涉税交易类型:</td>
+		    			 <td>					
+					    	<input id="searchform_taxTrsTypeList_select" name="taxTransactionType" easyuiClass="easyui-combogrid" easyuiStyle="width:150px;">										
+							</input>				    	
 						</td>
 		    		</tr>
-		    		<tr style="text-align:center;align="center">
+		    		 <tr style="text-align:center;align="center">
 		    		  <td align="center" colspan="6"> 
-		    		  <a href="#" id="searchbtn"  class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px" onclick="Searcha()">
-		    		  <spring:message code='client.search.button.find'/>
-		    		  </a>
-		    		  <a href="#" class="easyui-linkbutton" style="width:80px" onclick="">
-		    		  <spring:message code="button.Clear"/>
-		    		  </a>			                     
+		    		     <a href="#" id="searchbtn"  class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px" onclick="Search()"><spring:message code='client.search.button.find'/></a>
+		    		     <a href="#" id="cleartable" class="easyui-linkbutton" style="width:80px" onclick="clearFirstTable()"><spring:message code="button.Clear"/></a>			                     
 		    		   </td>
-		    		</tr>	    	
-		    				
+		    		 </tr>	    	
+		    		</table>	
+		    		<table>
 		    		<tr style="display:none">
 		    		   <td><input id="pageNumber" class="easyui-textbox" type="text" style="width:0px;" name="pageNumber" value=""></input></td>
 		    		   <td><input id="pageSize" class="easyui-textbox" type="text" style="width:0px;" name="pageSize" value=""></input></td>
 		    		</tr>		 	    	
 		    	</table>
-		    	
-		    	
 		    </form>
 	    </div>	         
     </div>
     <div data-options="region:'center',border:false" style="background-color: #E0ECFF">  
-	    <div style="width:100%;height:100%">
-	
-	         <table  id="trxAffirmSett_dataGrid"  style="width:100%;height:100%;text-align:center;" >	
+	    <div style="width:100%;height:100%">	
+	         <table  id="trxAffirmSett_dataGrid"  class="easyui-datagrid" style="width:100%;height:100%;text-align:center;" >	
 	
 		   </table>  
 	   </div>	 
@@ -73,14 +59,15 @@
             <tr>
             	<input id="id" type="hidden" name="id" style="width:200px;" >            
             	<td align="right">层级：</td>      
-                <td><input:select id="globalOrLocalOgrTypeId" name="globalOrLocalOgrType" value="$invoice_print_newSearch_validType" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">
+                <td ><input:select id="globalOrLocalOgrTypeId" name="globalOrLocalOgrType" value="$invoice_print_newSearch_validType" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">
 					<option value=""></option>	
 					<input:systemStatusOption parentCode="BASE_ORG_PARAMETER_TYPE"/>				
 					</input:select></td> 
-               
-               
+               <!-- 组织ID非常重要 -->
+               <td style="display: none;"><input id="org_addEditId" name="orgId" class="easyui-textbox"  style="width: 150px;" ></input></td>     
                 <td align="right">组织：</td>
-				<td><select id="org_addEdit" name="orgName" class="easyui-combogrid" style="width: 150px;" ></select></td>                     
+				<td><input id="org_addEdit" name="orgName" class="easyui-combogrid"  style="width: 150px;" ></input></td>                     
+                 <td style="display: none;"><input id="EdittaxTrxTypeCodeId" name="taxTrxTypeId" class="easyui-textbox"  style="width: 150px;" ></input></td>    
                 <td align="right">涉税交易类型编码：</td>
              <!--   <td><select id="taxTrxTypeCode_addEdit" name="taxTrxTypeCode" class="easyui-combogrid" style="width: 150px;" data-options="required:true"></select></td>  -->
                <td><input:select id="taxTrxTypeCode_addEdit" name="taxTrxTypeCode" value="$invoice_print_newSearch_validType" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">
@@ -90,8 +77,11 @@
             <tr>
                <td align="right">涉税交易类型：</td>
                <td><input id="taxTrxTypeName_addEdit" name="taxTrxTypeName" class="easyui-validatebox" type="text" name="taxTrxTypeCode" disabled="disabled" style="width:150px;" ></td>          
-               <td align="right">业务大类：</td>             
-               <td><input  Style="width:150px;" id="businessCategories" name="businessCategories" easyuiClass="easyui-combobox"></input></td>
+               <td align="right">业务大类：</td>                                    
+                <td><input:select id="businessCategories" name="businessCategories" value="$invoice_print_newSearch_validType" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">
+					<option value=""></option>				
+					<input:systemStatusOption parentCode="VAT_TAX_BIZ_CATEGORY"/>
+					</input:select></td> 
                <td align="right">价税分离核算规则：</td>          
                <td><input:select id="spitRuleCode" name="spitRuleCode" value="$invoice_print_newSearch_validType" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">
 					<option value=""></option>
@@ -102,22 +92,28 @@
                <td align="right">是否启用：</td>  
                <td><input:select id="enabledFlag" name="enabledFlag" value="$invoice_print_newSearch_validType" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">				  			
 				   </input:select></td>
+               <!-- 税种ID非常重要 -->
+               <td style="display: none;"><input id="EditCategoryId" name="taxCategoryId" class="easyui-textbox"  style="width: 150px;" ></input></td>
                <td align="right">税种：</td>            
-               <td><select id="taxCategoryId" name="taxCategoryName" class="easyui-combogrid" style="width: 150px; " ></select></td>  
+               <td><select id="taxCategoryId" name="categoryName" class="easyui-combogrid" style="width: 150px; " ></select></td>  
                <td align="right">税金科目编码：</td>
                <td><select id="accdSegment" name="accdSegment" class="easyui-combogrid" style="width: 150px;" data-options="required:true"></select></td>
             </tr>
             <tr>
                <td align="right">税金科目：</td>
-               <td><input id="accdSegmentName" name="accdSegmentName"  class="easyui-validatebox" type="text" name="taxTrxTypeCode" disabled="disabled" style="width:150px;" ></td>    
+               <td ><input id="accdSegmentName" name="accdSegmentName"  class="easyui-validatebox" type="text" name="taxTrxTypeCode" disabled="disabled" style="width:150px;" ></td>    
+               <!-- 税目ID非常重要 -->
+               <td style="display: none;"><input id="EdittaxItemId" name="taxItemId" class="easyui-textbox"  style="width: 150px;" ></input></td>
                <td align="right">税目：</td>          
-               <td><select id="taxItemId" name="taxItemName" class="easyui-combogrid" style="width: 150px; " ></select></td>  
+               <td><select id="taxItemId" name="itemName" class="easyui-combogrid" style="width: 150px; " ></select></td>  
+             <!-- <!-- 商品及服务ID非常重要 --> -->
+             <td style="display: none;"><input id="EditinventoryCategoryCodeId" name="inventoryItemId" class="easyui-textbox"  style="width: 150px;" ></input></td>    
                <td align="right">商品及服务编码：</td>
-               <td><input class="easyui-validatebox" type="text" id="inventoryItemNumberId" name="inventoryItemNumber"  style="width:150px;" ></td>
+               <td><input class="easyui-validatebox" type="text" id="inventoryCategoryCodeId" name="inventoryCategoryCode"  style="width:150px;" ></td>
             </tr>
             <tr>   
                <td align="right">商品及服务名称：</td>
-               <td><input class="easyui-validatebox" type="text" id="inventoryItemDescriptonId" name="inventoryItemDescripton"  style="width:150px;" ></td>
+               <td><input class="easyui-validatebox" type="text" id="inventoryCategoryNameId" name="inventoryCategoryName"  style="width:150px;" ></td>
                                     
                <td align="right">税率：</td>
                <td><input class="easyui-validatebox" type="text" id="taxRate" name="taxRate" disabled="disabled" style="width:150px;" ></td>
@@ -129,13 +125,13 @@
                <td><input class="easyui-validatebox" type="text" name="taxTrxTypeCode" disabled="disabled" style="width:150px;" ></td>
                <td align="right">开票规则：</td>
               <!--  <td><select id="rule" name="taxTransactionType" class="easyui-combogrid" style="width: 150px;" data-options="required:true"></select></td> -->
-               <td><input:select id="rule" name="taxTransactionType" value="$invoice_print_newSearch_validType" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">
+               <td><input:select id="rule" name="invoiceCategories" value="$invoice_print_newSearch_validType" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">
 				   <option value=""></option>
 				   <input:systemStatusOption parentCode="VAT_INVOICE_RULE"/>
 				   </input:select></td>
                <td align="right">属地/汇总：</td>
               <!--  <td><select id="total" name="taxTransactionType" class="easyui-combogrid" style="width: 150px;" data-options="required:true"></select></td> -->
-               <td><input:select id="total" name="taxTransactionType" value="$invoice_print_newSearch_validType" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">
+               <td><input:select id="total" name="invoicingType" value="$invoice_print_newSearch_validType" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">
 				   <option value=""></option>
 				   <input:systemStatusOption parentCode="VAT_BIZ_SCOPE_TYPE"/>
 				   </input:select></td>
@@ -213,6 +209,8 @@ $(document).ready(
 					});
 			Search();
 			addSelect();
+			judgeIsNull();
+			judgeIsNull2();
 		});
 
 
@@ -236,6 +234,8 @@ function addOrEditTrxAffirmSett(){
 }
 
 function addOrEditTrxAffirmSett1(){
+	
+	
 		if ($('#trxAffirmSett_dataGrid').datagrid('getChecked').length > 1) {
 			$.messager.alert("操作提示", "请选择一条数据进行修改");
 		} else {
@@ -249,11 +249,8 @@ function addOrEditTrxAffirmSett1(){
 					}
 				});
 				if (id != '') {
-					$.get(
-							'${vat}/tmsMdTrxAffirmSetting/loadTmsMdTrxAffirmSetting.do?id='+id,
-
-							function(result) {
-								
+					$.get('${vat}/tmsMdTrxAffirmSetting/loadTmsMdTrxAffirmSetting.do?id='+id,
+							function(result) {					
 								if (result.status == '0') {
 									$("#addOrEditTrxAffirmSett").dialog('open').dialog('setTitle',"<spring:message code='client.dialog.clientedit.title'/>");
 									$("#addOrEditTrxAffirmSettForm").form('load', result.data);
@@ -267,6 +264,45 @@ function addOrEditTrxAffirmSett1(){
 			}
 		}
 	}
+	
+function TmsMdTrxAffirmSettingEdit() {
+	if ($('#trxAffirmSett_dataGrid').datagrid('getChecked').length > 1) {
+		$.messager.alert("操作提示", "请选择一条数据进行修改");
+	} else {
+		clearSaveForm();
+		var row_list = $('#trxAffirmSett_dataGrid').datagrid('getChecked');
+		if (row_list) {
+			var id = '';
+			$.each(row_list, function(index, item) {
+				if (index == 0) {
+					id = item.id;
+				}
+			});
+			if (id != '') {
+				$.post('${vat}/tmsMdTrxAffirmSetting/loadTmsMdTrxAffirmSetting.do',
+					{
+						id : id
+					},
+					function(result) {
+						if (result.success == true) {				
+							$("#addOrEditTrxAffirmSett").dialog('open').dialog('setTitle',"<spring:message code='client.dialog.clientedit.title'/>");
+							$("#addOrEditTrxAffirmSettForm").form('load',result.rows[0]);
+						
+			
+						} 
+					}, 'json');
+			} else {
+				$.messager.alert('<spring:message code="system.alert"/>','请选择需要编辑的数据');
+			}
+		}
+	}
+}
+	
+	
+	
+	
+	
+	
 var createGridHeaderContextMenu = function(e, field) {  
 	    e.preventDefault();  
 	    var grid = $(this);/* grid本身 */  
@@ -319,7 +355,7 @@ $("#trxAffirmSett_dataGrid").datagrid({
 	singleSelect : false, //多选
 	collapsible : false,//可折叠  
 	fitColumns : false,//自动调整各列，用了这个属性，下面各列的宽度值就只是一个比例。
-	nowrap : false,//换行
+	nowrap : true,//换行
 	iconCls : 'icon icon-list',//图标
 	idField : 'id',//主键字段
     rownumbers:true, //显示行数
@@ -329,24 +365,30 @@ $("#trxAffirmSett_dataGrid").datagrid({
     remoteSort:false,//定义从服务器对数据进行排序。
     columns:[[  
             {field:'ck',checkbox:'true',align : 'center'},
+            {field:'id',title:'ID',width:80,hidden:true,align : 'center'},
+            {field:'orgId',title:'组织ID',width:80,hidden:true,align : 'center'},
+            {field:'inventoryItemId',title:'商务及服务编码ID',width:80,hidden:true,align : 'center'},
+            {field:'taxCategoryId',title:'税种ID',width:80,hidden:true,align : 'center'},
+            {field:'taxItemId',title:'税目ID',width:80,hidden:true,align : 'center'},
+            {field:'taxTrxTypeId',title:'涉税交易类型ID',width:80,hidden:true,align : 'center'},           
             {field:'orgName',title:'组织',width:80,align : 'center'},
-            {field:'taxTrxTypeId',title:'涉税交易类型编码',width:80,align : 'center'},
-            {field:'taxTrxTypeId',title:'涉税交易类型',width:80,align : 'center'} ,
-            {field:'businessCategories',title:'业务大类',width:80,align : 'center'} , 
+            {field:'taxTrxTypeCode',title:'涉税交易类型编码',width:80,align : 'center'},
+            {field:'taxTrxTypeName',title:'涉税交易类型',width:80,align : 'center'} ,
+            {field:'businessCategories',title:'业务大类',width:80,align : 'center',formatter:onFormat2} , 
             {field:'accdSegment',title:'税金科目编码',width:80,align : 'center'} ,
             {field:'sourceCode',title:'税金科目',width:80,align : 'center'} ,
-            {field:'sourceCode',title:'税价分离核算规则',width:80,align : 'center'},
-            {field:'taxCategoryId',title:'税种',width:80,align : 'center'} ,
-            {field:'taxItemId',title:'税目',width:80,align : 'center'} , 
+            {field:'spitRuleCode',title:'价税分离核算规则',width:80,align : 'center',formatter:onFormat3},
+            {field:'categoryName',title:'税种',width:80,align : 'center'} ,
+            {field:'itemName',title:'税目',width:80,align : 'center'} , 
             {field:'taxRate',title:'税率%',width:80,align : 'center'},
-            {field:'invoiceCategories',title:'开票规则',width:80,align : 'center'} ,
-            {field:'invoicingType',title:'属地/汇总',width:80,align : 'center'},
-            {field:'isAccount',title:'是否计税',width:80,align : 'center'},
-            {field:'taxSettingBase',title:'计税基础',width:80,align : 'center'},
+            {field:'invoiceCategories',title:'开票规则',width:80,align : 'center',formatter:onFormat4} ,
+            {field:'invoicingType',title:'属地/汇总',width:80,align : 'center',formatter:onFormat5},
+            {field:'isAccount',title:'是否计税',width:80,align : 'center',formatter:onFormat},
+            {field:'taxSettingBase',title:'计税基础',width:80,align : 'center',formatter:onFormat6},
             {field:'startDate',title:'生效日期',width:80,align : 'center'},
             {field:'endDate',title:'失效日期',width:80,align : 'center'},
-            {field:'isTax',title:'是否含税',width:80,align : 'center'},
-            {field:'enabledFlag',title:'是否启用',width:80,align : 'center'}
+            {field:'isTax',title:'是否含税',width:80,align : 'center',formatter:onFormat},
+            {field:'enabledFlag',title:'是否启用',width:80,align : 'center',formatter:onFormat}
           ]],
          	toolbar : [ {
 				text : "新增",
@@ -364,7 +406,8 @@ $("#trxAffirmSett_dataGrid").datagrid({
 				iconCls : 'icon-edit',
 				handler : function() {
 					tablePanl();
-					addOrEditTrxAffirmSett1();
+				//	addOrEditTrxAffirmSett1();
+					TmsMdTrxAffirmSettingEdit();
 					
 				}
 			}, '-', {
@@ -419,6 +462,8 @@ function tablePanl(){
     initTaxEntity();
     initTaxCategoryPanl();
     initItemsPanl();
+    $("#taxTrxTypeCode_addEdit").combobox('disable');
+    globalOrg();
 }
 
 
@@ -440,6 +485,7 @@ function Search() {
 
 //保存
 	function TmsMdTrxAffirmSettingEditSave() {
+	
 		$.messager.confirm("<spring:message code='client.datacommit.formsave.confirm.title'/>","<spring:message code='client.datacommit.formsave.confirm.text'/>",
 		function(result) {
 			if (result) {
@@ -466,92 +512,8 @@ function Search() {
 
 	}
 
-
-
-/**
- * 根据检索条件查询信息
- */
-function Searcha() {
-	$('#trxAffirmSett_searchform').form('submit', {
-		url : '${vat}/tmsMdTrxAffirmSetting/queryTransactionExceptionPage.do',
-		success : function(result) {
-			var result = $.parseJSON(result);
-			$("#trxAffirmSett_dataGrid").datagrid('loadData', result);
-			$("#trxAffirmSett_dataGrid").datagrid("loaded");
-		}
-	});
-}
-
- 
-/**
- * 通用下拉列表数据生成
- */
-function build_common_combo(id,id_field_name,field1,title1,field2,title2,url){
-	$(id).combogrid({
-			panelWidth : 300,
-			pagination:true,//分页
-			url : "",
-			onSelect: function(rec){
-			},
-			toolbar : [ {
-				text : '<input type="text" id="taxTransactionTypeInput_id"/>'
-			}, {
-				text : "查询",
-				iconCls : 'icon-search',
-				handler : function() {
-				}
-			}, '-' ],
-			columns : [ [ {
-				field:id_field_name,
-				hidden:'true'
-				},{
-				field : field1,
-				title : title1,
-				width : 80
-			}, {
-				field : field2,
-				title : title2,
-				width : 120
-			} ] ]
-		});
-		var page = $(id).combogrid('options').pageNumber;
-		var pageSizes = $(id).combogrid('options').pageSize;
-		var data = "pageNumber="+page +"&pageSize="+pageSizes +
-		"&taxTransactionTypeInput_id =" + $('#taxTransactionTypeInput_id').val(); 
-		$.ajax({
-			url : "${vat}/"+url,//     tmsMdTaxTrxType/loadTaxTransactionType_id.do
-			type : "POST",
-			data : data,
-			dataType : "json", 
-			cache : false,
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				 alert(XMLHttpRequest.status);
-				 alert(XMLHttpRequest.readyState);
-				 alert(textStatus);
-				   },
-			success : function(result) {
-				$(id).combogrid('grid').datagrid(
-						'loadData', result);
-			}
-		});
-}
-
-/**
- * 初始化通用下拉框
- */
- function init_common_combo(obj_id){
-  	build_common_combo(obj_id,'id','taxTrxTypeCode','涉税交易类型编码','taxTrxTypeName','涉税交易类型名称','tmsMdTaxTrxType/loadTaxTransactionType_id.do');
-	  $(obj_id).combogrid('grid').datagrid('options').onClickRow = 
-		function(index, row) {
-          search = false;
-          $(obj_id).combogrid('hidePanel');
-          $(obj_id).combogrid('setText', row.taxTrxTypeName);
-	}
-}
-
 $(document).ready(
 		function() {
-		
 			 init_common_combo("#org");
 			 init_common_combo("#businessCategories");
 			 init_common_combo("#taxTrxTypeCode_addEdit");
@@ -616,11 +578,12 @@ function Remove() {
 
 
 function initTaxEntity() {
+
 	$('#org_addEdit').combogrid(
 					{
 						required:true,
 					    valueField: 'value',
-						panelWidth : 600,
+						panelWidth : 500,
 						idField : 'id', //ID字段  
 						textField : 'orgName', //显示的字段  
 						url : "",
@@ -634,17 +597,17 @@ function initTaxEntity() {
 						fit : false, //自动大小
 						method : 'post',
 						columns : [ [ {
-							field : 'orgName',
-							title : '组织',
-							width : 300
+							field : 'orgCode',
+							title : '组织编码',
+							width : 200
 						},{
-							field : 'id',
-							title : '组织ID',
+							field : 'orgName',
+							title : '组织名称',
 							width : 300
 						} ] ],
 						toolbar : [
 								{
-									text : '数据结构说明:<input type="text" id="taxEntityId" class="easyui-textbox"/>'
+									text : '组织:<input type="text" id="taxEntityId" class="easyui-textbox"/>'
 								}, {
 									text : "查询",
 									iconCls : 'icon-search',
@@ -730,6 +693,13 @@ function initTaxEntity() {
 				  pageSize : $('#org_addEdit').combogrid("grid").datagrid('options').pageSize
 			});
 	searchBaseOrg();
+	
+	$('#org_addEdit').combogrid('grid').datagrid({
+		onSelect: function(index,value){
+			var selected = $('#org_addEdit').combogrid('grid').datagrid('getSelected');
+			$("#org_addEditId").textbox('setValue',selected.id);
+		}
+	});	
 }
 	
 function searchBaseOrg(){	
@@ -743,14 +713,28 @@ function searchBaseOrg(){
 			cache : false,
 			success : function(result) {
 				//clearSaveForm();
-				$('#org_addEdit').combogrid('grid')
-						.datagrid('loadData', result.data);
+				$('#org_addEdit').combogrid('grid').datagrid('loadData', result.data);
+				
 			}
 		});
 }
 
 //##########################################################################################################
 function addSelect(){
+	//查询框是否有效  
+		$("#enabledFlag_search").combobox({
+		panelHeight:'auto',
+		valueField: 'value',
+		textField: 'text',
+		editable:false,
+		data: [{
+			text: '否',
+			value: '0'
+		},{
+			text: '是',
+			value: '1'
+		}]
+	});
 	
 	//全局/组织
 	$("#globalOrLocalOgrTypeId").combobox({
@@ -760,23 +744,13 @@ function addSelect(){
 		textField: 'text',
 		editable:false	
 	});
-	
+	//业务大类
 	$("#businessCategories").combobox({
 		panelHeight:'auto',
 		 required:true,
 		valueField: 'value',
 		textField: 'text',
-		editable:false,
-		data: [{
-			text: '进项业务',
-			value: '进项业务'
-		},{
-			text: '销项业务',
-			value: '销项业务'
-		},{
-			text: '不适用',
-			value: '不适用'
-		}]	
+		editable:false,	
 	});
 	
 	//是否计税
@@ -864,6 +838,301 @@ function addSelect(){
 	
 	 
 }
+//################################################################################################################
+//查询筛选
+function judgeIsNull(){
+	
+	$('#org_addEdit_search').combogrid(
+			{
+				
+			 
+				panelWidth : 500,
+				idField : 'id', //ID字段  
+				textField : 'orgName', //显示的字段  
+				url : "",
+				fitColumns : true,
+				striped : true,
+		//		pageSize:'10',
+				editable : false,
+				pagination : true, //是否分页
+				rownumbers : true, //序号
+				collapsible : false, //是否可折叠的
+				fit : false, //自动大小
+				method : 'post',
+				columns : [ [ {
+					field : 'orgCode',
+					title : '组织编码',
+					width : 200
+				},{
+					field : 'orgName',
+					title : '组织名称',
+					width : 300
+				} ] ],
+				toolbar : [
+						{
+							text : '组织:<input type="text" id="taxEntityId" class="easyui-textbox"/>'
+						}, {
+							text : "查询",
+							iconCls : 'icon-search',
+							handler : function() {
+								findTaxEntity();
+							}
+						}, '-' ],
+				keyHandler : {
+					up : function() { //【向上键】押下处理
+						//取得选中行
+						var selected = $('#org_addEdit_search').combogrid('grid').datagrid('getSelected');
+						if (selected) {
+							//取得选中行的rowIndex
+							var index = $('#org_addEdit_search').combogrid('grid').datagrid('getRowIndex',selected);
+							//向上移动到第一行为止
+							if (index > 0) {
+								$('#org_addEdit_search').combogrid('grid').datagrid('selectRow',index - 1);
+							}
+						} else {
+							var rows = $('#org_addEdit_search').combogrid('grid').datagrid('getRows');
+							$('#org_addEdit_search').combogrid('grid').datagrid('selectRow',rows.length - 1);
+						}
+					},
+					down : function() { //【向下键】押下处理
+						//取得选中行
+						var selected = $('#org_addEdit_search').combogrid('grid').datagrid('getSelected');
+						if (selected) {
+							//取得选中行的rowIndex
+							var index = $('#org_addEdit_search').combogrid('grid').datagrid('getRowIndex',selected);
+							//向下移动到当页最后一行为止
+							if (index < $('#org_addEdit_search').combogrid('grid').datagrid('getData').rows.length - 1) {
+								$('#org_addEdit_search').combogrid('grid').datagrid('selectRow',index + 1);
+							}
+						} else {
+							$('#org_addEdit_search').combogrid('grid').datagrid('selectRow', 0);
+						}
+					},
+
+				},
+
+			});
+
+//取得分页组件对象
+var pager = $('#org_addEdit_search').combogrid('grid').datagrid('getPager');
+
+if (pager) {
+$(pager).pagination(
+				{
+					pageSize : 10,//每页显示的记录条数，默认为10           
+					//pageList: [5,10,15,20],//可以设置每页记录条数的列表           
+					beforePageText : '<spring:message code="pagination.beforePageText"/>',//页数文本框前显示的汉字           
+					afterPageText : '<spring:message code="pagination.afterPageText"/>',
+					displayMsg : '<spring:message code="pagination.displayMsg"/>',
+					//选择页的处理
+					onSelectPage : function(pageNumber, pageSize) {
+						//按分页的设置取数据
+						$('#getByBaseOrg').form('clear');
+						$("#pageNumber1").textbox('setValue',pageNumber);
+						$("#pageSize1").textbox('setValue',pageSize);										
+						searchBaseOrg();
+					},
+					//改变页显示条数的处理
+			
+	/* 				onChangePageSize : function(pageNumber, pageSize) {
+						$("#pageNumber1").textbox('setValue',pageNumber);
+						$("#pageSize1").textbox('setValue',pageSize);										
+						searchBaseOrg();
+					}, */
+				
+				onRefresh : function(pageNumber, pageSize) {
+						//按分页的设置取数据
+					$('#getByBaseOrg').form('clear');
+					$("#pageNumber1").textbox('setValue',pageNumber);
+					$("#pageSize1").textbox('setValue',pageSize);										
+					searchBaseOrg();
+					}
+				});
+}
+$('#getByBaseOrg').form('clear');
+$('#getByBaseOrg').form('load',
+	{
+		pageNumber : $('#org_addEdit').combogrid("grid").datagrid('options').pageNumber,
+		  pageSize : $('#org_addEdit').combogrid("grid").datagrid('options').pageSize
+	});
+searchBaseOrgSearch();
+
+$('#org_addEdit_search').combogrid('grid').datagrid({
+onSelect: function(index,value){
+	var selected = $('#org_addEdit_search').combogrid('grid').datagrid('getSelected');
+	$("#org_addEdit_searchId").textbox('setValue',selected.id);
+}
+});	
+}
+
+function searchBaseOrgSearch(){	
+$.ajax({
+	url : "${vat}/baseOrg/loadBaseOrgPage.do",
+	type : "POST",
+	async : true,
+	data : "pageNumber="+$("#pageNumber1").textbox('getValue')+"&pageSize="+$("#pageSize1").textbox('getValue'), //不能直接写成 {id:"123",code:"tomcat"}  
+	dataType : "json",
+	// contentType: "charset=utf-8",  
+	cache : false,
+	success : function(result) {
+		//clearSaveForm();
+		$('#org_addEdit_search').combogrid('grid').datagrid('loadData', result.data);
+		
+	}
+});
+	
+}
+
+//清除查询框
+function clearFirstTable(){
+	
+	$("#trxAffirmSett_searchtable").form('clear');
+}
+
+//查询框涉税交易类型面板
+
+function judgeIsNull2(){
+	$('#searchform_taxTrsTypeList_select').combogrid(
+			{
+				panelWidth : 500,
+				idField : 'id', //ID字段  
+				textField : 'taxTrxTypeName', //显示的字段  
+				url : "",
+				fitColumns : true,
+				striped : true,
+		//		pageSize:'10',
+				editable : false,
+				pagination : true, //是否分页
+				rownumbers : true, //序号
+				collapsible : false, //是否可折叠的
+				fit : false, //自动大小
+				method : 'post',
+				columns : [ [ {
+					field : 'taxTrxTypeCode',
+					title : '涉税交易类型编码',
+					width : 200
+				},{
+					field : 'taxTrxTypeName',
+					title : '涉税交易类型',
+					width : 300
+				} ] ],
+				toolbar : [
+						{
+							text : '交易类型名称:<input type="text" id="taxEntityId" class="easyui-textbox"/>'
+						}, {
+							text : "查询",
+							iconCls : 'icon-search',
+							handler : function() {
+								findTaxEntity();
+							}
+						}, '-' ],
+				keyHandler : {
+					up : function() { //【向上键】押下处理
+						//取得选中行
+						var selected = $('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('getSelected');
+						if (selected) {
+							//取得选中行的rowIndex
+							var index = $('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('getRowIndex',selected);
+							//向上移动到第一行为止
+							if (index > 0) {
+								$('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('selectRow',index - 1);
+							}
+						} else {
+							var rows = $('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('getRows');
+							$('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('selectRow',rows.length - 1);
+						}
+					},
+					down : function() { //【向下键】押下处理
+						//取得选中行
+						var selected = $('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('getSelected');
+						if (selected) {
+							//取得选中行的rowIndex
+							var index = $('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('getRowIndex',selected);
+							//向下移动到当页最后一行为止
+							if (index < $('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('getData').rows.length - 1) {
+								$('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('selectRow',index + 1);
+							}
+						} else {
+							$('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('selectRow', 0);
+						}
+					},
+
+				},
+
+			});
+
+	//取得分页组件对象
+	var pager = $('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('getPager');
+
+	if (pager) {
+	$(pager).pagination(
+				{
+					pageSize : 10,//每页显示的记录条数，默认为10           
+					//pageList: [5,10,15,20],//可以设置每页记录条数的列表           
+					beforePageText : '<spring:message code="pagination.beforePageText"/>',//页数文本框前显示的汉字           
+					afterPageText : '<spring:message code="pagination.afterPageText"/>',
+					displayMsg : '<spring:message code="pagination.displayMsg"/>',
+					//选择页的处理
+					onSelectPage : function(pageNumber, pageSize) {
+						//按分页的设置取数据
+						$('#getByBaseOrg').form('clear');
+						$("#pageNumber1").textbox('setValue',pageNumber);
+						$("#pageSize1").textbox('setValue',pageSize);										
+						searchBaseOrg();
+					},
+					//改变页显示条数的处理
+			
+	/* 				onChangePageSize : function(pageNumber, pageSize) {
+						$("#pageNumber1").textbox('setValue',pageNumber);
+						$("#pageSize1").textbox('setValue',pageSize);										
+						searchBaseOrg();
+					}, */
+				
+				onRefresh : function(pageNumber, pageSize) {
+						//按分页的设置取数据
+					$('#getByBaseOrg').form('clear');
+					$("#pageNumber1").textbox('setValue',pageNumber);
+					$("#pageSize1").textbox('setValue',pageSize);										
+					searchBaseOrg();
+					}
+				});
+	}
+	$('#getByBaseOrg').form('clear');
+	$('#getByBaseOrg').form('load',
+	{
+		pageNumber : $('#searchform_taxTrsTypeList_select').combogrid("grid").datagrid('options').pageNumber,
+		  pageSize : $('#searchform_taxTrsTypeList_select').combogrid("grid").datagrid('options').pageSize
+	});
+	searchTaxTrsTypeSearch();
+
+	$('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid({
+	onSelect: function(index,value){
+	var selected = $('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('getSelected');
+	$("#searchform_taxTrsTypeList_select_Id").textbox('setValue',selected.id);
+	}
+	});
+
+	}
+
+	function searchTaxTrsTypeSearch(){	
+	$.ajax({
+	url : "${vat}/tmsMdTaxTrxType/loadTmsMdTaxTrxTypePageName.do",
+	type : "POST",
+	async : true,
+	data : "pageNumber="+$("#pageNumber1").textbox('getValue')+"&pageSize="+$("#pageSize1").textbox('getValue'), //不能直接写成 {id:"123",code:"tomcat"}  
+	dataType : "json",
+	// contentType: "charset=utf-8",  
+	cache : false,
+	success : function(result) {
+		//clearSaveForm();
+		$('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('loadData', result.data);
+		
+	}
+	});
+
+	}
+
+
 //###############################################################################################################
 //税种下拉面板
 function initTaxCategoryPanl() {
@@ -871,7 +1140,7 @@ function initTaxCategoryPanl() {
 					{
 						required:true,
 					    valueField: 'value',
-						panelWidth : 600,
+						panelWidth : 500,
 						idField : 'id', //ID字段  
 						textField : 'categoryName', //显示的字段  
 						url : "",
@@ -885,12 +1154,12 @@ function initTaxCategoryPanl() {
 						fit : false, //自动大小
 						method : 'post',
 						columns : [ [ {
-							field : 'categoryName',
-							title : '税种',
-							width : 300
+							field : 'categoryCode',
+							title : '税种编号',
+							width : 200
 						},{
-							field : 'id',
-							title : '税种ID',
+							field : 'categoryName',
+							title : '税种名称',
 							width : 300
 						} ] ],
 						toolbar : [
@@ -981,6 +1250,12 @@ function initTaxCategoryPanl() {
 				  pageSize : $('#taxCategoryId').combogrid("grid").datagrid('options').pageSize
 			});
 	searchTaxCategory();
+	$('#taxCategoryId').combogrid('grid').datagrid({
+		onSelect: function(index,value){
+			var selected = $('#taxCategoryId').combogrid('grid').datagrid('getSelected');
+			$("#EditCategoryId").textbox('setValue',selected.id);
+		}
+	});	
 }
 	
 function searchTaxCategory(){	
@@ -1006,9 +1281,9 @@ function initItemsPanl() {
 					{
 						required:true,
 					    valueField: 'value',
-						panelWidth : 600,
+						panelWidth : 360,
 						idField : 'id', //ID字段  
-						textField : 'taxItemName', //显示的字段  
+						textField : 'itemName', //显示的字段  
 						url : "",
 						fitColumns : true,
 						striped : true,
@@ -1022,10 +1297,6 @@ function initItemsPanl() {
 						columns : [ [ {
 							field : 'itemName',
 							title : '税目',
-							width : 300
-						},{
-							field : 'id',
-							title : '税目ID',
 							width : 300
 						} ] ],
 						toolbar : [
@@ -1116,6 +1387,12 @@ function initItemsPanl() {
 				  pageSize : $('#taxCategoryId').combogrid("grid").datagrid('options').pageSize
 			});
 	searchItems();
+	$('#taxItemId').combogrid('grid').datagrid({
+		onSelect: function(index,value){
+			var selected = $('#taxItemId').combogrid('grid').datagrid('getSelected');
+			$("#EdittaxItemId").textbox('setValue',selected.id);
+		}
+	});	
 }
 	
 function searchItems(){	
@@ -1134,8 +1411,101 @@ function searchItems(){
 		});
 }
 
+function globalOrg(){
+		
+	$('#globalOrLocalOgrTypeId').combobox({			
+		onSelect:function(data){				
+		// 1 是全局
+			if(data.value == "1"){
+				
+				$('#org_addEdit').combogrid('clear');
+				$('#org_addEdit').combogrid(
+						{
+						   required:false,
+						   disabled:true
+						});
+			}else{
+				initTaxEntity();
+				$('#org_addEdit').combogrid(
+						{
+						   required:true,
+						   disabled:false
+						});
+				
+			}
+		}	
+	});
+		
+}
 
 
+
+
+
+function onFormat(val,row){
+	if(val == 'Y' || val == '1'){
+		
+		return "是";
+	}else if(val == 'N' || val == '0'){
+		
+		return "否";
+	}
+	
+}
+
+function onFormat2(val,row){
+	
+	if(val=='1'){
+		return "销项业务";
+	}else if(val=='2'){
+		return "进项业务";
+	}else if(val=='3'){
+		return "不适用";
+	}
+	
+}
+
+function onFormat3(val,row){
+	
+	if(val=='1'){
+		return "红字冲销收入";
+	}else if(val=='2'){
+		return "蓝字核算收入";
+	}
+	
+}
+
+function onFormat4(val,row){
+	      if(val=='0'){
+		return "不开发票";
+	}else if(val=='1'){
+		return "普票";
+	}else if(val=='2'){
+		return "专票";
+	}else if(val=='3'){
+		return "专票与普票";
+	}
+	
+}
+
+function onFormat5(val,row){
+    if(val=='1'){
+	return "属地业务";
+}else if(val=='2'){
+	return "汇总业务";
+}
+
+}
+
+function onFormat6(val,row){
+   
+	if(val=='1'){
+	return "明细计税";
+}else if(val=='2'){
+	return "汇总计税";
+}
+
+}
 </script>
 
 
