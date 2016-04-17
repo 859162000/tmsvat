@@ -152,9 +152,17 @@ $(document).ready(function() {
 function callRefresh(){
 		
 	InitTreeData();
+	
+	/*
 	fwqInit();
 	fwqParentInit();
+	*/
+}
+
+function popInit(){
 	
+	fwqInit();
+	fwqParentInit();	
 }
 
 
@@ -319,6 +327,7 @@ function collapseAll() {
 
 function add(){
 	clearEquipmentForm();
+	popInit();
 	$("#equipment_dialog").dialog('open').dialog('setTitle','新增');
 	$("#equipment_dialog_Form").form('load', {equipmentEnterDate:myformatter(new Date())});
 	

@@ -67,10 +67,19 @@ public class EquipmentController extends BaseController{
 	public void createTree(HttpServletResponse response) {
 		try {
 			List<TmsMdEquipment> list = equipmentService.loadAllEquipment();
+			
+			if(list==null){
+				list = new ArrayList<TmsMdEquipment>();
+			}
+			
 			logger.info("createtree list size:"+list.size());
-			List<FunctionTreeNode> FunctionTreeNodes = convertFunctionTreeNodeList(list);
-			logger.info("createtree FunctionTreeNodes size:"+FunctionTreeNodes.size());
-			List<FunctionTreeNode> results = TreeGenerator.buildTree(FunctionTreeNodes);
+			List<FunctionTreeNode> functionTreeNodes = convertFunctionTreeNodeList(list);
+			
+			if(functionTreeNodes!=null){
+				logger.info("createtree FunctionTreeNodes size:"+functionTreeNodes.size());
+			}
+			
+			List<FunctionTreeNode> results = TreeGenerator.buildTree(functionTreeNodes);
 			logger.info("createtree results size:"+results.size());
 			JSONArray jsonArray = JSONArray.fromObject(results);	
 			retJsonArray(response, jsonArray);
@@ -80,9 +89,11 @@ public class EquipmentController extends BaseController{
 	}
 	
 	private List<FunctionTreeNode> convertFunctionTreeNodeList(List<TmsMdEquipment> TmsMdEquipments) {
-		List<FunctionTreeNode> nodes = null;
+		//List<FunctionTreeNode> nodes = null;
+		List<FunctionTreeNode> nodes = new ArrayList<FunctionTreeNode>();
+		
 		if (TmsMdEquipments != null) {
-			nodes = new ArrayList<FunctionTreeNode>();
+			//nodes = new ArrayList<FunctionTreeNode>();
 			for (TmsMdEquipment TmsMdEquipment : TmsMdEquipments) {
 				FunctionTreeNode node = convertFunctionTreeNode(TmsMdEquipment);
 				if (node != null) {
@@ -106,9 +117,39 @@ public class EquipmentController extends BaseController{
 		}
 		return node;
 	}
-
-	@RequestMapping(value = "equipmentN/getDictionary", method = RequestMethod.GET)    
-       public void getDictionaryEntitiesByParentCode(HttpServletResponse response) throws IOException{
+	
+	
+	
+	@RequestMapping(value = "equipmentN/getDictionary")    
+    public void getDictionaryEntitiesByParentCode(HttpServletResponse response){
+		
+		try{
+          
+          List<Map<String, Object>> reList = new ArrayList<Map<String,Object>>();
+                            
+          HashMap<String, Object> map = new HashMap<String, Object>();
+          
+               map.put("value", 1);
+               map.put("text", "打印终端");
+               reList.add(map);
+               
+               map.put("value", 2);
+               map.put("text", "打印服务器");
+               reList.add(map);
+                    
+          JSONArray jsonArray = JSONArray.fromObject(reList);
+          retJsonArray(response, jsonArray);
+		}catch(Exception e){
+			e.printStackTrace();			
+		}
+		
+    }
+	
+/*
+	@RequestMapping(value = "equipmentN/getDictionary")    
+       public void getDictionaryEntitiesByParentCode(HttpServletResponse response){
+		
+		try{
              Collection<DictionaryEntity> results = dictionaryService.loadDictionaryEntities("BASE_PRINT_TYPE");
              List<Map<String, String>> reList = new ArrayList<Map<String,String>>();
              for(DictionaryEntity dictionaryEntity:results){
@@ -119,7 +160,12 @@ public class EquipmentController extends BaseController{
              }           
              JSONArray jsonArray = JSONArray.fromObject(reList);
              retJsonArray(response, jsonArray);
+		}catch(Exception e){
+			e.printStackTrace();			
+		}
+		
        }
+	*/
 
 	@RequestMapping(value = "equipmentN/loadEquipmentPage")
 	public void loadEquipmentPage(@RequestParam Map<String,Object> parameter,HttpServletResponse response) throws Exception {
@@ -161,7 +207,7 @@ public class EquipmentController extends BaseController{
 		logger.info("loadEquipmentPage: list size:"+list.size());
 		
 		//Map<String,String> map = DictionaryCacheUtils.getCodesByCvalueMap("BASE_IS_ENABLED");
-		Map<String,String> map = new HashMap(); 
+		Map<String,String> map = LittleUtils.ynMap; 
 		
 		
 		List<TmsMdEquipmentInParam> finalList = new ArrayList<TmsMdEquipmentInParam>();

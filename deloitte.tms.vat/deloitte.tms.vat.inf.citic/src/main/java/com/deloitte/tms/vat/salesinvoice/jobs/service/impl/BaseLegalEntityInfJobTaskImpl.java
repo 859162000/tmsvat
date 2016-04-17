@@ -12,8 +12,6 @@
 
 package com.deloitte.tms.vat.salesinvoice.jobs.service.impl;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +19,6 @@ import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import com.deloitte.tms.base.cache.service.OrgPathProvider;
 import com.deloitte.tms.base.masterdata.dao.BaseOrgDao;
@@ -33,23 +30,19 @@ import com.deloitte.tms.base.masterdata.dao.TmsMdUsageLocalLegalDao;
 import com.deloitte.tms.base.masterdata.model.BaseOrg;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEnablePrint;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
-import com.deloitte.tms.base.masterdata.model.TmsMdLegalTaxCategory;
 import com.deloitte.tms.base.masterdata.model.TmsMdOrgLegalEntity;
 import com.deloitte.tms.base.masterdata.model.TmsMdUsageLocalLegal;
 import com.deloitte.tms.base.masterdata.service.BaseOrgService;
 import com.deloitte.tms.base.masterdata.service.TmsMdLegalEnablePrintService;
-import com.deloitte.tms.base.masterdata.service.TmsMdLegalEntityService;
 import com.deloitte.tms.base.masterdata.service.TmsMdLegalTaxCategoryService;
-import com.deloitte.tms.base.masterdata.service.TmsMdOrgLegalEntityService;
+import com.deloitte.tms.pl.core.commons.constant.TableColnumDef;
+import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.StringUtils;
 import com.deloitte.tms.vat.core.common.IdGenerator;
 import com.deloitte.tms.vat.salesinvoice.common.StringPool;
 import com.deloitte.tms.vat.salesinvoice.jobs.dao.BaseLegalEntityInfDao;
 import com.deloitte.tms.vat.salesinvoice.jobs.model.BaseLegalEntityInf;
-import com.deloitte.tms.vat.salesinvoice.jobs.model.TmsCrvatTrxInf;
 import com.deloitte.tms.vat.salesinvoice.jobs.service.BaseLegalEntityInfJobTask;
-import com.deloitte.tms.vat.salesinvoice.jobs.service.BaseLegalEntityInfService;
-import com.deloitte.tms.vat.salesinvoice.jobs.service.TrxFileProcessJobTask;
 
 /**
  * 〈一句话功能简述〉 功能详细描述
@@ -97,226 +90,132 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 	
 	@Resource
 	private TmsMdUsageLocalLegalDao tmsMdUsageLocalLegalDao;
-
 	
-	/**   
-	 * @param map
-	 * @return  
-	 * @see com.deloitte.tms.vat.salesinvoice.jobs.service.BaseLegalEntityInfJobTask#executeBaseLegalEntityInfData(java.util.Map)  
-	 */
-	
-	@SuppressWarnings("unchecked")
 	@Override
-	public int executeBaseLegalEntityInfDatas(Map<String, Object> map) {
+	public int executeBaseLegalEntityInfDatas(
+			List<BaseLegalEntityInf> batchBaseLegalEntityInfs,
+			Map<String, TmsMdLegalEntity> legalEntityMap,
+			Map<String, BaseOrg> orgMap,
+			Map<String , TmsMdOrgLegalEntity> tmsMdOrgLegalEntityMap_LegalEntity,
+			Map<String, TmsMdLegalEnablePrint> legalEnablePrintMap,
+			Map<String, TmsMdUsageLocalLegal> usageLocalLegalMap) {
+		Long totalsapstart = System.currentTimeMillis();
+		log.info("********************************************beg batch process TmsMdLegalEntity,Org ******************** ");
+		for (BaseLegalEntityInf baseLegalEntityInf : batchBaseLegalEntityInfs) {
+			try {//隔离,防止对别的数据影响		
+				//处理基础数据
+				TmsMdLegalEntity parentLegalEntity = processTmsMdLegalEntityParent(legalEntityMap, baseLegalEntityInf);
+				TmsMdLegalEntity legalEntity = processTmsMdLegalEntityChild(legalEntityMap, baseLegalEntityInf);
+				BaseOrg parentBaseOrg = processBaseOrgParent(orgMap, baseLegalEntityInf);
+				BaseOrg baseOrg = processBaseOrgChild(orgMap, baseLegalEntityInf, parentBaseOrg);
+			} catch (Exception e) {				
+				log.error("process BaseLegalEntityInf name:"+baseLegalEntityInf.getLegalEntityName()+ "erro info:"+e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		log.info("********************************************end batch process TmsMdLegalEntity,Org ******************** ");
+		log.info("********************************************beg batch process new tmsMdOrgLegalEntity ******************** ");
+		//处理纳税实体和机构关系
+		for(TmsMdLegalEntity legalEntity:legalEntityMap.values()){
+			try {//隔离,防止对别的数据影响	
+				TmsMdOrgLegalEntity tmsMdOrgLegalEntity=tmsMdOrgLegalEntityMap_LegalEntity.get(legalEntity.getId());
+				if(tmsMdOrgLegalEntity==null){
+					tmsMdOrgLegalEntity=new TmsMdOrgLegalEntity();
+					tmsMdOrgLegalEntity.setId(IdGenerator.getUUID());
+					tmsMdOrgLegalEntity.setLegalEntityId(legalEntity.getId());
+					tmsMdOrgLegalEntity.setLegalEntityType(legalEntity.getLegalEntityType());
+					tmsMdOrgLegalEntity.setEnabledFlag(TableColnumDef.ENABLE_EFFECT);
+					BaseOrg org=orgMap.get(legalEntity.getLegalEntityCode());
+					AssertHelper.notEmpty_assert(org, "没有找到对应的机构,orgcode:"+legalEntity.getLegalEntityCode());
+					tmsMdOrgLegalEntity.setOrgId(org.getId());
+					baseLegalEntityInfDao.save(tmsMdOrgLegalEntity);
+					tmsMdOrgLegalEntityMap_LegalEntity.put(legalEntity.getId(),tmsMdOrgLegalEntity);
+				}
+			} catch (Exception e) {				
+				log.error("process tmsMdOrgLegalEntity code:"+legalEntity.getId()+ "erro info:"+e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		
+		//删除久关系
+//		baseLegalEntityInfDao.removeAll(allTmsMdOrgLegalEntity);
+		log.info("********************************************end batch process new tmsMdOrgLegalEntity ******************** ");
+		log.info("********************************************beg batch process new TmsMdLegalEnablePrint,TmsMdUsageLocalLegal ******************** ");
 		
 		int sucessnum=0;
-		
-		List<BaseLegalEntityInf> batchBaseLegalEntityInf = (List<BaseLegalEntityInf>) map.get("batchBaseLegalEntityInf");
-		
-		for(BaseLegalEntityInf baseLegalEntityInf:batchBaseLegalEntityInf){
-			if(executeBaseLegalEntityInfData(baseLegalEntityInf,map)){
+		int errocount=0;
+		for (BaseLegalEntityInf baseLegalEntityInf : batchBaseLegalEntityInfs) {
+			try {//隔离,防止对别的数据影响					
+				//仅仅新数据需要处理这些关系
+				TmsMdLegalEntity legalEntity=legalEntityMap.get(baseLegalEntityInf.getLegalEntityId());
+				AssertHelper.notEmpty_assert(legalEntity, "没找到相应实体:"+baseLegalEntityInf.getLegalEntityId());
+				TmsMdLegalEnablePrint legalEnablePrint=legalEnablePrintMap.get(legalEntity.getId());
+				TmsMdUsageLocalLegal usageLocalLegal=usageLocalLegalMap.get(legalEntity.getId());
+				
+				TmsMdLegalEntity parentEntity=null;
+				if(StringUtils.trim(baseLegalEntityInf.getParentId())!=null){
+					parentEntity=legalEntityMap.get(StringUtils.trim(baseLegalEntityInf.getParentId()));
+					AssertHelper.notEmpty_assert(legalEntity, "没找到相应实体:"+StringUtils.trim(baseLegalEntityInf.getParentId()));
+				}
+				String parentEntityId=parentEntity==null?null:parentEntity.getId();
+				//父节点就是自己,设置父节点为null
+				if(parentEntityId!=null&&parentEntityId.equals(legalEntity.getId())){
+					parentEntityId=null;
+				}
+				//处理纳税实体上的是否打印点
+				if(parentEntityId==null){
+					legalEntity.setIsEnablePrint(StringPool.IS_PRINT_ENABLED);
+				}else{
+					legalEntity.setIsEnablePrint(StringPool.IS_PRINT_UNENABLED);
+				}
+
+				//处理打印关系
+				if(legalEnablePrint==null){
+					legalEnablePrint = new TmsMdLegalEnablePrint();
+					legalEnablePrint.setLegalEntityId(legalEntity.getId());
+					legalEnablePrint.setParentId(parentEntityId);
+					legalEnablePrint.setIsEnablePrint(parentEntityId==null);
+					legalEnablePrint.setEnabledFlag(true);
+					tmsMdLegalEnablePrintDao.save(legalEnablePrint);
+					legalEnablePrintMap.put(legalEntity.getId(), legalEnablePrint);
+				}else{
+					legalEnablePrint.setIsEnablePrint(parentEntityId==null);
+					legalEnablePrint.setParentId(parentEntityId);
+					baseLegalEntityInfDao.update(legalEnablePrint);
+				}
+				//处理是否使用自身纳税人识别号
+				if(usageLocalLegal==null){
+					usageLocalLegal=new TmsMdUsageLocalLegal();
+					usageLocalLegal.setLegalEntityId(legalEntity.getId());
+					usageLocalLegal.setDes(legalEntity.getLegalEntityCode());
+					usageLocalLegal.setEnabledFlag(true);
+					usageLocalLegal.setIsUsageLocalRegNo(parentEntityId==null);
+					usageLocalLegal.setParentId(parentEntityId);
+					tmsMdUsageLocalLegalDao.save(usageLocalLegal);
+					usageLocalLegalMap.put(legalEntity.getId(), usageLocalLegal);
+				}else{
+					usageLocalLegal.setIsUsageLocalRegNo(parentEntityId==null);
+					usageLocalLegal.setParentId(parentEntityId);
+					baseLegalEntityInfDao.update(legalEnablePrint);
+				}			
+				
+				baseLegalEntityInf.setInterfaceTrxFlag(StringPool.FINISH);
+				baseLegalEntityInfDao.update(baseLegalEntityInf);
 				sucessnum++;
+			} catch (Exception e) {				
+				baseLegalEntityInf.setInterfaceTrxFlag(StringPool.ERRO);
+				baseLegalEntityInfDao.update(baseLegalEntityInf);			
+				errocount++;
+				log.error("process BaseLegalEntityInf name:"+baseLegalEntityInf.getLegalEntityName()+ "erro info:"+e.getMessage());
+				e.printStackTrace();
 			}
 		}
+		log.info("sucess read BaseLegalEntityInf:"+sucessnum);
+		log.info("fail read BaseLegalEntityInf:"+errocount);
+		log.info("costs: " + (System.currentTimeMillis() - totalsapstart) + " ms");
+		log.info("********************************************end batch process BaseLegalEntityInfJobTaskImpl ******************** ");
 		return sucessnum;
-		
 	}
-
-
-	
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param baseLegalEntityInf
-	 * @param map
-	 * @return
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	@SuppressWarnings("unchecked")
-	private boolean executeBaseLegalEntityInfData(BaseLegalEntityInf baseLegalEntityInf, Map<String, Object> map) {
-		
-		List<TmsMdLegalEntity> allTmsMdLegalEntity = (List<TmsMdLegalEntity>) map.get("allTmsMdLegalEntity");
-		List<TmsMdLegalEnablePrint> allTmsMdLegalEnablePrint = (List<TmsMdLegalEnablePrint>) map.get("allTmsMdLegalEnablePrint");
-		List<BaseOrg> allBaseOrg = (List<BaseOrg>) map.get("allBaseOrg");
-		List<TmsMdUsageLocalLegal> allTmsMdUsageLocalLegal = (List<TmsMdUsageLocalLegal>) map.get("allTmsMdUsageLocalLegal");
-		List<TmsMdOrgLegalEntity> allTmsMdOrgLegalEntity = (List<TmsMdOrgLegalEntity>) map.get("allTmsMdOrgLegalEntity");
-		
-		try {
-			log.info("***********begin processing TmsMdLegalEntity at " + System.currentTimeMillis() + "**********");
-			TmsMdLegalEntity tmsMdLegalEntityChild = processTmsMdLegalEntityChild(allTmsMdLegalEntity, baseLegalEntityInf);
-			TmsMdLegalEntity tmsMdLegalEntityParent = processTmsMdLegalEntityParent(allTmsMdLegalEntity, baseLegalEntityInf);
-			log.info("***********end processing TmsMdLegalEntity at " + System.currentTimeMillis() + "**********");
-			//取得父子TmsMdLegalEntity的uuid
-			String childLegalEntityId = tmsMdLegalEntityChild.getId();
-			String parentLegalEntityId = tmsMdLegalEntityParent.getId();
-			//处理打印关系
-			Map<String, String> mapPrint = new HashMap<String, String>();
-			mapPrint.put("childLegalEntityId", childLegalEntityId);
-			mapPrint.put("parentLegalEntityId", parentLegalEntityId);
-			
-			log.info("***********begin processing TmsMdLegalEnablePrint at " + System.currentTimeMillis() + "**********");
-			processTmsMdLegalEnablePrintChild(allTmsMdLegalEnablePrint, mapPrint);
-			processTmsMdLegalEnablePrintParent(allTmsMdLegalEnablePrint, mapPrint);
-			log.info("***********end processing TmsMdLegalEnablePrint at " + System.currentTimeMillis() + "**********");
-			
-			log.info("***********begin processing BaseOrg at " + System.currentTimeMillis() + "**********");
-			BaseOrg baseOrgParent = processBaseOrgParent(allBaseOrg, baseLegalEntityInf);
-			BaseOrg baseOrgChild = processBaseOrgChild(allBaseOrg, baseLegalEntityInf, baseOrgParent);
-			log.info("***********end processing BaseOrg at " + System.currentTimeMillis() + "**********");
-			
-			log.info("***********begin processing TmsMdUsageLocalLegal at " + System.currentTimeMillis() + "**********");
-			processTmsMdUsageLocalLegal(allTmsMdUsageLocalLegal, tmsMdLegalEntityChild, tmsMdLegalEntityParent);
-			processTmsMdOrgLegalEntity(allTmsMdOrgLegalEntity, baseLegalEntityInf, tmsMdLegalEntityChild, baseOrgChild);
-			log.info("***********end processing TmsMdUsageLocalLegal at " + System.currentTimeMillis() + "**********");
-			
-			baseLegalEntityInf.setInterfaceTrxFlag(StringPool.FINISH);
-			baseLegalEntityInfDao.update(baseLegalEntityInf);
-			
-			return true;
-		} catch (Exception e) {
-			
-			baseLegalEntityInf.setInterfaceTrxFlag(StringPool.ERRO);
-			baseLegalEntityInfDao.update(baseLegalEntityInf);
-			log.error("处理数据"+baseLegalEntityInf.toString()+"出错,原因:"+e.getMessage()+" 堆栈信息如下:");
-			e.printStackTrace();
-			return false;
-		}
-		
-	}
-
-	
-	
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param allTmsMdLegalEnablePrint
-	 * @param mapPrint
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private void processTmsMdLegalEnablePrintParent(List<TmsMdLegalEnablePrint> allTmsMdLegalEnablePrint, Map<String, String> mapPrint) {
-		// TODO Auto-generated method stub
-		TmsMdLegalEnablePrint tmsMdLegalEnablePrintParent = getTmsMdLegalEnablePrintParent(allTmsMdLegalEnablePrint,mapPrint);
-		String legalEntityId = mapPrint.get("parentLegalEntityId");
-		if(tmsMdLegalEnablePrintParent == null) {
-			tmsMdLegalEnablePrintParent = new TmsMdLegalEnablePrint();
-			tmsMdLegalEnablePrintParent.setLegalEntityId(legalEntityId);
-			tmsMdLegalEnablePrintParent.setParentId(null);
-			tmsMdLegalEnablePrintParent.setIsEnablePrint(true);
-			tmsMdLegalEnablePrintParent.setEnabledFlag(true);
-			tmsMdLegalEnablePrintDao.save(tmsMdLegalEnablePrintParent);
-			allTmsMdLegalEnablePrint.add(tmsMdLegalEnablePrintParent);
-		} 
-	}
-
-
-
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param allTmsMdUsageLocalLegal
-	 * @param tmsMdLegalEntityChild
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private void processTmsMdUsageLocalLegal(List<TmsMdUsageLocalLegal> allTmsMdUsageLocalLegal, TmsMdLegalEntity tmsMdLegalEntityChild,TmsMdLegalEntity tmsMdLegalEntityParent) {
-		String legalEntityId = StringUtils.trim(tmsMdLegalEntityChild.getId());
-		String legalEntityCode = StringUtils.trim(tmsMdLegalEntityChild.getLegalEntityCode());
-		String parentId = StringUtils.trim(tmsMdLegalEntityParent.getId());
-		TmsMdUsageLocalLegal tmsMdUsageLocalLegal = getTmsMdUsageLocalLegal(allTmsMdUsageLocalLegal, legalEntityId);
-		if(tmsMdUsageLocalLegal==null) {
-			tmsMdUsageLocalLegal=new TmsMdUsageLocalLegal();
-			tmsMdUsageLocalLegal.setLegalEntityId(legalEntityId);
-			tmsMdUsageLocalLegal.setDes(legalEntityCode);
-			tmsMdUsageLocalLegal.setEnabledFlag(true);
-			tmsMdUsageLocalLegal.setIsUsageLocalRegNo(false);
-			tmsMdUsageLocalLegal.setParentId(parentId);
-			tmsMdUsageLocalLegalDao.save(tmsMdUsageLocalLegal);
-			allTmsMdUsageLocalLegal.add(tmsMdUsageLocalLegal);
-		} else {
-			tmsMdUsageLocalLegal.setParentId(parentId);
-			tmsMdUsageLocalLegalDao.update(tmsMdUsageLocalLegal);
-		}
-	}
-
-
-
-	
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param allTmsMdUsageLocalLegal
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private TmsMdUsageLocalLegal getTmsMdUsageLocalLegal(List<TmsMdUsageLocalLegal> allTmsMdUsageLocalLegal,String legalEntityId) {
-		for(TmsMdUsageLocalLegal tmsMdUsageLocalLegal:allTmsMdUsageLocalLegal) {
-			if(legalEntityId.equals(tmsMdUsageLocalLegal.getLegalEntityId())) {
-				return tmsMdUsageLocalLegal;
-			} 
-		}
-		return null;
-	}
-
-
-
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param allTmsMdOrgLegalEntity
-	 * @param tmsMdLegalEntityChild
-	 * @param baseOrgChild
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private void processTmsMdOrgLegalEntity(List<TmsMdOrgLegalEntity> allTmsMdOrgLegalEntity,BaseLegalEntityInf baseLegalEntityInf,TmsMdLegalEntity tmsMdLegalEntityChild, BaseOrg baseOrgChild) {
-
-		String legalEntityId = tmsMdLegalEntityChild.getId();
-		String legalEntityType = baseLegalEntityInf.getLegalEntityType();
-		String orgId = baseOrgChild.getId();
-		
-		TmsMdOrgLegalEntity tmsMdOrgLegalEntity = getTmsMdOrgLegalEntity(allTmsMdOrgLegalEntity,legalEntityId,orgId);
-		
-		if(tmsMdOrgLegalEntity==null) {
-			tmsMdOrgLegalEntity = new TmsMdOrgLegalEntity();
-			tmsMdOrgLegalEntity.setLegalEntityId(legalEntityId);
-			tmsMdOrgLegalEntity.setOrgId(baseOrgChild.getId());
-			tmsMdOrgLegalEntity.setLegalEntityType(legalEntityType);
-			tmsMdOrgLegalEntity.setEnabledFlag("Y");
-			tmsMdOrgLegalEntity.setId(IdGenerator.getUUID());
-			tmsMdOrgLegalEntityDao.saveOrUpdate(tmsMdOrgLegalEntity);
-			allTmsMdOrgLegalEntity.add(tmsMdOrgLegalEntity);
-		}
-	}
-
-	
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param allTmsMdOrgLegalEntity
-	 * @param legalEntityId
-	 * @param orgId
-	 * @return
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private TmsMdOrgLegalEntity getTmsMdOrgLegalEntity(List<TmsMdOrgLegalEntity> allTmsMdOrgLegalEntity, String legalEntityId, String orgId) {
-		for(TmsMdOrgLegalEntity tmsMdOrgLegalEntity:allTmsMdOrgLegalEntity) {
-			if(legalEntityId.equals(tmsMdOrgLegalEntity.getLegalEntityId())&&orgId.equals(tmsMdOrgLegalEntity.getOrgId())) {
-				return tmsMdOrgLegalEntity;
-			} 
-		}
-		return null;
-	}
-
-
-
 	/** 
 	 *〈一句话功能简述〉 
 	 * 功能详细描述
@@ -327,37 +226,18 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 	 * @since [产品/模块版本] （可选）
 	 */
 	
-	private BaseOrg processBaseOrgParent(List<BaseOrg> allBaseOrg, BaseLegalEntityInf baseLegalEntityInf) {
+	private BaseOrg processBaseOrgParent(Map<String, BaseOrg> orgMap, BaseLegalEntityInf baseLegalEntityInf) {
 		String legalEntityCode = StringUtils.trim(baseLegalEntityInf.getParentId());
-		BaseOrg baseOrg = getBaseOrgParent(allBaseOrg,legalEntityCode);
-
-		if(baseOrg==null) {
-			baseOrg = new BaseOrg();
-			baseOrg.setOrgCode(legalEntityCode);
-			baseOrg.setOrgName(legalEntityCode);
-			baseOrgDao.save(baseOrg);
-			allBaseOrg.add(baseOrg);
-		}
-		
-		return baseOrg;
-	}
-
-
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param allBaseOrg
-	 * @param legalEntityCode
-	 * @return
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private BaseOrg getBaseOrgParent(List<BaseOrg> allBaseOrg, String legalEntityCode) {
-		for(BaseOrg baseOrg:allBaseOrg) {
-			if(legalEntityCode.equals(baseOrg.getOrgCode())){
-				return baseOrg;
-			}
+		if(legalEntityCode!=null){
+			BaseOrg baseOrg = orgMap.get(legalEntityCode);
+			if(baseOrg==null) {
+				baseOrg = new BaseOrg();
+				baseOrg.setOrgCode(legalEntityCode);
+				baseOrg.setOrgName(legalEntityCode);
+				baseOrgDao.save(baseOrg);
+				orgMap.put(legalEntityCode,baseOrg);
+			}		
+			return baseOrg;
 		}
 		return null;
 	}
@@ -372,157 +252,55 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 	 * @since [产品/模块版本] （可选）
 	 */
 	
-	private BaseOrg processBaseOrgChild(List<BaseOrg> allBaseOrg,BaseLegalEntityInf baseLegalEntityInf, BaseOrg baseOrgParent) {
+	private BaseOrg processBaseOrgChild(Map<String, BaseOrg> orgMap,BaseLegalEntityInf baseLegalEntityInf, BaseOrg baseOrgParent) {
 
 		String legalEntityCode = StringUtils.trim(baseLegalEntityInf.getLegalEntityId());// 机构号
-		String parentId = StringUtils.trim(baseOrgParent.getId());
-		BaseOrg baseOrg = getBaseOrgChild(allBaseOrg,legalEntityCode,parentId);
-		
-		if(baseOrg==null) {
-			baseOrg = new BaseOrg();
-			baseOrg.setOrgCode(legalEntityCode);
-			baseOrg.setOrgName(legalEntityCode);
-			baseOrg.setParentId(parentId);
-			baseOrgDao.save(baseOrg);
-			allBaseOrg.add(baseOrg);
-		} else {
-			baseOrg.setParentId(parentId);
-			baseOrgDao.update(baseOrg);
-		}
-		
-		return baseOrg;
-	}
-	
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param allBaseOrg
-	 * @param legalEntityCode
-	 * @param parentId 
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private BaseOrg getBaseOrgChild(List<BaseOrg> allBaseOrg, String legalEntityCode, String parentId) {
-		for(BaseOrg baseOrg:allBaseOrg) {
-			if(legalEntityCode.equals(baseOrg.getOrgCode())&&parentId.equals(baseOrg.getParentId())){
-				return baseOrg;
+		if(legalEntityCode!=null){
+			String parentId = StringUtils.trim(baseOrgParent.getId());
+			BaseOrg baseOrg = orgMap.get(legalEntityCode);
+			
+			if(baseOrg==null) {
+				baseOrg = new BaseOrg();
+				baseOrg.setOrgCode(legalEntityCode);
+				baseOrg.setOrgName(legalEntityCode);
+				baseOrg.setParentId(parentId);
+				baseOrgDao.save(baseOrg);
+				orgMap.put(legalEntityCode,baseOrg);
+			} else {
+				baseOrg.setParentId(parentId);
+				baseOrgDao.update(baseOrg);
 			}
+			
+			return baseOrg;
 		}
 		return null;
 	}
-
-
-
 	/** 
 	 *〈一句话功能简述〉 
-	 * 功能详细描述
+	 *  这里有问题.父的纳税实体类别有问题
 	 * @param allTmsMdLegalEntity
 	 * @param baseLegalEntityInf
 	 * @return
 	 * @see [相关类/方法]（可选）
 	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private TmsMdLegalEntity processTmsMdLegalEntityParent(List<TmsMdLegalEntity> allTmsMdLegalEntity, BaseLegalEntityInf baseLegalEntityInf) {
-		
+	 */	
+	private TmsMdLegalEntity processTmsMdLegalEntityParent(Map<String, TmsMdLegalEntity> legalEntityMap, BaseLegalEntityInf baseLegalEntityInf) {
 		String parentId = StringUtils.trim(baseLegalEntityInf.getParentId());// 机构号
-		String legalEntityLevel = baseLegalEntityInf.getLegalEntityLevel();// 实法人实体层级
-		
-		TmsMdLegalEntity tmsMdLegalEntityParent = getTmsMdLegalEntity(allTmsMdLegalEntity,parentId);
-		
-		if(tmsMdLegalEntityParent==null){
-			tmsMdLegalEntityParent = new TmsMdLegalEntity();
-			tmsMdLegalEntityParent.setIsEnablePrint(StringPool.IS_PRINT_ENABLED);
-			tmsMdLegalEntityParent.setLegalEntityCode(parentId);
-			tmsMdLegalEntityParent.setLegalEntityName(parentId);
-			tmsMdLegalEntityParent.setLegalEntityType(legalEntityLevel);
-			tmsMdLegalEntityParent.setParentId(null);
-			tmsMdLegalEntityDao.save(tmsMdLegalEntityParent);
-			allTmsMdLegalEntity.add(tmsMdLegalEntityParent);
-		}
-	
-		return tmsMdLegalEntityParent;
-	}
-
-
-
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param allTmsMdLegalEnablePrint
-	 * @param baseLegalEntityInf
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private TmsMdLegalEnablePrint processTmsMdLegalEnablePrintChild(List<TmsMdLegalEnablePrint> allTmsMdLegalEnablePrint, Map<String,String> mapPrint) {
-		TmsMdLegalEnablePrint tmsMdLegalEnablePrintChild = getTmsMdLegalEnablePrintChild(allTmsMdLegalEnablePrint,mapPrint);
-		String legalEntityId = mapPrint.get("childLegalEntityId");
-		String parentId = mapPrint.get("parentLegalEntityId");
-		if(tmsMdLegalEnablePrintChild == null) {
-			tmsMdLegalEnablePrintChild = new TmsMdLegalEnablePrint();
-			tmsMdLegalEnablePrintChild.setLegalEntityId(legalEntityId);
-			tmsMdLegalEnablePrintChild.setParentId(parentId);
-			tmsMdLegalEnablePrintChild.setIsEnablePrint(false);
-			tmsMdLegalEnablePrintChild.setEnabledFlag(true);
-			tmsMdLegalEnablePrintDao.save(tmsMdLegalEnablePrintChild);
-			allTmsMdLegalEnablePrint.add(tmsMdLegalEnablePrintChild);
-		} else {
-			tmsMdLegalEnablePrintChild.setParentId(parentId);
-			tmsMdLegalEnablePrintDao.update(tmsMdLegalEnablePrintChild);
-		}
-		return tmsMdLegalEnablePrintChild;
-	}
-	
-	
-	
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param allTmsMdLegalEnablePrint
-	 * @param mapPrint
-	 * @return
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private TmsMdLegalEnablePrint getTmsMdLegalEnablePrintParent(List<TmsMdLegalEnablePrint> allTmsMdLegalEnablePrint, Map<String, String> mapPrint) {
-
-		String legalEntityId = mapPrint.get("parentLegalEntityId");
-		
-		for(TmsMdLegalEnablePrint tmsMdLegalEnablePrint:allTmsMdLegalEnablePrint){
-			if(legalEntityId.equals(tmsMdLegalEnablePrint.getLegalEntityId())){
-				return tmsMdLegalEnablePrint;
+		if(AssertHelper.notEmpty(parentId)){
+			TmsMdLegalEntity tmsMdLegalEntityParent = legalEntityMap.get(parentId);
+			if(tmsMdLegalEntityParent==null){
+				tmsMdLegalEntityParent = new TmsMdLegalEntity();
+				tmsMdLegalEntityParent.setIsEnablePrint(StringPool.IS_PRINT_ENABLED);
+				tmsMdLegalEntityParent.setLegalEntityCode(parentId);
+				tmsMdLegalEntityDao.save(tmsMdLegalEntityParent);
+				legalEntityMap.put(parentId,tmsMdLegalEntityParent);
+			}else{
+				
 			}
+			return tmsMdLegalEntityParent;
 		}
 		return null;
 	}
-
-
-
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param allTmsMdLegalEnablePrint
-	 * @param legalEntityId
-	 * @param parentId
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private TmsMdLegalEnablePrint getTmsMdLegalEnablePrintChild(List<TmsMdLegalEnablePrint> allTmsMdLegalEnablePrint,Map<String,String> mapPrint) {
-		
-		String legalEntityId = mapPrint.get("childLegalEntityId");
-		
-		for(TmsMdLegalEnablePrint tmsMdLegalEnablePrint:allTmsMdLegalEnablePrint){
-			if(legalEntityId.equals(tmsMdLegalEnablePrint.getLegalEntityId())){
-				return tmsMdLegalEnablePrint;
-			}
-		}
-		return null;
-	}
-
 	/** 
 	 *〈一句话功能简述〉 
 	 * 功能详细描述
@@ -531,51 +309,25 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 	 * @return 
 	 * @see [相关类/方法]（可选）
 	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private TmsMdLegalEntity processTmsMdLegalEntityChild(List<TmsMdLegalEntity> allTmsMdLegalEntity, BaseLegalEntityInf baseLegalEntityInf) {
+	 */	
+	private TmsMdLegalEntity processTmsMdLegalEntityChild(
+			Map<String, TmsMdLegalEntity> legalEntityMap
+			, BaseLegalEntityInf baseLegalEntityInf) {
 		
 		String legalEntityCode = StringUtils.trim(baseLegalEntityInf.getLegalEntityId());// 机构号
-		String legalEntityLevel = StringUtils.trim(baseLegalEntityInf.getLegalEntityLevel());// 实法人实体层级
-		String parentId = StringUtils.trim(baseLegalEntityInf.getParentId());
-		
-		TmsMdLegalEntity tmsMdLegalEntityChild = getTmsMdLegalEntity(allTmsMdLegalEntity,legalEntityCode);
-		
-		if(tmsMdLegalEntityChild==null){
-			tmsMdLegalEntityChild = new TmsMdLegalEntity();
-			tmsMdLegalEntityChild.setIsEnablePrint(StringPool.IS_PRINT_UNENABLED);
-			tmsMdLegalEntityChild.setLegalEntityCode(legalEntityCode);
-			tmsMdLegalEntityChild.setLegalEntityName(legalEntityCode);
-			tmsMdLegalEntityChild.setLegalEntityType(legalEntityLevel);
-			tmsMdLegalEntityChild.setParentId(parentId);
-			tmsMdLegalEntityDao.save(tmsMdLegalEntityChild);
-			allTmsMdLegalEntity.add(tmsMdLegalEntityChild);
-		} else {
-			tmsMdLegalEntityChild.setParentId(parentId);
-			tmsMdLegalEntityDao.update(tmsMdLegalEntityChild);
-		}
-	
-		return tmsMdLegalEntityChild;
-	}
-	
-	/** 
-	 *〈一句话功能简述〉 
-	 * 功能详细描述
-	 * @param allTmsMdLegalEntity
-	 * @param legalEntityCode
-	 * @param parentId 
-	 * @return
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private TmsMdLegalEntity getTmsMdLegalEntity(List<TmsMdLegalEntity> allTmsMdLegalEntity, String legalEntityCode) {
-		for(TmsMdLegalEntity tmsMdLegalEntity:allTmsMdLegalEntity){
-			if(legalEntityCode.equals(StringUtils.trim(tmsMdLegalEntity.getLegalEntityCode()))){
-				return tmsMdLegalEntity;
+		if(AssertHelper.notEmpty(legalEntityCode)){
+			TmsMdLegalEntity tmsMdLegalEntityChild = legalEntityMap.get(legalEntityCode);
+			if(tmsMdLegalEntityChild==null){
+				tmsMdLegalEntityChild = new TmsMdLegalEntity();
+				tmsMdLegalEntityChild.setIsEnablePrint(StringPool.IS_PRINT_UNENABLED);
+				tmsMdLegalEntityChild.setLegalEntityCode(legalEntityCode);
+				tmsMdLegalEntityDao.save(tmsMdLegalEntityChild);
+				legalEntityMap.put(legalEntityCode,tmsMdLegalEntityChild);
+			} else {//补全父节点先处理的问题
+				
 			}
+			return tmsMdLegalEntityChild;
 		}
 		return null;
 	}
-
 }

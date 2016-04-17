@@ -37,7 +37,8 @@ public class SecurityContextHolder extends BaseContextHolder{
 		
 		if(defaultDept!=null){			
 //			AssertHelper.notEmpty_assert(orgPath, "用户所属机构orgpath没有对应数据,登录失败");
-			userCache.put(ContextDef.DIVISIONCODE,defaultDept.getId());
+			userCache.put(ContextDef.DIVISIONCODE,defaultDept.getOrgCode());
+			userCache.put(ContextDef.DIVISIONID,defaultDept.getId());
 			userCache.put(ContextDef.DIVISIONNAME,defaultDept.getOrgName());
 			
 			OrgPath orgPath=deptDao.findOrgPathByOrgId(defaultDept.getId());

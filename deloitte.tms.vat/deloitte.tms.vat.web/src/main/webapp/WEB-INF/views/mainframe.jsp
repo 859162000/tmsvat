@@ -411,7 +411,7 @@ function getCookie(name) {//取cookies函数
 			<li class="li-skinitem" title="blue"><span class="blue" rel="blue"></span></li>
 			<li class="li-skinitem" title="cupertino"><span class="cupertino" rel="cupertino"></span></li>
 			<li class="li-skinitem" title="dark-hive"><span class="dark-hive" rel="dark-hive"></span></li> -->
-			<li class="li-skinitem" title="当前用户"><img id="loginfoicon" src="resource/login_files/user.png"><span id="loginfo"><%=ContextUtils.getCurrentUserName() %></span></li>
+			<li class="li-skinitem" title="当前用户"><img id="loginfoicon" src="resource/login_files/user.png"><span id="loginfo"><%=ContextUtils.getCurrentUserName() %><%=(ContextUtils.getCurrentOrgName()==null?"":"("+ContextUtils.getCurrentOrgName()+")")%></span></li>
 			<li class="li-skinitem" title="退出登录"><a href="security_logout_"><img id="logout" src="resource/login_files/Quit.png"></a></li>
 		</ul>	
 		</div>

@@ -10,6 +10,7 @@ public class ContextDef {
 	public final static String VERSIONCODE = "VERSIONCODE";
 	public final static String VERSIONID = "VERSIONID";
 	
+	public final static String DIVISIONID = "DIVISIONID";
 	public final static String DIVISIONCODE = "DIVISIONCODE";
 	public final static String DEPTCODE = "DEPTCODE";
 	public final static String DIVISIONNAME = "DIVISIONNAME";

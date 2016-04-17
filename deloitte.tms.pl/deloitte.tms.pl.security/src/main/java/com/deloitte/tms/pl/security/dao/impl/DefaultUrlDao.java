@@ -35,10 +35,10 @@ public class DefaultUrlDao extends BaseDao implements IUrlDao{
 		query.append("SELECT U FROM "+DefaultUrl.class.getName()+" U WHERE U.forNavigation=:forNavigation ");
 		values.put("forNavigation", true);
 		if (StringUtils.isNotEmpty(parentId)) {
-			query.append("AND U.parentId = :parentId ORDER BY U.order ASC ");
+			query.append("AND U.parentId = :parentId ORDER BY U.order desc ");
 			values.put("parentId", parentId);
 		} else {
-			query.append("AND U.parentId IS NULL ORDER BY U.order ASC ");
+			query.append("AND U.parentId IS NULL ORDER BY U.order desc ");
 		}
 		return findBy(query, values);
 	}

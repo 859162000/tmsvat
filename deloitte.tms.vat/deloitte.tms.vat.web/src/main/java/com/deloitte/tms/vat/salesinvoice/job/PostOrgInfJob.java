@@ -13,7 +13,6 @@
 package com.deloitte.tms.vat.salesinvoice.job;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +55,7 @@ import com.deloitte.tms.vat.salesinvoice.jobs.service.BaseLegalEntityInfService;
 @Component("postOrgInfJob")
 public class PostOrgInfJob implements Job, JobTest {
 	
-	private final static Logger log = Logger.getLogger(PostTmsCrvatTrxInfJob.class);
+	private final static Logger log = Logger.getLogger(PostOrgInfJob.class);
 
 	@Resource
 	private BaseLegalEntityInfJobTask baseLegalEntityInfJob;
@@ -84,61 +83,122 @@ public class PostOrgInfJob implements Job, JobTest {
 	 */
 	@Override
 	public void execute() {
-		log.info("******************************start at "+System.currentTimeMillis()+"*****************************");
-		int pageIndex=0;
-		int pageSize=PageConstant.PAGE_SIZE;
-		int totalsucess=0;
+		Long totalsapstart = System.currentTimeMillis();
+		log.info("******************************beg process org*****************************");
 		
+		//获取需要处理的接口数据
 		List<BaseLegalEntityInf> listTmsMdCustomersInf = getToRunBaseLegalEntityInf();
+		//获取机构相关的缓存数据
+		List<TmsMdLegalEntity> allTmsMdLegalEntity = tmsMdLegalEntityDao.findAllTmsMdLegalEntity();
+		List<BaseOrg> allBaseOrg = baseOrgDao.findAllBaseOrg();
+		List<TmsMdOrgLegalEntity> allTmsMdOrgLegalEntity = tmsMdOrgLegalEntityDao.findAllTmsMdOrgLegalEntities();
+		//打印关系
+		List<TmsMdLegalEnablePrint> allTmsMdLegalEnablePrint = tmsMdLegalEnablePrintDao.findAllTmsMdLegalEnablePrint();
+		//纳税识别号关系
+		List<TmsMdUsageLocalLegal> allTmsMdUsageLocalLegal = tmsMdUsageLocalLegalDao.findAllTmsMdUsageLocalLegal();
 		
-		Map<String,Object> mapProcess = getAllRelatedObjects();
 		
+		Map<String , TmsMdLegalEntity> tmsMdLegalEntityMap=new HashMap<String, TmsMdLegalEntity>();		
+		Map<String , BaseOrg>baseOrgMap=new HashMap<String, BaseOrg>();	
+		Map<String , TmsMdOrgLegalEntity> tmsMdOrgLegalEntityMap_LegalEntity=new HashMap<String, TmsMdOrgLegalEntity>();
+//		Map<String , TmsMdOrgLegalEntity> tmsMdOrgLegalEntityMap_Org=new HashMap<String, TmsMdOrgLegalEntity>();
+//		
+		Map<String , TmsMdLegalEnablePrint> tmsMdLegalEnablePrintMap=new HashMap<String, TmsMdLegalEnablePrint>();
+		Map<String , TmsMdUsageLocalLegal> tmsMdUsageLocalLegalMap=new HashMap<String, TmsMdUsageLocalLegal>();
+
+		//LegalEntityCode为key
+		for(TmsMdLegalEntity tmsMdLegalEntity: allTmsMdLegalEntity){
+			tmsMdLegalEntityMap.put(tmsMdLegalEntity.getLegalEntityCode(), tmsMdLegalEntity);
+		}
+		//OrgCode为key
+		for(BaseOrg baseOrg: allBaseOrg){
+			baseOrgMap.put(baseOrg.getOrgCode(), baseOrg);
+		}
+		//LegalEntityId为key
+		for(TmsMdOrgLegalEntity tmsMdOrgLegalEntity: allTmsMdOrgLegalEntity){
+			tmsMdOrgLegalEntityMap_LegalEntity.put(tmsMdOrgLegalEntity.getLegalEntityId(), tmsMdOrgLegalEntity);
+		}
+//		//OrgId为key
+//		for(TmsMdOrgLegalEntity tmsMdOrgLegalEntity: allTmsMdOrgLegalEntity){
+//			tmsMdOrgLegalEntityMap_Org.put(tmsMdOrgLegalEntity.getOrgId(), tmsMdOrgLegalEntity);
+//		}
+		//childid为key,找出的数据,更新父id.树由子-父关系建立,所以处理掉这个数据后,树就正确了
+		for(TmsMdLegalEnablePrint tmsMdLegalEnablePrint: allTmsMdLegalEnablePrint){
+			tmsMdLegalEnablePrintMap.put(tmsMdLegalEnablePrint.getLegalEntityId(), tmsMdLegalEnablePrint);
+		}
+		//childid为key,找出的数据,更新父id,重建关系并放入map,否则不做任何事情.树由子-父关系建立,所以处理掉这个数据后,树就正确了
+		for(TmsMdUsageLocalLegal tmsMdUsageLocalLegal: allTmsMdUsageLocalLegal){
+			tmsMdUsageLocalLegalMap.put(tmsMdUsageLocalLegal.getLegalEntityId(), tmsMdUsageLocalLegal);
+		}
+
+		/***************************** beg 开始批量处理机构数据**************************/
+		int pageIndex=0;
+		int pageSize=2000;
+		int totalsucess=0;
 		//批提交处理数据
-		List<BaseLegalEntityInf> batchBaseLegalEntityInf = new ArrayList<BaseLegalEntityInf>();
+		List<BaseLegalEntityInf> batchBaseLegalEntityInfs = new ArrayList<BaseLegalEntityInf>();
 		Long start = System.currentTimeMillis();
-		log.info("******************************begin processing baseLegalEntityInf at "+start+"*****************************");
 		for (BaseLegalEntityInf baseLegalEntityInf : listTmsMdCustomersInf) {
 			if ((StringPool.READY).equals(baseLegalEntityInf.getInterfaceTrxFlag())) {
 				if(pageIndex<pageSize) {
-					batchBaseLegalEntityInf.add(baseLegalEntityInf);
+					batchBaseLegalEntityInfs.add(baseLegalEntityInf);
 					pageIndex++;
 				} else {
-					log.info("*****************************processing "+pageIndex+" numbers*****************************");
-					mapProcess.put("batchBaseLegalEntityInf", batchBaseLegalEntityInf);
-					int processSucess = 0;
-					processSucess = processList(mapProcess);//返回处理成功数量
-					batchBaseLegalEntityInf = new ArrayList<BaseLegalEntityInf>();	
+					batchBaseLegalEntityInfs.add(baseLegalEntityInf);
+					//返回处理成功数量
+					int sucessnum =baseLegalEntityInfJob.executeBaseLegalEntityInfDatas(
+							batchBaseLegalEntityInfs
+							,tmsMdLegalEntityMap
+							,baseOrgMap
+							,tmsMdOrgLegalEntityMap_LegalEntity
+							,tmsMdLegalEnablePrintMap
+							,tmsMdUsageLocalLegalMap);
+					
+					//重置计数器
+					totalsucess=totalsucess+sucessnum;
+					batchBaseLegalEntityInfs = new ArrayList<BaseLegalEntityInf>();	
 					pageIndex = 0;
-					totalsucess = totalsucess + processSucess;
 				}
 			}
 		}
-		totalsucess = processList(mapProcess);
-		Long end = System.currentTimeMillis();
-		log.info("******************************end processing baseLegalEntityInf at "+end+"*****************************");
+		//处理末尾数据
+		int sucessnum = baseLegalEntityInfJob.executeBaseLegalEntityInfDatas(
+				batchBaseLegalEntityInfs
+				,tmsMdLegalEntityMap
+				,baseOrgMap
+				,tmsMdOrgLegalEntityMap_LegalEntity
+				,tmsMdLegalEnablePrintMap
+				,tmsMdUsageLocalLegalMap);
+		totalsucess=totalsucess+sucessnum;
+		/***************************** end 批量处理机构数据**************************/
+		//处理合计输出
+		log.info("PostOrgInfJob "+listTmsMdCustomersInf.size()+" data costs:："
+				+ (System.currentTimeMillis() - totalsapstart) + " ms"
+				+" sucess:"+totalsucess+"fail:"+(listTmsMdCustomersInf.size()-totalsucess));
+		log.info("******************************end processing org *****************************");
 	}
 
 	
 	
 	
-	/** 
-	 * 处理数据
-	 * @param mapProcess
-	 * @return
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	
-	private int processList(Map<String, Object> mapProcess) {
-		Long sapstart = System.currentTimeMillis();
-		int sucessnum=baseLegalEntityInfJob.executeBaseLegalEntityInfDatas(mapProcess);
-		@SuppressWarnings("unchecked")
-		List<BaseLegalEntityInf> batchBaseLegalEntityInf = (List<BaseLegalEntityInf>) mapProcess.get("batchBaseLegalEntityInf");
-		log.info("PostOrgInfJob "+batchBaseLegalEntityInf.size()+" data costs:："
-				+ (System.currentTimeMillis() - sapstart) + " ms"
-				+" sucess:"+sucessnum+"fail:"+(batchBaseLegalEntityInf.size()-sucessnum));
-		return sucessnum;
-	}
+//	/** 
+//	 * 处理数据
+//	 * @param mapProcess
+//	 * @return
+//	 * @see [相关类/方法]（可选）
+//	 * @since [产品/模块版本] （可选）
+//	 */
+//	
+//	private int processList(Map<String, Object> mapProcess) {
+//		Long sapstart = System.currentTimeMillis();
+//		int sucessnum=baseLegalEntityInfJob.executeBaseLegalEntityInfDatas(mapProcess);
+//		@SuppressWarnings("unchecked")
+//		List<BaseLegalEntityInf> batchBaseLegalEntityInf = (List<BaseLegalEntityInf>) mapProcess.get("batchBaseLegalEntityInf");
+//		log.info("PostOrgInfJob "+batchBaseLegalEntityInf.size()+" data costs:："
+//				+ (System.currentTimeMillis() - sapstart) + " ms"
+//				+" sucess:"+sucessnum+"fail:"+(batchBaseLegalEntityInf.size()-sucessnum));
+//		return sucessnum;
+//	}
 
 
 
@@ -149,27 +209,27 @@ public class PostOrgInfJob implements Job, JobTest {
 	 * @since [产品/模块版本] （可选）
 	 */
 	
-	private Map<String, Object> getAllRelatedObjects() {
-		
-		Long start = System.currentTimeMillis();
-		log.info("$$$$$$$$$$$$$$$$$$$$$$begin to cache data at "+start+"$$$$$$$$$$$$$$$$$$$$$$");
-		List<TmsMdLegalEntity> allTmsMdLegalEntity = tmsMdLegalEntityDao.findAllTmsMdLegalEntity();
-		List<TmsMdLegalEnablePrint> allTmsMdLegalEnablePrint = tmsMdLegalEnablePrintDao.findAllTmsMdLegalEnablePrint();
-		List<BaseOrg> allBaseOrg = baseOrgDao.findAllBaseOrg();
-		List<TmsMdUsageLocalLegal> allTmsMdUsageLocalLegal = tmsMdUsageLocalLegalDao.findAllTmsMdUsageLocalLegal();
-		List<TmsMdOrgLegalEntity> allTmsMdOrgLegalEntity = tmsMdOrgLegalEntityDao.findAllTmsMdOrgLegalEntities();
-		
-		Map<String,Object> mapProcess = new HashMap<String,Object>();
-		mapProcess.put("allTmsMdLegalEntity", allTmsMdLegalEntity);
-		mapProcess.put("allTmsMdLegalEnablePrint", allTmsMdLegalEnablePrint);
-		mapProcess.put("allBaseOrg", allBaseOrg);
-		mapProcess.put("allTmsMdUsageLocalLegal",allTmsMdUsageLocalLegal);
-		mapProcess.put("allTmsMdOrgLegalEntity", allTmsMdOrgLegalEntity);
-		
-		log.info("$$$$$$$$$$$$$$$$$$$$$$begin to cache data at "+ System.currentTimeMillis()+"$$$$$$$$$$$$$$$$$$$$$$");
-		return mapProcess;
-		
-	}
+//	private Map<String, Object> getAllRelatedObjects() {
+//		
+//		Long start = System.currentTimeMillis();
+//		log.info("$$$$$$$$$$$$$$$$$$$$$$begin to cache data at "+start+"$$$$$$$$$$$$$$$$$$$$$$");
+//		List<TmsMdLegalEntity> allTmsMdLegalEntity = tmsMdLegalEntityDao.findAllTmsMdLegalEntity();
+//		List<TmsMdLegalEnablePrint> allTmsMdLegalEnablePrint = tmsMdLegalEnablePrintDao.findAllTmsMdLegalEnablePrint();
+//		List<BaseOrg> allBaseOrg = baseOrgDao.findAllBaseOrg();
+//		List<TmsMdUsageLocalLegal> allTmsMdUsageLocalLegal = tmsMdUsageLocalLegalDao.findAllTmsMdUsageLocalLegal();
+//		List<TmsMdOrgLegalEntity> allTmsMdOrgLegalEntity = tmsMdOrgLegalEntityDao.findAllTmsMdOrgLegalEntities();
+//		
+//		Map<String,Object> mapProcess = new HashMap<String,Object>();
+//		mapProcess.put("allTmsMdLegalEntity", allTmsMdLegalEntity);
+//		mapProcess.put("allTmsMdLegalEnablePrint", allTmsMdLegalEnablePrint);
+//		mapProcess.put("allBaseOrg", allBaseOrg);
+//		mapProcess.put("allTmsMdUsageLocalLegal",allTmsMdUsageLocalLegal);
+//		mapProcess.put("allTmsMdOrgLegalEntity", allTmsMdOrgLegalEntity);
+//		
+//		log.info("$$$$$$$$$$$$$$$$$$$$$$begin to cache data at "+ System.currentTimeMillis()+"$$$$$$$$$$$$$$$$$$$$$$");
+//		return mapProcess;
+//		
+//	}
 
 
 	/** 

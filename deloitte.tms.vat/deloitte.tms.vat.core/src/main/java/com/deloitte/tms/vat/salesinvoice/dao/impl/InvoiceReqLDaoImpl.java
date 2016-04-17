@@ -66,5 +66,20 @@ public class InvoiceReqLDaoImpl extends BaseDao<InvoiceReqL> implements InvoiceR
 		buildInvoiceReqLQuery(query, values, params);
 		return (InvoiceReqL) findBy(query, values).get(0);
 	}
+	@Override
+	public void updateReqLStatusByReqHid(String reqhid,String status) {
+		// TODO Auto-generated method stub
+		AssertHelper.notEmpty_assert(reqhid, "申请单号不能为空");
+		StringBuffer query=new StringBuffer();
+		Map<String,Object> values=new HashMap<String,Object>();		
+		query.append("update TMS_CRVAT_INVOICE_REQ_L set STATUS = :status  where CRVAT_INVOICE_REQ_H_ID =:reqhid ");	
+		if(AssertHelper.notEmpty(reqhid))
+		{		
+			values.put("status", status);
+			values.put("reqhid", reqhid);
+		}
+		executeSql(query, values);
+		
+	}
 }
 

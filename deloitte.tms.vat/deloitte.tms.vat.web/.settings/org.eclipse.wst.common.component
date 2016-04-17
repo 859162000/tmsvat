@@ -34,10 +34,7 @@
         <dependent-module archiveName="deloitte.tms.vat.inf.citic-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.vat.inf.citic/deloitte.tms.vat.inf.citic">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="deloitte.tms.vat.inf.aisino.core-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.vat.inf.aisino.core/deloitte.tms.vat.inf.aisino.core">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="deloitte.tms.vat.inf.aisino.sh-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.vat.inf.aisino.sh/deloitte.tms.vat.inf.aisino.sh">
+        <dependent-module archiveName="deloitte.tms.vat.inf.aisino-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/deloitte.tms.vat.inf.aisino/deloitte.tms.vat.inf.aisino">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="deloitte.tms.vat.web"/>

@@ -500,10 +500,15 @@ public class InvoiceReqHServiceImpl extends BaseService implements InvoiceReqHSe
 	}
 	public void updateCommit(String id,Map params){
 		//InvoiceReqH entity=this.convertInvoiceReqHInParamToEntity(inParam);
-		InvoiceReqH entity= (InvoiceReqH) this.get(InvoiceReqH.class, id);
+		InvoiceReqH entity= (InvoiceReqH) this.get(InvoiceReqH.class, id);		
 		String status=AppFormStatuEnums.SUBMITTED.getValue();
 		entity.setStatus(status);
-		/*List<InvoiceReqL>list=(List<InvoiceReqL>) entity.getInvoiceReqLs();*/
+		invoiceReqHDao.update(entity);
+		invoiceReqLDao.updateReqLStatusByReqHid(entity.getId(), AppFormStatuEnums.SUBMITTED.getValue());
+		invoiceReqHDao.updateTrxPoolStatusByReqHid(entity.getId(), CrvatTaxPoolStatuEnums.APPFORM_SUBMITTED.getValue());		
+	/*	String status=AppFormStatuEnums.SUBMITTED.getValue();
+		entity.setStatus(status);
+		List<InvoiceReqL>list=(List<InvoiceReqL>) entity.getInvoiceReqLs();
 		List<InvoiceReqL>list=this.getInvoiceReqLs(entity.getId());
 		for (InvoiceReqL invoiceReqL:list) {
 			invoiceReqL.setStatus(AppFormStatuEnums.SUBMITTED.getValue());
@@ -511,7 +516,7 @@ public class InvoiceReqHServiceImpl extends BaseService implements InvoiceReqHSe
 			pool.setStatus(CrvatTaxPoolStatuEnums.APPFORM_SUBMITTED.getValue());
 			invoiceReqLDao.update(invoiceReqL);
 			invoiceTrxPoolDao.update(pool);
-		}
+		}*/
 		
 	}
 	
@@ -629,13 +634,14 @@ public class InvoiceReqHServiceImpl extends BaseService implements InvoiceReqHSe
 			InvoiceReqH entity=(InvoiceReqH) invoiceReqHDao.get(InvoiceReqH.class, ids[i]);
 			/*List<InvoiceReqL>list=(List<InvoiceReqL>) entity.getInvoiceReqLs();*/
 			List<InvoiceReqL>list=this.getInvoiceReqLs(entity.getId());
+			invoiceReqHDao.updateTrxPoolStatusByReqHid(ids[i], CrvatTaxPoolStatuEnums.APPFORM_REVOKED.getValue());
 			invoiceReqHDao.remove(entity);
-			for (int j = 0; j < list.size(); j++) {
+			/*for (int j = 0; j < list.size(); j++) {
 				String poolId=list.get(j).getCrvatTrxPoolId();
 				InvoiceTrxPool pool=(InvoiceTrxPool) invoiceReqLService.get(InvoiceTrxPool.class, poolId);
 				pool.setStatus(CrvatTaxPoolStatuEnums.APPFORM_REVOKED.getValue());
 				invoiceTrxPoolService.update(pool);
-			}
+			}*/
 			invoiceReqLDao.removeAll(list);
 		}
 		

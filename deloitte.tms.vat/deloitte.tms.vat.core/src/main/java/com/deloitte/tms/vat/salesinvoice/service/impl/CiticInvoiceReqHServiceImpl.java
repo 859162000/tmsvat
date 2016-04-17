@@ -167,6 +167,7 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 	public void saveInvoiceReqHeadAndRel(InvoiceReqH invoiceReqH) {
 		// TODO Auto-generated method stub
 		this.save(invoiceReqH);
+		//invoiceReqHDao.updateTrxPoolStatusByReqHid(invoiceReqH.getId(), CrvatTaxPoolStatuEnums.APPFORM_USED.getValue());
 		for(InvoiceReqL invoiceReqL:invoiceReqH.getInvoiceReqLs()){
 			InvoiceTrxPool pool=(InvoiceTrxPool) this.get(InvoiceTrxPool.class, invoiceReqL.getCrvatTrxPoolId());
 			pool.setStatus(CrvatTaxPoolStatuEnums.APPFORM_USED.getValue());
@@ -329,15 +330,18 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 	private void updateCommit(String id){		
 		InvoiceReqH entity= (InvoiceReqH) this.get(InvoiceReqH.class, id);
 		String status=AppFormStatuEnums.SUBMITTED.getValue();
-		entity.setStatus(status);	
-		List<InvoiceReqL>list=invoiceReqHDao.getInvoiceReqLs(entity.getId());
+		entity.setStatus(status);
+		invoiceReqHDao.update(entity);
+		invoiceReqLDao.updateReqLStatusByReqHid(entity.getId(), AppFormStatuEnums.SUBMITTED.getValue());
+		invoiceReqHDao.updateTrxPoolStatusByReqHid(entity.getId(), CrvatTaxPoolStatuEnums.APPFORM_SUBMITTED.getValue());
+		/*List<InvoiceReqL>list=invoiceReqHDao.getInvoiceReqLs(entity.getId());
 		for (InvoiceReqL invoiceReqL:list) {
 			invoiceReqL.setStatus(AppFormStatuEnums.SUBMITTED.getValue());
 			InvoiceTrxPool pool = (InvoiceTrxPool) this.get(InvoiceTrxPool.class, invoiceReqL.getCrvatTrxPoolId());
 			pool.setStatus(CrvatTaxPoolStatuEnums.APPFORM_SUBMITTED.getValue());
 			invoiceReqLDao.update(invoiceReqL);
 			invoiceTrxPoolDao.update(pool);
-		}
+		}*/
 		
 	}
 	
@@ -453,7 +457,7 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 		invoiceReqH.setCustRegistrationNumber(map.get("custRegistrationNumber").toString());
 		String sequece = FlowHelper.getNextFlowNo("INVOICEREQ");
 		invoiceReqH.setCrvatInvoiceReqNumber(sequece);
-		invoiceReqH.setStatus(CrvatTaxPoolStatuEnums.APPFORM_USED.getValue());
+		invoiceReqH.setStatus(AppFormStatuEnums.DRAFT.getValue());
 		invoiceReqH.setIsAllMapping("0");
 		invoiceReqH.setMappingStatus("0");
 		//invoiceReqH.setOrgId(map.get("orgId").toString());
@@ -467,6 +471,8 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 			InvoiceTrxPool pool=(InvoiceTrxPool) invoiceTrxPoolService.get(InvoiceTrxPool.class, reqL.getInvoiceTrxId());
 			InvoiceReqL invoiceReqL=this.convertInvoiceTrxPoolToInvoiceReqL(pool);
 			invoiceReqL.setId(IdGenerator.getUUID());
+			invoiceReqL.setCrvatInvoiceReqHId(invoiceReqH.getId());
+			invoiceReqL.setOrgId(map.get("orgId").toString());
 			List<InvoiceReqL> invoiceReqLs = new ArrayList<InvoiceReqL>();
 			invoiceReqLs.add(invoiceReqL);
 			invoiceReqH.setInvoiceReqLs(invoiceReqLs);

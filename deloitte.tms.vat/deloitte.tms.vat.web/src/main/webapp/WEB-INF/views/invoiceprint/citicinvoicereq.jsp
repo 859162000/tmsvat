@@ -1355,62 +1355,70 @@
 	}
 	//从选择框页面里面选中数据进入申请单流水列表
 	function addNo() {
-		var flag = $('#newformflag').textbox('getValue');	
-		if(flag=='add'){
-			$("#dlgDetial").datagrid("loading");			
-			$('#reqForm').form('submit', {
-				url : 'citicInvoiceReq/addtransactionlisttotemp.do',
-				success : function(result) {
-					var result = $.parseJSON(result);				
-					if(result.success){
-						$('#dgrequestdetail').datagrid('loading');
-						var id = $('#detail_Hid').val();
-						
-						$.post('citicInvoiceReq/gettempEditInfo.do',
-								{
-									crvatInvoiceReqHId : id,									
-									pageNumber : $('#dgrequestdetail').datagrid(
-											'options').pageNumber,
-									pageSize : $('#dgrequestdetail')
-											.datagrid('options').pageSize
-								}, function(result) {
-									//var result = $.parseJSON(result);
-									$("#dgrequestdetail").datagrid('loadData', result);							
-									$('#saveHeadbtn').linkbutton('enable');
-									$('#submitHeadbtn').linkbutton('enable');															
-									$('#dgrequestdetail').datagrid('loaded');
-								}, 'json');
+		var flag = $('#newformflag').textbox('getValue');
+		var rows = $('#dlgDetial').datagrid("getRows");		
+		if(rows.length>0){
+			if(flag=='add'){
+				$("#dlgDetial").datagrid("loading");			
+				$('#reqForm').form('submit', {
+					url : 'citicInvoiceReq/addtransactionlisttotemp.do',
+					success : function(result) {
+						var result = $.parseJSON(result);				
+						if(result.success){
+							$('#dgrequestdetail').datagrid('loading');
+							var id = $('#detail_Hid').val();
+							
+							$.post('citicInvoiceReq/gettempEditInfo.do',
+									{
+										crvatInvoiceReqHId : id,									
+										pageNumber : $('#dgrequestdetail').datagrid(
+												'options').pageNumber,
+										pageSize : $('#dgrequestdetail')
+												.datagrid('options').pageSize
+									}, function(result) {
+										//var result = $.parseJSON(result);
+										$("#dgrequestdetail").datagrid('loadData', result);							
+										$('#saveHeadbtn').linkbutton('enable');
+										$('#submitHeadbtn').linkbutton('enable');															
+										$('#dgrequestdetail').datagrid('loaded');
+									}, 'json');
+						}
+						$("#dlgDetial").datagrid("loaded");
 					}
-					$("#dlgDetial").datagrid("loaded");
-				}
-			});
-		}
-		if(flag=='edit'){
-			$("#dlgDetial").datagrid("loading");
-			$('#reqForm').form('submit', {
-				url : 'citicInvoiceReq/addtransactionlisttoreh.do',
-				success : function(result) {
-					var result = $.parseJSON(result);	
-					if(result.success){
-						$('#dgrequestdetail').datagrid('loading');
-						var id = $('#detail_Hid').val();						
-						$.post('citicInvoiceReq/getEditInfo.do',
-								{
-									crvatInvoiceReqHId : id,								
-									pageNumber : $('#dgrequestdetail').datagrid(
-											'options').pageNumber,
-									pageSize : $('#dgrequestdetail')
-											.datagrid('options').pageSize
-								}, function(result) {									
-									$("#dgrequestdetail").datagrid('loadData', result);																																		
-									$('#dgrequestdetail').datagrid('loaded');
-								}, 'json');
+				});
+			}
+			if(flag=='edit'){
+				$("#dlgDetial").datagrid("loading");
+				$('#reqForm').form('submit', {
+					url : 'citicInvoiceReq/addtransactionlisttoreh.do',
+					success : function(result) {
+						var result = $.parseJSON(result);	
+						if(result.success){
+							$('#dgrequestdetail').datagrid('loading');
+							var id = $('#detail_Hid').val();						
+							$.post('citicInvoiceReq/getEditInfo.do',
+									{
+										crvatInvoiceReqHId : id,								
+										pageNumber : $('#dgrequestdetail').datagrid(
+												'options').pageNumber,
+										pageSize : $('#dgrequestdetail')
+												.datagrid('options').pageSize
+									}, function(result) {									
+										$("#dgrequestdetail").datagrid('loadData', result);																																		
+										$('#dgrequestdetail').datagrid('loaded');
+									}, 'json');
+						}
+						$("#dlgDetial").datagrid("loaded");
 					}
-					$("#dlgDetial").datagrid("loaded");
-				}
-			});
+				});
+			}
+			$("#tax_req_dlg").dialog('close');	
+		}else{
+			$("#tax_req_dlg").dialog('close');	
 		}
-		$("#tax_req_dlg").dialog('close');	
+			
+		
+		
 		
 	}	
 		

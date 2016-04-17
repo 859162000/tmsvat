@@ -140,22 +140,22 @@ public class CiticInvoiceReqHController extends BaseController{
 		JSONObject result=new JSONObject();
 		try {
 			DaoPage page=invoiceReqHService.findInvoiceTrxPoolByParams(map, PageUtils.getPageNumber(map),PageUtils.getPageSize(map));
-			List<InvoiceTrxPoolInParam>list=invoiceTrxPoolService.getAlltransaction(map);
+			//List<InvoiceTrxPoolInParam>list=invoiceTrxPoolService.getAlltransaction(map);
 			JsonConfig jsonConfig = new JsonConfig();  
 			jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
 			JSONArray jsonArray1 = JSONArray.fromObject(page.getResult(),jsonConfig);
 			result.put("total", page.getRecordCount());
 			result.put("rows", jsonArray1.toString());
-			String ids="";
+			/*String ids="";
 			if(list.size()>0){
 				for (int i = 0; i < list.size(); i++) {
 					ids+=list.get(i).getId()+";";
 				}
-			}
+			}*/
 			/*if(list.size()>0){
 				result.put("customerId",list.get(0).getCustomerId());
 			}*/
-			result.put("allIds", ids);
+			//result.put("allIds", ids);
 			result.put("pages", page.getPageCount());
 			result.put("success", true);
 		} catch (Exception e) {

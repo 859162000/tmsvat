@@ -56,15 +56,27 @@ public class EquipmentDaoImpl extends BaseDao<TmsMdEquipment> implements Equipme
 			
 		}
 		
+		
+		
+		value=params.get("getparent");
+		if(!AssertHelper.empty(value))
+		{
+			if(LittleUtils.isDB2()){
+				
+				query.append(" and parentEquipmentId ='' ");
+			}else{
+				query.append(" and parentEquipmentId is null");
+			}
+			
+			
+		}
+		
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
 		
-	/*	value=params.get("getparent");
-		if(!AssertHelper.empty(value))
-		{
-			query.append(" and parentEquipmentId is null");
-		}*/
+		logger.info("buildEquipmentQuery will run: "+query);
+
 	}
 	
 	public List<TmsMdEquipment> loadEquipmentData(Map params)

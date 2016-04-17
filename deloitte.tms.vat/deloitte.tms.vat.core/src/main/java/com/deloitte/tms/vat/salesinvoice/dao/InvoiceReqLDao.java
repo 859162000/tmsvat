@@ -17,5 +17,6 @@ public interface InvoiceReqLDao extends IDao<InvoiceReqL>{
 	public DaoPage findInvoiceReqLByParams(Map params, Integer pageIndex,Integer pageSize);
 	public List<InvoiceReqL> findInvoiceReqLByParams(Map params);
 	public InvoiceReqL findInvoiceReqLByPoolId(String poolId);
+	public void updateReqLStatusByReqHid(String reqhid,String status);
 }
 

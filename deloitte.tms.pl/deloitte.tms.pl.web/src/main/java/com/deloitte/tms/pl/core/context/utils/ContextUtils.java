@@ -169,9 +169,13 @@ public class ContextUtils implements ApplicationContextAware,InitializingBean {
 	{
 		return getCachedProperty(ContextDef.DIVISIONCODE);
 	}
+	public static String getCurrentOrgName()
+	{
+		return getCachedProperty(ContextDef.DIVISIONNAME);
+	}
 	public static String getCurrentOrgId()
 	{
-		return getCachedProperty(ContextDef.DIVISIONCODE);
+		return getCachedProperty(ContextDef.DIVISIONID);
 	}
 //	public static String getDataOwner() {
 //		return getCachedProperty(ContextDef.DIVISIONCODE);

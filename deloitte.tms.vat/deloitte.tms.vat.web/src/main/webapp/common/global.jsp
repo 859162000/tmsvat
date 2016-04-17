@@ -51,6 +51,15 @@ function build_common_combo(id,id_field_name,field1,title1,field2,title2,url){
 					var searchcondition_temp='&'+field1+'='+searchcondition;
 					comoboxGridSearch(id,url,searchcondition_temp);
 				}
+			}, '-', {
+				text : "清空",
+				iconCls : '',
+				handler : function() {
+					$('#'+id_temp_input_id).val("");
+					var searchcondition = "";
+					 var searchcondition_temp='&'+field1+'='+searchcondition;
+					comoboxGridSearch(id,url,searchcondition_temp);
+				}
 			}, '-' ],
 			columns : [ [ {
 				field:id_field_name,

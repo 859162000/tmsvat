@@ -122,7 +122,8 @@ public class PreOrgFileInfJob implements Job, JobTest {
 	 *      java.lang.String)
 	 */
 	public int executeProcessFile(String filePath, String fileType, String fileOutPath) {
-
+		Long totalsapstart = System.currentTimeMillis();
+		log.info("******************************beg processing BaseLegalEntityInf *****************************");
 		File file = new File(filePath);
 
 		if (!file.isFile() || !file.exists()) {
@@ -147,7 +148,6 @@ public class PreOrgFileInfJob implements Job, JobTest {
 		int totalsucess=0;
 		
 		List<BaseLegalEntityInf> batchBaseLegalEntityInfs=new ArrayList<BaseLegalEntityInf>();
-		Long totalsapstart = System.currentTimeMillis();
 
 		for (BaseLegalEntityInf baseLegalEntityInf : legalEntityInfs) {
 			if(pageIndex<pageSize){
@@ -174,7 +174,8 @@ public class PreOrgFileInfJob implements Job, JobTest {
 		generateDoneFileContent(postcount, legalEntityInfs.size()-totalsucess, map);
 
 		processAllFiles(map);
-
+		
+		log.info("******************************beg processing BaseLegalEntityInf *****************************");
 		return postcount;
 	}
 

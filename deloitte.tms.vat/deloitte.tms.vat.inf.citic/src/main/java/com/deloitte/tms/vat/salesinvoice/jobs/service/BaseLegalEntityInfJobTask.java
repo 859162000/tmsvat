@@ -13,7 +13,15 @@
 
 package com.deloitte.tms.vat.salesinvoice.jobs.service;
 
+import java.util.List;
 import java.util.Map;
+
+import com.deloitte.tms.base.masterdata.model.BaseOrg;
+import com.deloitte.tms.base.masterdata.model.TmsMdLegalEnablePrint;
+import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
+import com.deloitte.tms.base.masterdata.model.TmsMdOrgLegalEntity;
+import com.deloitte.tms.base.masterdata.model.TmsMdUsageLocalLegal;
+import com.deloitte.tms.vat.salesinvoice.jobs.model.BaseLegalEntityInf;
 
 
 /**  
@@ -29,13 +37,12 @@ import java.util.Map;
 public interface BaseLegalEntityInfJobTask {
 	
 	public static final String BEAN_ID="BaseLegalEntityInfJobTask";
-	
-	/**
-	 * 从BASE_LEGAL_ENTITY_INF表中分离数据到相应表中
-	 * @param tmsCrvatTrxInf
-	 * @return
-	 * @see [相关类/方法]（可选）
-	 * @since [产品/模块版本] （可选）
-	 */
-	public int executeBaseLegalEntityInfDatas(Map<String,Object> map);
+
+	public int executeBaseLegalEntityInfDatas(
+			List<BaseLegalEntityInf> batchBaseLegalEntityInfs,
+			Map<String, TmsMdLegalEntity> tmsMdLegalEntityMap,
+			Map<String, BaseOrg> baseOrgMap,
+			Map<String , TmsMdOrgLegalEntity> tmsMdOrgLegalEntityMap_LegalEntity,
+			Map<String, TmsMdLegalEnablePrint> tmsMdLegalEnablePrintMap,
+			Map<String, TmsMdUsageLocalLegal> tmsMdUsageLocalLegalMap);
 }

@@ -123,6 +123,7 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 				long loopTimes = function(totalAmount);
 				if (loopTimes == 0) {
 					String invoiceReqNumber = temps.getCrvatInvoiceReqNumber();// 申请单编号
+					tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);//约定 attribute 1 是申请单号
 					String orgId = temps.getOrgId();// 组织编号
 					TmsMdEquipment tmsMdEquipment = invoiceSpecialContractServiceImpli
 							.getTmsMdEquipment(temps.getLegalEntityId());// 查询终端信息
@@ -189,7 +190,7 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 				//	invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
 					tmsCrvatInvReqBatchesLService.save(tnvoicePrintPoolHTemp);
 					invoicePrintPoolLTemp.setId(IdGenerator.getUUID());
-
+					invoicePrintPoolLTemp.setIsTax(temps.getIsTax());//是否含税
 					invoicePrintPoolLTemp.setInvoicePrtPoolHId(uuId);// H ID
 					invoicePrintPoolLTemp.setInvoiceAmount(totalAmount);// 发票打印池行数据和头数据一对一
 					BigDecimal taxRate = new BigDecimal(temps.getTaxRate());// 税率
@@ -226,6 +227,7 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 						String invoiceReqNumber = temps.getCrvatInvoiceReqNumber();// 申请单编号
 						String orgId = temps.getOrgId();// 组织编号
 						//销售方信息
+						tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);//约定 attribute 1 是申请单号
 						TmsMdLegalEntity tmsMdLegalEntity = (TmsMdLegalEntity) invoiceSpecialContractServiceImpli.findById(TmsMdLegalEntity.class, temps.getLegalEntityId());
 						tnvoicePrintPoolHTemp.setLegalEntityCode(tmsMdLegalEntity.getLegalEntityCode());//销方纳税人编码
 						tnvoicePrintPoolHTemp.setLegalEntityName(tmsMdLegalEntity.getLegalEntityName());//销方纳税名称
@@ -288,6 +290,7 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 						tmsCrvatInvReqBatchesLService.save(tnvoicePrintPoolHTemp);
 						//invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
 						invoicePrintPoolLTemp.setId(IdGenerator.getUUID());
+						invoicePrintPoolLTemp.setIsTax(temps.getIsTax());//是否含税
 						invoicePrintPoolLTemp.setInvoicePrtPoolHId(uuId);// H ID
 						invoicePrintPoolLTemp.setInvoiceAmount(tempBigDecimal);// 发票打印池行数据和头数据一对一
 						BigDecimal taxRate = new BigDecimal(temps.getTaxRate());// 税率
@@ -328,6 +331,7 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 						BigDecimal tempBigDecimal = new BigDecimal(
 								totalAmount.doubleValue() - 9999999 * loopTimes);
 						String invoiceReqNumber = temps.getCrvatInvoiceReqNumber();// 申请单编号
+						tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);//约定 attribute 1 是申请单号
 						String orgId = temps.getOrgId();// 组织编号
 						//销售方信息
 						TmsMdLegalEntity tmsMdLegalEntity = (TmsMdLegalEntity) invoiceSpecialContractServiceImpli.findById(TmsMdLegalEntity.class, temps.getLegalEntityId());
@@ -394,6 +398,7 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 						tmsCrvatInvReqBatchesLService.save(tnvoicePrintPoolHTemp);
 					//	invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
 						invoicePrintPoolLTemp.setId(IdGenerator.getUUID());
+						invoicePrintPoolLTemp.setIsTax(temps.getIsTax());//是否含税
 						invoicePrintPoolLTemp.setPriceOfUnit(tempBigDecimal);// 单价
 						invoicePrintPoolLTemp.setInvoicePrtPoolHId(uuId);// H ID
 						invoicePrintPoolLTemp.setInvoiceAmount(tempBigDecimal);// 发票打印池行数据和头数据一对一
@@ -417,6 +422,7 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 						invoicePrintPoolLTemp.setCreatedBy(ContextUtils
 								.getCurrentUserName());
 						invoicePrintPoolLTemp.setCreateDate(new Date());
+					
 						invoicePrintPoolLTemp.setModifiedBy(ContextUtils
 								.getCurrentUserName());
 						invoicePrintPoolLTemp.setModifiedDate(new Date());

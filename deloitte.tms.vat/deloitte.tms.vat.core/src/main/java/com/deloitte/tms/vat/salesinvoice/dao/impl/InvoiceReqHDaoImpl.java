@@ -302,7 +302,7 @@ public class InvoiceReqHDaoImpl extends BaseDao<InvoiceReqH> implements InvoiceR
 	@Override
 	public void updateTrxPoolStatusByReqHid(String reqHid, String status) {
 		AssertHelper.notEmpty_assert(reqHid, "申请单号不能为空");
-		AssertHelper.notEmpty_assert(status, "状态参数不能为空");
+		//AssertHelper.notEmpty_assert(status, "状态参数不能为空");
 		StringBuffer query=new StringBuffer();
 		Map<String,Object> values=new HashMap<String,Object>();		
 		query.append("update TMS_CRVAT_TRX_POOL_ALL set status = :status  where CRVAT_TRX_POOL_ID in ");

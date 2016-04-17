@@ -276,18 +276,21 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 		
 		if(customer.getId()==null){
 			customerDao.save(customer);
+			allCustomers.add(customer);
 			if(AssertHelper.notEmpty(tmsCrvatTrxInf.getCustBankAccountNum())){
 				CustBankAccount custBankAccount = createCustBankAccount(tmsCrvatTrxInf);
 				custBankAccount.setCustomerId(customer.getId());
 				custBankAccountDao.save(custBankAccount);
+				allCustBankAccount.add(custBankAccount);
 			}
-			if(AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientName())&&
-					AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientAddr())&&
-					AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientComp())&&
+			if(AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientName())||
+					AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientAddr())||
+					AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientComp())||
 					AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientPhone())){
 				CustomerSite tmsMdCustSite = createCustomerSite(tmsCrvatTrxInf);					
 				tmsMdCustSite.setCustomerId(customer.getId());	
 				customerSiteDao.save(tmsMdCustSite);
+				allListSite.add(tmsMdCustSite);
 			}			
 		}else{
 			customerDao.update(customer);
@@ -325,7 +328,8 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 	private CustBankAccount getCustBankAccount(String customerId,
 			String custBankAccountNum, List<CustBankAccount> allCustBankAccount) {
 		for(CustBankAccount custBankAccount:allCustBankAccount){
-			if(customerId.equals(custBankAccount.getId())&&custBankAccountNum.equals(custBankAccount.getCustBankAccountNum())){
+			if(customerId.equals(custBankAccount.getId())
+					&&custBankAccountNum.equals(custBankAccount.getCustBankAccountNum())){
 				return custBankAccount;
 			}
 		}
@@ -334,7 +338,8 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 	private CustomerSite getCustomerSite(String customerId,
 			String recipientAddr, List<CustomerSite> allListSite) {
 		for(CustomerSite customerSite:allListSite){
-			if(customerId.equals(customerSite.getId())&&recipientAddr.equals(customerSite.getRecipientAddr())){
+			if(customerId.equals(customerSite.getId())
+					&&recipientAddr.equals(customerSite.getRecipientAddr())){
 				return customerSite;
 			}
 		}
@@ -401,7 +406,8 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 		}		
 		invoiceTrxPool.setCurrencyAmount(BigDecimal.valueOf(currencyAmount));
 		invoiceTrxPool.setCurrencyCode(StringUtils.trim(currencyCode));
-		invoiceTrxPool.setExchangeRate(BigDecimal.valueOf(exchangeRate));
+//		invoiceTrxPool.setExchangeRate(BigDecimal.valueOf(exchangeRate));
+		invoiceTrxPool.setExchangeRate(BigDecimal.valueOf(1.000000));
 		invoiceTrxPool.setTaxRate(Double.valueOf(taxRate));
 		invoiceTrxPool.setRateDate(rateDate);
 		invoiceTrxPool.setInvoiceCategory(StringUtils.trim(invoiceCategory));

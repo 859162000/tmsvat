@@ -294,15 +294,19 @@
 		});
 	}
 	function saveDetails(){
-		$('#newDetailForm').form('submit', {
-			url:'saveTmsMdLegalInvoice.do',			
-			 success : function(object) {
-				var object = $.parseJSON(object);
-			 	$.messager.alert('<spring:message code="system.alert"/>',object.msg);
-			 	closeDialog();
-			 	Search();
-		     } 
-		});
+		if($('#invoice_print_newSearch_legalEntityId').val().length>0){
+			$('#newDetailForm').form('submit', {
+				url:'saveTmsMdLegalInvoice.do',			
+				 success : function(object) {
+					var object = $.parseJSON(object);
+				 	$.messager.alert('<spring:message code="system.alert"/>',object.msg);
+				 	closeDialog();
+				 	Search();
+			     } 
+			});
+		}else{
+			$.messager.alert('<spring:message code="system.error"/>','纳税人信息不存在或不完整，请重新填写！');
+		}
 	}
 	function addInvoiceTax(){
 		$('#layoutid').layout('expand', 'east');
@@ -321,13 +325,18 @@
 	}
 	function getLegalInfo(){
 		var legalEntityCode=$('#invoice_print_newSearch_clientEntityNum').val();
+		$('#invoice_print_newSearch_taxpayerName').textbox('setValue','');
 		$.ajax({
 			url : "getLegalInfoList.do?legalEntityCode="+legalEntityCode,
             dataType : "json",
             cache:false,
             success : function(object) {
-            	$('#invoice_print_newSearch_legalEntityId').textbox('setValue',object.legalEntityId);
-            	$('#invoice_print_newSearch_taxpayerName').textbox('setValue',object.legalEntityName);
+            	if(object.legalEntityId){
+	            	$('#invoice_print_newSearch_legalEntityId').textbox('setValue',object.legalEntityId);
+	            	$('#invoice_print_newSearch_taxpayerName').textbox('setValue',object.legalEntityName);
+            	}else{
+            		$.messager.alert('<spring:message code="system.error"/>','纳税人信息不存在或不完整，请重新填写！');
+            	}
             }
 		});
 	}

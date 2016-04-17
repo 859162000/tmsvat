@@ -141,7 +141,7 @@ public class EquipmentServiceImpl extends BaseService implements EquipmentServic
 		return entity;
 	}
 	@Override
-	public void deleteEquipment(String id) {
+	public void deleteEquipment(String id) {/*
 		
 		if(LittleUtils.strEmpty(id)){
 			return;
@@ -150,5 +150,5 @@ public class EquipmentServiceImpl extends BaseService implements EquipmentServic
 		Hibernate.initialize(equipment.getTmsMdEquipments());
 		equipmentDao.removeAll(equipment.getTmsMdEquipments());
 		equipmentDao.remove(equipment);
-	}
+	*/}
 }

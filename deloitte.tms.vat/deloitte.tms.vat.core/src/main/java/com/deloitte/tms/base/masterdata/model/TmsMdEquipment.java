@@ -1,8 +1,11 @@
 package com.deloitte.tms.base.masterdata.model;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,7 +30,7 @@ import com.deloitte.tms.pl.core.commons.annotation.ModelProperty;
 import com.deloitte.tms.pl.core.commons.constant.TablePreDef;
 import com.deloitte.tms.pl.core.hibernate.identifier.Ling2UUIDGenerator;
 import com.deloitte.tms.pl.core.model.impl.BaseEntity;
-import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxL;
+import com.deloitte.tms.pl.security.utils.LittleUtils;
 
 @Entity
 @Table(name=TmsMdEquipment.TABLE)
@@ -78,18 +81,18 @@ public class TmsMdEquipment extends BaseEntity implements Serializable {
 	@Cascade(CascadeType.REFRESH)
 	TmsMdEquipment parent;
 	
-	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+/*	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
 	@Cascade(CascadeType.REFRESH)
 	@Where(clause="DELETED_FLAG=1")
-	private List<TmsMdEquipment> tmsMdEquipments;
-	
+	private List<TmsMdEquipment> tmsMdEquipments;*/
+/*	
 	public List<TmsMdEquipment> getTmsMdEquipments() {
 		return tmsMdEquipments;
 	}
 
 	public void setTmsMdEquipments(List<TmsMdEquipment> tmsMdEquipments) {
 		this.tmsMdEquipments = tmsMdEquipments;
-	}
+	}*/
 
 	public String getEquipmentSeqNo() {
 		return equipmentSeqNo;
@@ -203,6 +206,48 @@ public class TmsMdEquipment extends BaseEntity implements Serializable {
 
 	public void setParentEquipmentId(String parentEquipmentId) {
 		this.parentEquipmentId = parentEquipmentId;
+	}
+	
+	public TmsMdEquipment(Map<String, Object> map){
+		
+		try{
+			System.out.println("TmsMdEquipment contructor...");
+		
+		Set<String> keys = map.keySet();
+		for(String key : keys){
+			Object value = map.get(key);
+			
+			if(value instanceof String){
+				
+				String tempV=(String)value;
+				if(LittleUtils.strEmpty(tempV)){
+					tempV="";
+				}
+				StringBuffer sb = new StringBuffer();
+				key.substring(0,1);
+				sb.append("set").append(key.substring(0,1).toUpperCase()).append(key.substring(1));
+				
+				try{
+				Method m = this.getClass().getMethod(sb.toString(), String.class);
+				
+				if(m==null){
+					
+				}else{
+					m.invoke(this, tempV.trim());
+				}
+				
+				
+				}catch(Exception x){
+					x.printStackTrace();
+				}
+				
+			}
+		}
+		
+		System.out.println("to do ");
+		}catch(Exception e){
+			e.printStackTrace();		
+		}
 	}
 
 /*	public TmsMdLegalEquipment getTmsMdLegalEquipment() {

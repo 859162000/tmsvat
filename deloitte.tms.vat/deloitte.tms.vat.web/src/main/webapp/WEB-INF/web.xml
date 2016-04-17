@@ -123,7 +123,6 @@
         <filter-name>CorsFilter</filter-name>
         <url-pattern>*.ljson</url-pattern>
     </filter-mapping>
-    
 	
 	
 	<!-- spring监听器 -->
