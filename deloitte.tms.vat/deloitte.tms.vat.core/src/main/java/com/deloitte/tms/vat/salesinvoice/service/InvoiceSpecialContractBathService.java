@@ -8,7 +8,6 @@ import com.deloitte.tms.base.masterdata.model.TmsMdEquipment;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.service.IService;
-import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatInf;
 
 public interface InvoiceSpecialContractBathService extends IService{
 
@@ -27,9 +26,6 @@ public interface InvoiceSpecialContractBathService extends IService{
 			int pageNumber, int pageSize);
 
 	int removeInvoiceReqHs(String ids);
-
-	List<TmsCrvatInvReqBatInf> analyzeTmsCrvatInvReqBatchesParam();
-
 	int submitFromPage(String ids);
 
 	

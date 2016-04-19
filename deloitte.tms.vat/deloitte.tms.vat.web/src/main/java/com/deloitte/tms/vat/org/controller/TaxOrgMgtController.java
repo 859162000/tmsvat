@@ -305,7 +305,7 @@ public class TaxOrgMgtController extends BaseController {
 				x.printStackTrace();
 			}
 			//to-do could not locate named parameter [custRegistrationNumber]
-			DaoPage daoPage = legalEntityService.loadPageTaxOrg(TmsMdLegalEntity.class,
+			DaoPage daoPage = legalEntityService.loadPageTaxDepts(TmsMdLegalEntity.class,parameter,
 					 pageNumber,pageSize);
 
 			if(daoPage!=null){

@@ -159,14 +159,14 @@
 			    				<td align='right'>发票号码:</td>
 			    				<td><input name="invoiceNumber" readonly/></td>
 			    				<td align='right'>税额:</td>
-			    				<td><input name="" readonly/></td>
+			    				<td><input name="vatAmount" readonly/></td>
 				    		</tr>
 				    		<tr>
 				    			<td align='right'>开具日期:</td>
 				    			<td><input name="invoicePrintDate"  readonly/></td>
 			    				<td align='right'>开具人:</td>
 			    				<td><input name="invoicePrintBy" readonly/></td>
-			    				<td align='right'>合计金额(含税):</td>
+			    				<td align='right'>合计金额:</td>
 			    				<td><input name="invoiceAmount" readonly/></td>
 			    				<td align='right'>不含税金额:</td>
 			    				<td><input name="acctdAmountCR" readonly/></td>
@@ -297,7 +297,7 @@
      					/* {field:'bankAccountNum',title:"净额",width:80,align:'center'},
      					{field:'bankAccountNum',title:"税额",width:80,align:'center'},
      					{field:'bankAccountNum',title:"合计",width:80,align:'center'}, */
-     					{field:'taxRate',title:"税率",width:90,halign:'center',align:'right'},
+     					{field:'taxRate',title:"税率(%)",width:90,halign:'center',align:'right'},
      					{field:'vatAmount',title:"税额",width:90,halign:'center',align:'right'},
      			]],
 			onLoadSuccess:function(){  
@@ -332,8 +332,8 @@
    					/* {field:'bankAccountNum',title:"净额",width:80,align:'center'},
    					{field:'bankAccountNum',title:"税额",width:80,align:'center'},
    					{field:'bankAccountNum',title:"合计",width:80,align:'center'}, */
-   					{field:'taxRate',title:"税率",width:80,halign:'center',align:'right'},
-   					{field:'vatAmount',title:"税额",width:80,halign:'center',align:'right'},
+   					{field:'taxRate',title:"税率",width:80,halign:'center',align:'right'}
+   					/* {field:'vatAmount',title:"税额",width:80,halign:'center',align:'right'}, */
    			]],
  			onDblClickRow:function(index,data){
  				printPoolHQueryInit_poolD_view(index,data);
@@ -364,7 +364,7 @@
    					{field:'equipmentCode',title:"打印终端编号",width:100,align:'center'},
    					{field:'equipmentName',title:"打印终端名称",width:100,align:'center'},
    					{field:'invoiceCategoryName',title:"发票类型",width:100,align:'center'},
-   					{field:'acctdAmountCR',title:"金额",width:100,halign:'center',align:'right'},
+   					{field:'invoiceAmount',title:"金额",width:100,halign:'center',align:'right'},
    					{field:'vatAmount',title:"税额",width:100,halign:'center',align:'right'},
    					{field:'invoiceAmount',title:"合计金额",width:100,halign:'center',align:'right'},
    					{field:'customerName',title:"购方单位名称",width:100,align:'center'},
@@ -461,11 +461,12 @@
 			},
 			success:function(result){
 				var result = $.parseJSON(result);
-				if(result.status=='0'){
+				$("#printPoolHQueryInit_dataGrid").datagrid('loadData', result);
+				/* if(result.status=='0'){
 				     $("#printPoolHQueryInit_dataGrid").datagrid('loadData', result.data);
 				}else if(result.status=='1'){
 					//$.messager.alert('<spring:message code="system.alert"/>',result.erroMessage,'info');
-				}
+				} */
 				$("#printPoolHQueryInit_dataGrid").datagrid("loaded"); 
 		     }
 		});

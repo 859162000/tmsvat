@@ -50,6 +50,19 @@ public class TmsMdContract extends BaseEntity {
 	
 	@Column(name="CONTRACT_NAME")
 	private String contractName;
+	
+	@Column(name="ACTUAL_TOTAL_RECEIPTS_AMT")
+	private BigDecimal actualTotalProjectAmt;
+	
+	@Column(name="VIRTUAL_TOTAL_RECEIPTS_AMT")
+	private BigDecimal virtualTotalReceiptsAmt;
+	
+	@Column(name="ACTUAL_TOTAL_INVOICE_AMT")
+	private BigDecimal actualTotalInvoiceAmt;
+	
+	@Column(name="VIRTUAL_TOTAL_INVOICE_AMT")
+	private BigDecimal virtualTotalInvoiceAmt;
+	
 
 	public String getContractName() {
 		return contractName;
@@ -150,17 +163,37 @@ public class TmsMdContract extends BaseEntity {
 		this.startDate = startDate;
 	}
 
-	@Override
-	public String toString() {
-		return "TmsMdContract [Id=" + Id + ", contractAmount=" + contractAmount
-				+ ", contractCategory=" + contractCategory
-				+ ", contractNumber=" + contractNumber + ", contractName="
-				+ contractName + ", description=" + description
-				+ ", enabledFlag=" + enabledFlag + ", endDate=" + endDate
-				+ ", refCustomerId=" + refCustomerId + ", startDate="
-				+ startDate + "]";
+	public BigDecimal getActualTotalProjectAmt() {
+		return actualTotalProjectAmt;
+	}
+
+	public void setActualTotalProjectAmt(BigDecimal actualTotalProjectAmt) {
+		this.actualTotalProjectAmt = actualTotalProjectAmt;
+	}
+
+	public BigDecimal getVirtualTotalReceiptsAmt() {
+		return virtualTotalReceiptsAmt;
+	}
+
+	public void setVirtualTotalReceiptsAmt(BigDecimal virtualTotalReceiptsAmt) {
+		this.virtualTotalReceiptsAmt = virtualTotalReceiptsAmt;
+	}
+
+	public BigDecimal getActualTotalInvoiceAmt() {
+		return actualTotalInvoiceAmt;
+	}
+
+	public void setActualTotalInvoiceAmt(BigDecimal actualTotalInvoiceAmt) {
+		this.actualTotalInvoiceAmt = actualTotalInvoiceAmt;
+	}
+
+	public BigDecimal getVirtualTotalInvoiceAmt() {
+		return virtualTotalInvoiceAmt;
+	}
+
+	public void setVirtualTotalInvoiceAmt(BigDecimal virtualTotalInvoiceAmt) {
+		this.virtualTotalInvoiceAmt = virtualTotalInvoiceAmt;
 	}
 	
 	
-
 }

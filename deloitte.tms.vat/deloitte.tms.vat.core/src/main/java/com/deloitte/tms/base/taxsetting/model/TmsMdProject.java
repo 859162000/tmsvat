@@ -76,6 +76,29 @@ public class TmsMdProject extends BaseEntity {
 	@Temporal(TemporalType.DATE)
 	@Column(name="START_DATE")
 	private Date startDate;
+	
+	/**
+	 * 实际累计收款金额
+	 */
+	@Column(name="ACTUAL_TOTAL_RECEIPTS_AMT")
+	private BigDecimal actualTotalProjectAmt;
+	
+	/**
+	 * 已用累计收款金额
+	 */
+	@Column(name="VIRTUAL_TOTAL_RECEIPTS_AMT")
+	private BigDecimal virtualTotalReceiptsAmt;
+	/**
+	 * 实际累计开票金额
+	 */
+	@Column(name="ACTUAL_TOTAL_INVOICE_AMT")
+	private BigDecimal actualTotalInvoiceAmt;
+	
+	/**
+	 * 已用累计开票金额
+	 */
+	@Column(name="VIRTUAL_TOTAL_INVOICE_AMT")
+	private BigDecimal virtualTotalInvoiceAmt;
 
 	//private TmsMdContract tmsMdContract;
 
@@ -162,12 +185,40 @@ public class TmsMdProject extends BaseEntity {
 		this.startDate = startDate;
 	}
 
-//	public TmsMdContract getTmsMdContract() {
-//		return this.tmsMdContract;
-//	}
-//
-//	public void setTmsMdContract(TmsMdContract tmsMdContract) {
-//		this.tmsMdContract = tmsMdContract;
-//	}
+	public BigDecimal getActualTotalProjectAmt() {
+		return actualTotalProjectAmt;
+	}
+
+	public void setActualTotalProjectAmt(BigDecimal actualTotalProjectAmt) {
+		this.actualTotalProjectAmt = actualTotalProjectAmt;
+	}
+
+	public BigDecimal getVirtualTotalReceiptsAmt() {
+		return virtualTotalReceiptsAmt;
+	}
+
+	public void setVirtualTotalReceiptsAmt(BigDecimal virtualTotalReceiptsAmt) {
+		this.virtualTotalReceiptsAmt = virtualTotalReceiptsAmt;
+	}
+
+	public BigDecimal getActualTotalInvoiceAmt() {
+		return actualTotalInvoiceAmt;
+	}
+
+	public void setActualTotalInvoiceAmt(BigDecimal actualTotalInvoiceAmt) {
+		this.actualTotalInvoiceAmt = actualTotalInvoiceAmt;
+	}
+
+	public BigDecimal getVirtualTotalInvoiceAmt() {
+		return virtualTotalInvoiceAmt;
+	}
+
+	public void setVirtualTotalInvoiceAmt(BigDecimal virtualTotalInvoiceAmt) {
+		this.virtualTotalInvoiceAmt = virtualTotalInvoiceAmt;
+	}
+
+	
+	
+	
 
 }

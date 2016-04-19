@@ -203,6 +203,7 @@ public class UrlMetadataSource implements FilterInvocationSecurityMetadataSource
 		for(DefaultUser user:roleUsers){
 			SecurityConfigAttribute attribute=new SecurityConfigAttribute(AttributeType.user,true,role.getCompanyId());
 			attribute.setMember(user);
+			list.add(attribute);	
 		}
 //		for(RoleMember member:role.getRoleMembers()){
 //			SecurityConfigAttribute attribute=null;

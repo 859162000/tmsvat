@@ -17,30 +17,23 @@
 	
 	<%-- <%@ include file="/common/global.jsp" %> --%>
 </head>
-
-
- 
-
 <body class="easyui-layout" style="overflow-y: hidden"  scroll="no">    
     <div region="north" split="true" border="false" style="overflow: hidden; height:20%;">  
         <div class="easyui-panel" title="<spring:message code="searchgroup"/>" style="width:100%;height:100%; background-color: #E0ECFF">		
 		    <form id="searchform" method="post" >
 		    	<table cellpadding="5">
 		    		<tr>
-		    		
 		    			<td>纳税人名称:</td>
-				    	<td><input class="easyui-textbox" type="text" style="width:150px;" name="legalEntityName"></input></td>
-		    		
+				    	<td><input class="easyui-textbox" type="text" style="width:150px;" name="legalEntityName" id="legalEntityName_id"></input></td>
 		    			<td>纳税人识别号:</td>
-				    	<td><input class="easyui-textbox" type="text" style="width:150px;" name="registrationNumber" ></input></td>
-				    	    				    				    		
+				    	<td><input class="easyui-textbox" type="text" style="width:150px;" name="registrationNumber" id="registrationNumber_id"></input></td>
 			    		<td>
 			    		  <div style="text-align:center;padding:10px">
 			    	          <a href="#" id="searchbtn"  class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px" onclick="Search()"><spring:message code="button.Search"/></a>
 			    	          <a href="#" class="easyui-linkbutton" style="width:80px" onclick="clearSearchForm()"><spring:message code="button.Clear"/></a>			                      
 			              </div>    			   
 			    		</td>
-		    		</tr>		    		
+		    		</tr>
 		    		<tr style="display: none">
 		    		   <td><input id="pageNumber" class="easyui-textbox" type="text" style="width:0px;" name="pageNumber" value=""></input></td>
 		    		   <td><input id="pageSize" class="easyui-textbox" type="text" style="width:0px;" name="pageSize" value=""></input></td>
@@ -48,7 +41,6 @@
 		    	</table>
 		    </form>
 	    </div>
-	        	         
     </div>
     <div data-options="region:'center',border:false" style="background-color: #E0ECFF">  
 	    <div style="width:100%;height:100%">
@@ -82,42 +74,32 @@
 
 			<div style="margin:20px 0;"></div>			
 				    <form id="saveform" method="post"  commandName="tmsMdLegalEntity" >
-				  
 				    	<table cellpadding="10">
 				    		<tr>			   		
 				    			<td>纳税人名称:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" id="legalEntityName" name="legalEntityName" data-options="required:true"></input></td>
 				    			<td>纳税人识别号:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="registrationNumber"　data-options="required:true"></input></td>
+				    			<td>营业执照号码:</td>
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="licenseNo"></input></td>
+				    			<!-- 
 				    			<td>从业人数:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="numberOfEmployees" data-options="validType:'number'"></input></td>
-				    		
-				    		
+				    		 -->
 				    		</tr>
-				    		
 				    		<tr>			   		
 				    			<td>纳税主体代码:</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;"  name="legalEntityCode" ></input></td>
-				    			
-				    			
-				    			 
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;"  name="legalEntityCode"  data-options="required:true"></input></td>
 				    			<td>纳税主体类型:</td>
 				    			<td>
 				    			<select name="legalEntityType"　>
 				    			<option value="1">一般增值税纳税人</option>
 				    			<option value="2">小规模增值税纳税人</option>
 				    			<option value="3">非增值税纳税人</option>
-				    			
-				    			</select>
-				    			
-				    		<!-- 	<input class="easyui-textbox" type="text" style="width:150px;" name="legalEntityType"　></input>
-				    			 -->
+				    			</select>		    			
 				    			</td>
-				    			
-				    			
 				    			<td>组织代码:</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="orgCode2" ></input></td>				    		
-				    		
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="orgCode" ></input></td>				    		
 				    		</tr>
 				    		
 				    <!-- 		<tr>			   		
@@ -154,85 +136,115 @@
 				    		<!-- 	<td>年度缴纳税额:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="annualPaymentAmount"></input></td>
 				    			 -->
+				    			 <!-- 
 				    			 <td>纳税人名称(寄件人姓名):</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="taxPayerName"　 data-options="required:true"></input></td>
-				    			
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="taxpayerName"　 data-options="required:true"></input></td>
+				    			 -->
 				    			 
 				    			<td>注册地址:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="registrationContactAddress" data-options="required:true"></input></td>
 				    			<td>邮政编码:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="zipCode"></input></td>
+				    			
+				    			<td>备注:</td>
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;"  name="description" ></input></td>
+				    			
 				    		</tr>
 				    		
 				    		<tr>			   		
-				    			<td>注册地址联系电话:</td>
+				    			<td>注册联系电话:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="registrationContactPhone"  data-options="required:true"></input></td>
 				    			<td>生产经营地址:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="contactAddress" ></input></td>
-				    	<!-- 		
-				    			<td>开业设定日期:</td>
+				    			
+				    	<!--todo: 改成个可选控件 		<td>开业设定日期:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="dateOfEstablish"></input></td>
 				    			 -->
-				    			<td>描述:</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;"  name="description" ></input></td>
-				    			
-				    			
-				    		</tr>
-				    		
-				    		<tr>			   		
 				    			<td>工商机关名称:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="adminIndustryCommerce"  ></input></td>
-				    			<td>证照名称:</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="licenseName" ></input></td>
-				    			<td>证照号码:</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="licenseNo"></input></td>
+				    			
+				    			
 				    		</tr>
 				    		
+				    					    		
 				    		<tr>			   		
+				    			
+				    			<!-- 
 				    			<td>国标行业(主行业):</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="gbTradePrimaryIndustry"  ></input></td>
 				    			<td>国标行业(附属行业):</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="gbTradeAffiliatedIndustry" ></input></td>
+				    			 -->
+				    			
+				    	<!-- 		
 				    			<td>营业税国地征收隶属关系:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="businessTaxRelation"></input></td>
+				    	 -->
+				    	
 				    		</tr>
 				    		
 				    		<tr>			   		
-				    			<td>企业所得税征收隶属关系:</td>
+				    			<td>企业所得税征收隶属关系:</td> <!-- todo 下拉菜单 -->
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="incomeTaxRelation"  ></input></td>
+				    			
+				    			<!-- 
 				    			<td>注册资本投资总额:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="registCapitalInvestmen" ></input></td>
+				    			
+				    			 -->
+				    			
 				    			<td>开户银行:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="bankBranchName"  data-options="required:true"></input></td>
-				    		</tr>
-				    		
-				    		<tr>			   		
 				    			<td>开户银行账号:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="bankAccountNum"  data-options="required:true"></input></td>
-				    			<td>是否为增值税(一般纳税人):</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="isVat" ></input></td>
-				    			<td>是否独立申报缴税:</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="isIndependtTax"></input></td>
+				    			
+				    		
+				    		
 				    		</tr>
 				    		
-				    		<tr>			   		
+				    					   		
+				    			
+				    		<!-- 	
+				    		
+				    		<tr>
+				    			<td>是否为增值税(一般纳税人):</td>
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="isVat" ></input></td>
+				    			
+				    			
+				    			<td>是否独立申报缴税:</td>
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="isIndependtTax"></input></td>
+				    			
+				    				</tr>
+				    		 -->
+				    	
+				    		
+				   <!--  		<tr>			   		
+				    			
 				    			<td>登记注册类型:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="registTypeId"  ></input></td>
+				    			
+				    			
 				    			<td>单位性质:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="companyTypeId" ></input></td>
 				    			<td>机构类型:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="agencyTypeId"></input></td>
-				    		</tr>
+				    		</tr> -->
 				    		
-				    		<tr>			   		
-				    			<td>经营范围:</td>
-				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="businessScopeId"  ></input></td>
+				    					   		
+				    			
+				    		<!-- 	
+				    		
+				    		<tr>
 				    			<td>使用会计制度:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="accountModeId" ></input></td>
 				    			<td>资产关联关系:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="assetsRelationId"></input></td>
-				    		</tr>
+				    		 </tr>
+				    		 
+				    		 -->
 				    		
+				    		
+				    		<!-- 
 				    		<tr>			   		
 				    			<td>核算方式:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="payMethodId"  ></input></td>
@@ -240,16 +252,19 @@
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="enterpriseChangeId" ></input></td>
 				    			<td>集团纳税人识别号:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="groupCustRegistNum"></input></td>
-				    		</tr>
 				    		
+				    		
+				    		</tr>
+				    		 -->
 				    		<tr>			   		
-				    			<td>国税主管税务机关:</td>
+				    			<td>国税主管机关:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="stateAcgency"  ></input></td>
-				    			<td>地税主管税务机关:</td>
+				    			<td>地税主管机关:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="loalAcgency" ></input></td>
 				    			
-				    			<td></td>
-				    			<td></td>
+				    			<td>经营范围:</td><!-- todo复选框 -->
+				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="businessScopeId"  ></input></td>
+				    			
 				    			
 				    			<!-- <td>是否启用:</td>
 				    			<td><input class="easyui-textbox" type="text" style="width:150px;" name="enabledFlag"></input></td>
@@ -266,24 +281,18 @@
 				    			<td><</td>
 				    		</tr>
 				    		 -->
-
-				
 				    		<tr style="display: none">
-				    									
 							<td><input id="id" class="easyui-textbox" name="id"
 								style="width: 200px"></input></td>
 							</tr>	 					    		
-				    			    				    			 	    	
 		    	       </table>
 				    </form>			   			
 		</div>	
-	         
     </div>
-
-    
-   
 </body>
 <script type="text/javascript">
+	var registrationNumber_id='';
+	var legalEntityName_id='';
 	$.extend($.messager.defaults,{
 	    ok:'<spring:message code="confirm"/>',
 	    cancel:'<spring:message code="cancel"/>'
@@ -300,8 +309,15 @@
 			columns:[[
 				{field:'legalEntityName',title:'纳税人名称',width:100,align:'center'},
 				{field:'registrationNumber',title:'纳税人识别号',width:80,align:'center'},
+				/* 
 				{field:'numberOfEmployees',title:'从业人数',width:80,align:'center'},
-				{field:'annualPaymentAmount',title:'年度缴纳税额',width:100,align:'center'},
+				 */
+				
+				 /* 
+				 {field:'annualPaymentAmount',title:'年度缴纳税额',width:100,align:'center'},
+				
+				 */
+				
 				{field:'registrationContactAddress',title:'注册地址',width:100,align:'center'},
 				{field:'registrationContactPhone',title:'注册地址联系电话',width:80,align:'center'},
 				
@@ -342,21 +358,19 @@
 			//afterPageText: '页',
 			afterPageText : '<spring:message code="pagination.afterPageText"/>',
 			displayMsg : '<spring:message code="pagination.displayMsg"/>',
-			
-			onSelectPage: function (pageNumber, pageSize) {//分页触发		
-		    	// alert('分页触发');
-				find(pageNumber,pageSize);
-				
-				clearSaveForm(); //??????????????needed???
-				 Search(); 
-				 
+			onSelectPage: function (pageNumber, pageSize) {//分页触发
+				//翻页时如果查询条件有变动，重新search
+				if((registrationNumber_id != $('#registrationNumber_id').val()) || (legalEntityName_id!=$('#legalEntityName_id').val())){
+					Search();
+				}else{
+					//否则执行分页处理
+					find(pageNumber,pageSize);
+					clearSaveForm(); //??????????????needed???
+					Search();
+				}
 	         }
-	
 		});
-		
-		
 	});
-	
 
 	$(document).ready(function() {
 		//InitCombobox();	
@@ -365,35 +379,8 @@
 			pageSize : $('#dg').datagrid('options').pageSize
 		});
 		
-			
-		//initSearch();
 		Search();
 	});
-	
-	  function initSearch(){
-	    	
-	    
-	    	
-	    	$('#searchform').form('submit', {
-				url:'taxOrgMgt/initSearchTaxOrg.do',	
-				dataType : "json",
-				onSubmit : function() {
-					return $(this).form('enableValidation').form('validate');
-				},
-				success : function(result) {
-				if(typeof(result)=='undefined'){
-					
-					alert('result fail');
-				}else{
-				   var result = $.parseJSON(result);
-			       $("#dg").datagrid('loadData', result);		       
-			       $("#dg").datagrid("loaded"); 
-					}
-			     }
-			});
-
-	    }
-
     
 	/* function InitCombobox(){
 		$('#status').combobox({
@@ -415,11 +402,10 @@
 		});
 	
 	}
+	
     function Search(){ 
-    	
-    	//loading效果
-    	//$("#dg").datagrid("loading");  
-    	
+    	registrationNumber_id = $('#registrationNumber_id').val();
+    	legalEntityName_id = $('#legalEntityName_id').val();
     	$('#searchform').form('submit', {
 			url:'taxOrgMgt/searchTaxOrg.do',			
 			onSubmit : function() {

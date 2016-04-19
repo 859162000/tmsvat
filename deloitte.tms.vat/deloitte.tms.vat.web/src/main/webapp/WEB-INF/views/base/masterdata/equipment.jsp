@@ -11,7 +11,6 @@
 <script type="text/javascript">
 
 function InitTreeData() {
-	alert("InitTreeData calling");
 	allIDs="";
 	noTreeData=true;
 	$('#equipmentTree').tree({
@@ -43,12 +42,9 @@ function InitTreeData() {
 			
 		}
 	});
-	
-	
 }
 
 function initDataGridMain(){
-	
 	$('#dg').datagrid({
 		url: '',			
 		fitColumns: true,
@@ -83,7 +79,7 @@ function initDataGridMain(){
              text:'编辑',  
              iconCls:'icon-edit',  
              handler:function(){  
-            	 edit();  
+            	 edit();
              }  
          },'-',{  
              text:'删除',  
@@ -111,14 +107,11 @@ function initDataGridMain(){
 	});
 }
 
-
 function find(pageNumber,pageSize){
-	
 	$('#searchform').form('load', {
 		pageNumber : pageNumber,
 		pageSize : pageSize
 	});
-	
 }
 
 function searchEquipment(){
@@ -128,10 +121,9 @@ function searchEquipment(){
 		success : function(result) {
 			var result = $.parseJSON(result);
         	if(result!=null){
-			     $("#dg").datagrid('loadData', result);
+			    $("#dg").datagrid('loadData', result);
 				$("#dg").datagrid("loaded"); 	
         	}else{
-        		
         		$("#dg").datagrid("loaded"); 
         	}
 	     }	
@@ -139,53 +131,82 @@ function searchEquipment(){
 	});
 }
 
-
+function remove(){
+	var row_list=$('#dg').datagrid('getChecked');
+	if(row_list!=''&&row_list!='undefined'){
+		if(row_list.length<1){  
+            $.messager.alert('提示',"请选择你要删除的记录",'info');  
+            return false;  
+        } 
+		$.messager.confirm("<spring:message code='client.datacommit.delete.confirm.title'/>","<spring:message code='client.datacommit.delete.confirm.text'/>",function(result){ 
+			if (result){
+				var urlString="${vat}/equipmentN/deleteEquipment.do?";
+				$.each(row_list,function(index,item){ 
+	                   if(index==0)   
+	                	   urlString += "id="+item.id;  
+	                   else  
+	                       urlString += "&id="+item.id;  
+	                });
+	        	if(urlString!=''){
+	        		$.ajax({  
+	        	        url: urlString,  
+	        	        type: "POST",  
+	        	        async: true,  
+	        	        data: urlString, //不能直接写成 {id:"123",code:"tomcat"}  
+	        	        dataType: "json",
+	        	        cache: false,  
+	        	        success: function(result){
+	        	        	if(result.success){
+	        	        		$.messager.alert('<spring:message code="system.alert"/>','<spring:message code="system.delete.success.text"/>');
+								clearEquipmentForm();
+								$("#equipmentTree").tree('reload');
+								find($('#dg').datagrid('options').pageNumber, $('#dg').datagrid('options').pageSize);
+								searchEquipment();
+	        	        	}else{
+	        	        		$.messager.alert('<spring:message code="system.alert"/>',result.msg);
+	        	        	}
+	        	        } 
+	        	    });
+	        	}
+			}
+        });
+    }else{
+    	$.messager.alert('提示',"请选择你要删除的记录",'info'); 
+    }
+}
 
 $(document).ready(function() {
-	
-
 	callRefresh();
 	initDataGridMain();
-	
 });
 
 function callRefresh(){
-		
 	InitTreeData();
-	
-	/*
-	fwqInit();
-	fwqParentInit();
-	*/
 }
 
 function popInit(){
-	
 	fwqInit();
 	fwqParentInit();	
 }
 
-
 function fwqInit(){
-	
 	$('#equipmentType').combobox({
 		 onSelect:function(record){
             var eType = $('#equipmentType').combobox('getValue');
-			 if(eType == 2){
+			 if(eType == '1'||eType=='Printing_Terminal'){
 				 $('#equipment_dialog').height("262px");
 				 loadServerData(1,10);
-    			 $('#mainserver').show();		 
+    			 $('#mainserver').show();
 			 }else{
 				 $('#equipment_dialog').height("236px");
     			 $('#parentEquipmentName').combogrid({ required: false });
-    			$('#mainserver').hide();
+    			 $('#mainserver').hide();
 			 }
     	}
 	});
 }
 
 function fwqParentInit(){
-	
 	$('#parentEquipmentName').combogrid({
 		panelWidth : 300,
 		idField : 'id',  
@@ -295,9 +316,6 @@ function fwqParentInit(){
 	}
 }
 
-
-
-
 function loadServerData(pageNumber,pageSize){
 	var senddata = 'getparent=1&pageNumber='+pageNumber+'&pageSize='+pageSize;
     $.ajax({
@@ -324,35 +342,67 @@ function collapseAll() {
 	$('#equipmentTree').tree('collapseAll');
 }
 
+function edit(){
+	var row_list=$('#dg').datagrid('getChecked');
+	if(row_list!=''&&row_list!='undefined'){
+		if(row_list.length<1){  
+            $.messager.alert('提示',"请选择要编辑的记录",'info');  
+            return;  
+        } 
+		var urlString="${vat}/equipmentN/getEquipmentById.do?";
+		$.each(row_list,function(index,item){ 
+            if(index==0)   
+         	   urlString += "id="+item.id;  
+        });
+		
+		clearEquipmentForm();
+		popInit();
+		$("#equipment_dialog").dialog('open').dialog('setTitle','编辑');
+		
+       	if(urlString!=''){
+       		$.ajax({  
+       	        url: urlString,  
+       	        type: "POST",  
+       	        async: true,  
+       	        data: urlString, //不能直接写成 {id:"123",code:"tomcat"}  
+       	        dataType: "json",
+       	        cache: false,  
+       	        success: function(result){
+       	        	$("#equipmentCode").textbox('setValue',result.equipmentCode);
+       	        	$("#equipmentName").textbox('setValue',result.equipmentName);
+       	        	$("#equipmentIp").textbox('setValue',result.equipmentIp);
+       	        	$("#equipmentPort").textbox('setValue',result.equipmentPort);
+       	        	$("#equipmentManager").textbox('setValue',result.equipmentManager);
+       	        	$("#equipmentSeqNo").textbox('setValue',result.equipmentSeqNo);
+       	        	$("#equipmentType").combobox('setValue',result.equipmentType);
+       	        	$("#enabledFlag").val(result.enabledFlag);
+       	        	$("#parentEquipmentName").textbox('setValue',result.parentEquipmentName);
+       	        	$("#parentEquipmentId").val(result.parentEquipmentId);
+       	        	$("#id").val(result.id);
+       	        	$("#equipmentEnterDate").textbox('setValue',result.equipmentEnterDate);
+       	        } 
+       	    });
+		}
+    }else{
+    	$.messager.alert('提示',"请选择要编辑的记录",'info'); 
+    }
+}
 
 function add(){
 	clearEquipmentForm();
 	popInit();
 	$("#equipment_dialog").dialog('open').dialog('setTitle','新增');
 	$("#equipment_dialog_Form").form('load', {equipmentEnterDate:myformatter(new Date())});
-	
 }
 
 function clearEquipmentForm(){
 	$('#equipment_dialog_Form').form('clear');
 }
 
-
-
-
 function save2(){
-	//alert('save2 ...');
-//		if($('#equipmentType').val().toLowerCase().indexOf("print") != -1){
-//			$('#parentEquipmentName').combogrid({ required: false });
-//		}else{
-//			$('#parentEquipmentName').combogrid({ required: true });
-//		}
-	
 	var equipment_dialog_Form=$('#equipment_dialog_Form');
-	//if(equipment_dialog_Form.form('enableValidation').form('validate')){
 		$.messager.confirm("<spring:message code='client.datacommit.formsave.confirm.title'/>","<spring:message code='client.datacommit.formsave.confirm.text'/>",function(result){
 			if (result){
-				//alert('save3 ...');
 				var date = $('#equipmentEnterDate').val();
 				$('#equipment_dialog_Form').form('submit',{
 					url:'equipmentN/saveEquipment.do',	
@@ -367,29 +417,19 @@ function save2(){
 						
 						if(result.success){
 							$('#equipment_dialog').dialog('close');
+							$.messager.alert('<spring:message code="system.alert"/>','保存成功');
 							clearEquipmentForm();
 							$("#equipmentTree").tree('reload');
-							
 							find($('#dg').datagrid('options').pageNumber, $('#dg').datagrid('options').pageSize);
-							
 							searchEquipment();
-							
-							$.messager.alert('<spring:message code="system.alert"/>','保存成功');
 						}else{
 							$.messager.alert('<spring:message code="system.alert"/>','保存失败');
 						}						
-						
 					} 
 				});
 			}
 		});
-	//}
 }
-
-
-
-
-
 </script>
 
 <body class="easyui-layout" style="overflow-y: hidden" scroll="no">
@@ -514,22 +554,26 @@ function save2(){
 			  		<tr>
 						<td align="right"></font>管理人员：</td>
 	    				<td>
-		    				<input class="easyui-textbox" type="text" name="equipmentManager" style="width:172px"/>
+		    				<input class="easyui-textbox" type="text" id="equipmentManager" name="equipmentManager" style="width:172px"/>
 	    				</td>					
 	    			</tr>
 			  		<tr>
 						<td align="right"><font color=red>*</font>是否启用：</td>
 		    			<td>
-						    <input:select name="enabledFlag" value="$enabledFlag" easyuiClass="easyui-combobox" easyuiStyle="width:172px;" missingMessage="该项为必填项" dataOptions="required:true">
+						    <%-- <input:select id="enableFlag" name="enabledFlag" value="$enabledFlag" easyuiClass="easyui-combobox" easyuiStyle="width:172px;" missingMessage="该项为必填项" dataOptions="required:true">
 					            <option value=""></option>
 					            <input:systemStatusOption parentCode="BASE_IS_ENABLED"/>
-							</input:select>
+							</input:select> --%>
+							<select id="enabledFlag" name="enabledFlag">
+								<option value="Yes">是</option>
+								<option value="No">否</option>
+							</select>
 	    				</td>					
 					</tr>
 			  		<tr>
 						<td align="right"></font>添加日期：</td>
 	    				<td>
-		    				<input class="easyui-textbox" type="text" name="equipmentEnterDate" style="width:172px"/>
+		    				<input id="equipmentEnterDate" class="easyui-textbox" type="text" name="equipmentEnterDate" style="width:172px"/>
 	    				</td>
 					</tr>
 					<tr style="display: none">							
@@ -553,11 +597,6 @@ function save2(){
 				singleSelect="true">
 			</table>	
 			</div>
-		
 		</div>
-		
 </body>
-
-
-
 </html>

@@ -832,6 +832,58 @@ public class FileUtils {
 		InputStream in = class1.getResourceAsStream(path);//"request_queryjsp.xml"
 		return in;
 	}
+	public static Long download4System(InputStream fis, OutputStream out)
+			throws IOException {
+		Long length = 0L;
+		try {
+			length = (long) fis.available();			
+			byte bufferArray[]=new byte[10240];
+			if(fis!=null)
+			{
+				int byteLength=fis.read(bufferArray);
+				while(byteLength!=-1)
+				{
+					out.write(bufferArray,0,byteLength);
+					byteLength=fis.read(bufferArray);
+				}
+			}
+			out.flush();
+			out.close();
+
+		} catch (Exception e) {
+			//e.printStackTrace();
+			log.error("文件下载失败！");
+		} finally {
+			// 使用IO包关闭流
+			safeClose(out);
+		}
+		return length;
+	}
+
+	public static String toUtf8String(String s) {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			if (c >= 0 && c <= 255) {
+				sb.append(c);
+			} else {
+				byte[] b;
+				try {
+					b = Character.toString(c).getBytes("utf-8");
+				} catch (Exception ex) {
+					System.out.println(ex);
+					b = new byte[0];
+				}
+				for (int j = 0; j < b.length; j++) {
+					int k = b[j];
+					if (k < 0)
+						k += 256;
+					sb.append("%" + Integer.toHexString(k).toUpperCase());
+				}
+			}
+		}
+		return sb.toString();
+	}
 }
 
 class ExtensionFileFilter implements FileFilter {

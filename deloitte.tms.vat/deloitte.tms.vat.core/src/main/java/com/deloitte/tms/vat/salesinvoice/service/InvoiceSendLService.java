@@ -19,7 +19,8 @@ public interface InvoiceSendLService extends IService{
 	
 	public DaoPage findInvoiceSendLByParams(Map params, Integer pageIndex,Integer pageSize);
 	
-	public List<InvoiceSendLInParam> findInvoiceSendLByParams(Map params);
+	//public List<InvoiceSendLInParam> findInvoiceSendLByParams(Map params);
+	public List<InvoiceSendL> findInvoiceSendLByParams(Map params);
 	
 	public void saveInvoiceSendLDataListsMap(Map dataListsMap);
 	

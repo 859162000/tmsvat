@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.deloitte.tms.base.cache.model.LegalEntityNode;
 import com.deloitte.tms.base.cache.service.OrgPathProvider;
 import com.deloitte.tms.base.cache.utils.LegalEntityCacheUtils;
+import com.deloitte.tms.base.cache.utils.PrintOrgCacheUtils;
 import com.deloitte.tms.base.enums.PrintRangeEnums;
 import com.deloitte.tms.pl.core.commons.utils.FileUtils;
 import com.deloitte.tms.pl.job.task.JobTest;
@@ -75,5 +76,17 @@ public class CacheController {
 			printRangeEnums=PrintRangeEnums.city;
 		}
 		return LegalEntityCacheUtils.legalEntityCodesByOrgId(orgId, printRangeEnums);
+	}
+	@ResponseBody
+	@RequestMapping(value = "/testCity")
+	public List<String> testCity(String orgId){
+		return PrintOrgCacheUtils.getOrgIdsByCity(orgId);
+	}
+	@ResponseBody
+	@RequestMapping(value = "/testCityCustomerId")
+	public List<String> testCity(String orgId,String customerId){
+		//cf032ab7-533e-470d-84f7-232d13651a60
+		//fa6b7b3e-1610-4a2b-b21b-b97177990386
+		return PrintOrgCacheUtils.getCustomerBankAccountsByCustomerIdAndOrgId(orgId,customerId);
 	}
 }

@@ -2,7 +2,6 @@ package com.deloitte.tms.vat.salesinvoice.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -27,9 +26,7 @@ import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.reflect.ReflectUtils;
 import com.deloitte.tms.pl.core.dao.IDao;
 import com.deloitte.tms.pl.core.service.impl.BaseService;
-import com.deloitte.tms.pl.dictionary.model.DictionaryEntity;
 import com.deloitte.tms.vat.salesinvoice.dao.InvoiceSpecialContractBathDao;
-import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatInf;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesH;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesL;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesLInParam;
@@ -49,7 +46,7 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 	public DaoPage findTmsCrvatInvReqBatchesHInParam(List<String[]> list) {
 		List<TmsCrvatInvReqBatchesLInParam>  listTmsCrvatInvReqBatchesLInParam = new ArrayList<TmsCrvatInvReqBatchesLInParam>();
 		BigDecimal invoiceAmounts = new BigDecimal(0);
-		int i = 0;
+		int i = 1;
 		for(String[] dataExcel:list){
 			i++;
 			TmsCrvatInvReqBatchesLInParam tmsCrvatInvReqBatchesLInParam = new TmsCrvatInvReqBatchesLInParam();
@@ -135,6 +132,12 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 			//根据涉水交易类型id查找涉水交易认定规则信息
             String orgid = "2FFAF852FE4B557AE053877D10ACBC082FFA";
 			List<TmsMdTrxAffirmSetting> tmsMdTrxAffirmSetting = invoiceSpecialContractBathDaoImpl.findTmsMdTrxAffirmSetting(tmsMdTaxTrxType.getId(),orgid);
+			if(tmsMdTrxAffirmSetting.size()==0||tmsMdTrxAffirmSetting==null){
+				 String erro = "请检查第"+i+"行,"+"第"+4+"列涉税交易类型";//提示信息
+				 List<String[]> msg = new ArrayList<String[]>();//数据集合
+				 msg.add(new String[]{erro});//添加提示信息
+				return new DaoPage(list.size(),-1,10,msg);
+			}
 			TmsMdTrxAffirmSetting tms = tmsMdTrxAffirmSetting.get(0);//涉税交易认定规则
 			
 			tmsCrvatInvReqBatchesLInParam.setTrxAffirmSettingId(tms.getId());
@@ -231,7 +234,16 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 		List<TmsCrvatInvReqBatchesH> list = (List<TmsCrvatInvReqBatchesH>) daoPage.getResult();
 		for(TmsCrvatInvReqBatchesH tm:list){
 			tm.setStatus(DictionaryCacheUtils.getCodeName("VAT_CR_INVOICE_APPFORM_STATUS",tm.getStatus()));
-			
+			if("true".equals(tm.getAttribute4())){
+				tm.setAttribute4("成功");
+			}else{
+				tm.setAttribute4("异常");
+			}
+			if("0".equals(tm.getIsReceipts())){
+				tm.setIsReceipts("否");
+			}else{
+				tm.setIsReceipts("是");
+			}
 		}
 		
 		
@@ -252,11 +264,23 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 		for(TmsCrvatInvReqBatchesL tmsCrvatInvReqBatchesL:listTmsCrvatInvReqBatchesL){
          TmsCrvatInvReqBatchesLInParam tmsCrvatInvReqBatchesLInParam = new TmsCrvatInvReqBatchesLInParam();
      	ReflectUtils.copyProperties(tmsCrvatInvReqBatchesL, tmsCrvatInvReqBatchesLInParam);
+     	
+     	if("true".equals(tmsCrvatInvReqBatchesLInParam.getAttribute4())){
+     		tmsCrvatInvReqBatchesLInParam.setAttribute4("成功");
+		}else{
+			tmsCrvatInvReqBatchesLInParam.setAttribute4("异常");
+		}
+		if("0".equals(tmsCrvatInvReqBatchesLInParam.getIsReceipts())){
+			tmsCrvatInvReqBatchesLInParam.setIsReceipts("否");
+		}else{
+			tmsCrvatInvReqBatchesLInParam.setIsReceipts("是");
+		}
+     	
 			String customerId = tmsCrvatInvReqBatchesL.getCustomerId();//客户id
 			//根据客户编号查询客户信息
 			List<Customer> listCustomer = invoiceSpecialContractBathDaoImpl.findCustomer(null,customerId);
+			if(listCustomer!=null&&listCustomer.size()!=0){
 			Customer customer = listCustomer.get(0);
-			
 			tmsCrvatInvReqBatchesLInParam.setCustomerId(customer.getId());//购方id
 			tmsCrvatInvReqBatchesLInParam.setCustomerNumber(customer.getCustomerNumber());//购方编码
 			tmsCrvatInvReqBatchesLInParam.setCustomerName(customer.getCustomerName());//购方名称
@@ -266,7 +290,7 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 			tmsCrvatInvReqBatchesLInParam.setContactPhone(customer.getContactPhone());//购方纳税人联系电话 
 			tmsCrvatInvReqBatchesLInParam.setCustDepositBankAccountNum(customer.getCustDepositBankAccountNum());//购方开户账号
 			tmsCrvatInvReqBatchesLInParam.setCustDepositBankName(customer.getCustDepositBankName());//购方开户银行名称
-			
+			}
 			String contractId = tmsCrvatInvReqBatchesL.getContractId();//合同编号
 			if(AssertHelper.notEmpty(contractId)){
 			//根据合同编号查询合同信息
@@ -295,6 +319,7 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 			
 			//根据收入类型名称查询涉税交易类型信息
 			List<TmsMdTaxTrxType> listTmsMdTaxTrxType = invoiceSpecialContractBathDaoImpl.findTmsMdTaxTrxType(null,taxTrxTypeId);
+			if(listTmsMdTaxTrxType!=null&&listTmsMdTaxTrxType.size()!=0){
 			TmsMdTaxTrxType tmsMdTaxTrxType = listTmsMdTaxTrxType.get(0);
             
 			tmsCrvatInvReqBatchesLInParam.setTaxTrxTypeId(tmsMdTaxTrxType.getId());//涉税交易类型id
@@ -327,6 +352,8 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 			tmsCrvatInvReqBatchesLInParam.setInventoryItemQty(num);
 			tmsCrvatInvReqBatchesLInParam.setInvoiceAmount(amout);
 			tmsCrvatInvReqBatchesLInParam.setInvoiceAmounts(invoiceAmounts);
+			
+			}
 			listTmsCrvatInvReqBatchesLInParam.add(tmsCrvatInvReqBatchesLInParam);
 		}
 		return new DaoPage(daoPage.getTotal(),1,10,listTmsCrvatInvReqBatchesLInParam);
@@ -350,23 +377,7 @@ public class InvoiceSpecialContractBathServiceImpl extends BaseService implement
 		return 0;
 	}
 	
-	/**
-	 * 取得长江证券数据
-	 */
-	@Override
-	public List<TmsCrvatInvReqBatInf> analyzeTmsCrvatInvReqBatchesParam() {
-		List<TmsCrvatInvReqBatInf>  list = invoiceSpecialContractBathDaoImpl.analyzeTmsCrvatInvReqBatchesParam();
-		for(TmsCrvatInvReqBatInf tmsCrvatInvReqBatInf:list){
-			
-		}
-		
-		
-		
-		
-		
-		
-		return list;
-	}
+	
 	/**
 	 * 提交申请单
 	 */

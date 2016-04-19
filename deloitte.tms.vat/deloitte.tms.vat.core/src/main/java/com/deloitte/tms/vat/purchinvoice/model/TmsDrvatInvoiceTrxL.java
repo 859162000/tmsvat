@@ -17,6 +17,7 @@ import org.hibernate.annotations.Parameter;
 import com.deloitte.tms.pl.core.commons.annotation.ModelProperty;
 import com.deloitte.tms.pl.core.hibernate.identifier.Ling2UUIDGenerator;
 import com.deloitte.tms.pl.core.model.impl.BaseEntity;
+import com.deloitte.tms.pl.security.utils.LittleUtils;
 import com.deloitte.tms.vat.core.common.ExcelProcess;
 
 /**
@@ -26,6 +27,7 @@ import com.deloitte.tms.vat.core.common.ExcelProcess;
 @Table(name=TmsDrvatInvoiceTrxL.TABLE)
 @ModelProperty(comment="进项税发票登记-行表")
 public class TmsDrvatInvoiceTrxL extends BaseEntity {
+	
 
 	public static final String TABLE = "TMS_DRVAT_INVOICE_TRX_L";
 	public static final String SEQ = TABLE;
@@ -132,8 +134,21 @@ public class TmsDrvatInvoiceTrxL extends BaseEntity {
     
 	@Column(name = "ATTRIBUTE6",  length = 240)
 	@ModelProperty(comment="ATTRIBUTE6")
-	String attribute6;
+	String attribute6;//含税金额
 	
+
+	@Column(name = "ATTRIBUTE7",  length = 240)
+	@ModelProperty(comment="ATTRIBUTE7")
+	String attribute7;//税金
+	
+	public String getAttribute7() {
+		return attribute7;
+	}
+
+	public void setAttribute7(String attribute7) {
+		this.attribute7 = attribute7;
+	}
+
 	public String getAttribute6() {
 		return attribute6;
 	}
@@ -345,18 +360,21 @@ public class TmsDrvatInvoiceTrxL extends BaseEntity {
 		/**
 		 *  static {
 	 // excelHeaderFields.add("发票系统"); attribute2     / 不是导入的
-	   excelHeaderFields.add("验证日期");   attribute1      / Date  --0
-	  excelHeaderFields.add("发票代号");  invoiceCode         ---1
-	  excelHeaderFields.add("发票票号");   invoiceNumber
-	  excelHeaderFields.add("纳税人识别号"); venderRegistrationNumber
-	  excelHeaderFields.add("开票日期");    invoicingDate   /  Date
+	   ATTRIBUTE1     --> excelHeaderFields.add("验证日期");   attribute1      / Date  --0
+	INVOICE_CODE-->  excelHeaderFields.add("发票代号");  invoiceCode         ---1
+	invoice_number-->  excelHeaderFields.add("发票票号");   invoiceNumber
+	vender_registration_number-->  excelHeaderFields.add("纳税人识别号"); venderRegistrationNumber
+	INVOICING_DATE-->  excelHeaderFields.add("开票日期");    invoicingDate   /  Date
 	  
-	--5  excelHeaderFields.add("含税金额 ->改成 净额");  attribute6-->    vatAmount + enteredAmount(净额)
---6	  excelHeaderFields.add("税金");           vatAmount
-	  excelHeaderFields.add("纳税人名称");         venderName
+attribute6-->	--5  excelHeaderFields.add("含税金额 ->改成 净额");  attribute6-->    vatAmount + enteredAmount(净额)
+vat_Amount-> --6	  excelHeaderFields.add("税金");           vatAmount
+vernder_name-->	  excelHeaderFields.add("纳税人名称");         venderName
 	  excelHeaderFields.add("公司代码");             attribute3
 	  excelHeaderFields.add("发票验证人");           attribute4  
-	  excelHeaderFields.add("发票状态");           invoiceAuthenticationStatus  / 不是导入的
+	  
+	  excelHeaderFields.add("发票状态");           invoiceAuthenticationStatus  / 不是导入的 ->20160419变成是导入初始值PF
+	  
+	  
 	 // list.add("认证失败原因");                  attribute5 / 不是导入的
   }
 		 */
@@ -368,7 +386,11 @@ public class TmsDrvatInvoiceTrxL extends BaseEntity {
 		ArrayList<String> fields =  ExcelProcess.excelHeaderFieldsByDb;
 		
 		
-		for(int i=0; i< len; i++){
+		System.out.println("actual read record line has fields:"+len + "; and defined record should have fields:"+fields.size());
+		
+		int mixLen = len <= fields.size() ? len : fields.size();
+		
+		for(int i=0; i< mixLen; i++){
 			
 			StringBuffer sb = new StringBuffer();
 			Date tempDate=new Date();
@@ -393,29 +415,30 @@ public class TmsDrvatInvoiceTrxL extends BaseEntity {
 				System.out.println("--------after:"+ d);
 				//m.invoke(this, tempDate);
 				m.invoke(this, d);
-			}else if(i==5 || i==6){
-				Method m = TmsDrvatInvoiceTrxL.class.getMethod(sb.toString(),Double.class);
+			}else if(i==100){//attribute7', title:'税额'
+				
+				/*Method m = TmsDrvatInvoiceTrxL.class.getMethod(sb.toString(),Double.class);
 				
 				m.invoke(this, Double.parseDouble( importExcelData[i])   );
+				*/
 			}else{
 				Method m = TmsDrvatInvoiceTrxL.class.getMethod(sb.toString(), String.class);
 				m.invoke(this, importExcelData[i]);	
 			}
 			
 		}
-			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
+			}  catch(Exception e){
 				e.printStackTrace();
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch(Exception e){
-				e.printStackTrace();
+				System.out.println(e.getMessage());
 			}
 		}
 
 	
-	
+	public TmsDrvatInvoiceTrxL(String id){
+		super();
+		this.id=id;
+		this.setFlag(LittleUtils.one);
+	}
 	
 	
 }

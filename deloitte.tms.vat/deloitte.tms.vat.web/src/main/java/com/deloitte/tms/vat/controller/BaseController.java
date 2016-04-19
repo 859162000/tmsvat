@@ -125,7 +125,9 @@ public  class BaseController {
 	}
 
 	
-	public void returnOk( HttpServletResponse response, String msg ) throws Exception{
+	public void returnOk( HttpServletResponse response, String msg ) {
+		
+		try{
 		
 		JSONObject result = new JSONObject();
 		result.put("success", true);
@@ -133,6 +135,9 @@ public  class BaseController {
 		
 		retJson(response, result);
 		
+		}catch(Exception x){
+			x.printStackTrace();
+		}		
 	}
 	
 	

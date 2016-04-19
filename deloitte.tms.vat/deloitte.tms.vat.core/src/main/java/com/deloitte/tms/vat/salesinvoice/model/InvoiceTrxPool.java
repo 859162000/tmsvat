@@ -109,7 +109,17 @@ public class InvoiceTrxPool extends BaseEntity {
 	private String currencyCode;
 	
 	@Column(name="CUST_BANK_ACCOUNT_NUM")
+	@ModelProperty(des="客户表Customer中的custDepositBankNumber")
 	private String custBankAccountNum;
+	
+	
+	@Column(name="CUST_BANK_ACCOUNT_ID")
+	@ModelProperty(des="购方银行或资金ID")
+	private String custBankAccountId;
+	
+	@Column(name="CUSTOMER_BANK_ACCOUNT_NUM")
+	@ModelProperty(des="客户账号表CustBankAccount中的custBankAccountNum")
+	private String custmerBankAccountNum;
 
 	@Column(name="CUST_BANK_ACCOUNT_TYPE")
 	private String custBankAccountType;
@@ -170,7 +180,6 @@ public class InvoiceTrxPool extends BaseEntity {
 
 	@Column(name="IS_ACCOUNT")
 	private String isAccount;
-	
 
 	@Column(name="IS_TAX")
 	private String isTax;
@@ -353,6 +362,36 @@ public class InvoiceTrxPool extends BaseEntity {
 	@Column(name="EXCHANGE_AMOUNT")
 	private BigDecimal exchangeAmount;
 	
+	@Column(name="CUST_BANK_ORG_CODE",length=100)
+	@ModelProperty(comment="购方银行或资金账户所属机构号")
+	private String custBankOrgCode;	
+	
+	@Transient
+	private String tempId;
+	
+	@Transient
+	private String lid;
+	
+	public String getLid() {
+		return lid;
+	}
+
+
+	public void setLid(String lid) {
+		this.lid = lid;
+	}
+
+
+	public String getTempId() {
+		return tempId;
+	}
+
+
+	public void setTempId(String tempId) {
+		this.tempId = tempId;
+	}
+
+
 	public InvoiceTrxPool() {
 	}
 	
@@ -1179,9 +1218,26 @@ public class InvoiceTrxPool extends BaseEntity {
 	public void setTmsMdLegalEntity(TmsMdLegalEntity tmsMdLegalEntity) {
 		this.tmsMdLegalEntity = tmsMdLegalEntity;
 	}
-	
-	
-	
+
+
+	public String getCustmerBankAccountNum() {
+		return custmerBankAccountNum;
+	}
+
+
+	public void setCustmerBankAccountNum(String custmerBankAccountNum) {
+		this.custmerBankAccountNum = custmerBankAccountNum;
+	}
+
+
+	public String getCustBankOrgCode() {
+		return custBankOrgCode;
+	}
+
+
+	public void setCustBankOrgCode(String custBankOrgCode) {
+		this.custBankOrgCode = custBankOrgCode;
+	}
 	
 	
 	

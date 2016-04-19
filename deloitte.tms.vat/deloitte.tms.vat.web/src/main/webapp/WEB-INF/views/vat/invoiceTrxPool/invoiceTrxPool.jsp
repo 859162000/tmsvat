@@ -54,8 +54,6 @@
 				    	  </div>
 				    	</td>
 				    	
-				    	
-				    	
 				    	<td >交易批次号：</td>
 						<td><input id="invoiceTrxPool_searchform_batchNum"
 							class="easyui-textbox" style="width: 120px" name="batchNum" />
@@ -74,9 +72,9 @@
 						<td>
 								<a href="#" id="searchbtn" class="easyui-linkbutton"
 									data-options="iconCls:'icon-search'" style="width: 80px"
-									onclick="Search()"><spring:message code='button.Search' /></a>
+									onclick="callRefresh()"><spring:message code='button.Search' /></a>
 						</td>
-						<td  align="left">
+						<td align="left">
 								<a href="#" id="resetbtn" class="easyui-linkbutton"
 									data-options="iconCls:'icon-reload'" style="width: 80px"
 									onclick="Reset()"><spring:message code='button.Clear' /></a>
@@ -114,13 +112,29 @@
 </body>
 <script type="text/javascript">
 	$(document).ready(function(){
-		pageDataSettingInit();
+		var zjlx = $("#invoiceTrxPool_searchform_customerInfoList_select").val();
+    	if(zjlx="请输入查询条件")
+		{
+    		$("#invoiceTrxPool_searchform_customerInfoList_input").textbox({disabled: true});
+		}
+    	
+    	$('#invoiceTrxPool_searchform_customerInfoList_select').combobox({
+		 onSelect:function(record){
+            var eType = $('#invoiceTrxPool_searchform_customerInfoList_select').combobox('getValue');
+            //alert("********"+eType);
+            //if(eType="1"||eType="2"||eType="3"){
+            	$("#invoiceTrxPool_searchform_customerInfoList_input").textbox({disabled: false});
+            //}else{
+            	//$("#invoiceTrxPool_searchform_customerInfoList_input").textbox({disabled: true});
+            //}
+         }
+	    }); 
+    	
+    	pageDataSettingInit();
 		InitCombobox();
 		init_common_combo_taxType("#invoiceTrxPool_searchform_taxType");		
 		init_common_combo_customer("#invoiceTrxPool_searchform_customerName_input");
 		init_common_combo_salesentity("#invoiceTrxPool_searchform_salesEntityName");
-		
-		
 		
 		$('#invoiceTrxPool_searchform').form('load', {
 			pageNumber: $('#invoiceTrxPool_dataGrid').datagrid('options').pageNumber,
@@ -129,6 +143,7 @@
 		Search();
 	});
 	
+
 	function onSelectStartDate(date){
 		var date = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()
 		$('#invoiceTrxPool_searchform_glEndDate').datebox('setValue',date)
@@ -157,8 +172,7 @@
 				return $(this).form('enableValidation').form('validate');
 			},
 			success:function(result) {
-				//数据加载以及绑定	
-			 
+			   //数据加载以及绑定	
 			   var result = $.parseJSON(result);
 		       $("#invoiceTrxPool_dataGrid").datagrid('loadData', result);	
 		       //$("#invoiceTrxPool_dataGrid").datagrid('loadData', result.data);		       
@@ -166,6 +180,43 @@
 		     }
 		});
     };
+    
+    
+    function callRefresh(){
+    	var zjlx = $('#invoiceTrxPool_searchform_customerInfoList_select').combobox('getValue');
+    	if(zjlx!="请输入查询条件")
+		{
+    		var zjlx2 = $("#invoiceTrxPool_searchform_customerInfoList_input").val();
+    		if(zjlx2 == null||zjlx2 == ""){
+    			alert("请输入证件号码！");
+    			return false;
+    		}
+    	}
+    	
+    	$('#invoiceTrxPool_searchform').form('load', {
+			pageNumber: $('#invoiceTrxPool_dataGrid').datagrid('options').pageNumber,
+			pageSize: $('#invoiceTrxPool_dataGrid').datagrid('options').pageSize
+		});
+ 		Search2();
+    };
+    
+    function Search2(){
+    	$("#invoiceTrxPool_dataGrid").datagrid("loading");
+    	$('#invoiceTrxPool_searchform').form('submit', {
+			url:'invoiceTrxPool/searchInvoiceTrxPool.do',			
+			onSubmit : function() {
+				return $(this).form('enableValidation').form('validate');
+			},
+			success : function(result) {
+			   var result = $.parseJSON(result);
+		       $("#invoiceTrxPool_dataGrid").datagrid('loadData', result);		       
+		       $("#invoiceTrxPool_dataGrid").datagrid("loaded"); 
+			//}
+		    }
+		});
+
+    };
+    
 	
 	function Reset() {
 		var pageNumber = $('#pageNumber').val();
@@ -204,6 +255,11 @@
 			   value:'<spring:message code="invoiceTrxPool.plsInputCriteria"/>',//缺省值
 			   url:"", 
 			  });
+		var zjlx = $("#invoiceTrxPool_searchform_customerInfoList_select").val();
+    	if(zjlx="请输入查询条件")
+		{
+    		$("#invoiceTrxPool_searchform_customerInfoList_input").textbox({disabled: true});
+		};
 		$("#invoiceTrxPool_searchform_salesEntityList_select").combogrid({
 			   panelWidth:150,
 			   value:'<spring:message code="invoiceTrxPool.plsInputCriteria"/>',//缺省值
@@ -372,15 +428,10 @@
 			pageNumber : pageNumber,
 			pageSize : pageSize
 		});
-		Search();
+		Search2();
 	}
 	
 	
-
-	
-	
-	
-	 
 	function convertToName(url){
 		var val;
 	     $.ajax({

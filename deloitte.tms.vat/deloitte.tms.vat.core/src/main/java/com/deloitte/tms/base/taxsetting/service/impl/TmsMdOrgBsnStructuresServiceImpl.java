@@ -103,44 +103,28 @@ public class TmsMdOrgBsnStructuresServiceImpl extends BaseService implements Tms
 		
 		if(model.getBaseOrg() !=null && !"".equals(model.getBaseOrg())){			
 			inparam.setOrgName(model.getBaseOrg().getOrgName());			
-		}else{			
-			inparam.setOrgName("");
 		}
 		if(model.getBaseOrg() != null && !"".equals(model.getBaseOrg())){			
 			inparam.setOrgCode(model.getBaseOrg().getOrgCode());		
-		}else{
-			inparam.setOrgCode("");	
 		}
 		if(model.getTmsMdFlexStructures() !=null && !"".equals(model.getTmsMdFlexStructures()) ){
 			inparam.setAccdflexStructuresDescription(model.getTmsMdFlexStructures().getFlexStructuresDescription());
-		}else{
-			inparam.setAccdflexStructuresDescription("");
 		}
 		if(model.getTmsMdFlexStructures() != null && !"".equals(model.getTmsMdFlexStructures())){			
 			inparam.setAccdflexStructuresCode(model.getTmsMdFlexStructures().getFlexStructuresCode());			
-		}else{
-			inparam.setAccdflexStructuresCode("");
 		}
 		if(model.getTmsMdFlexStructures2() != null && !"".equals(model.getTmsMdFlexStructures2())){
 			inparam.setBsnflexStructuresCode(model.getTmsMdFlexStructures2().getFlexStructuresCode());		
-		}else{
-			inparam.setBsnflexStructuresCode("");			
 		}
 		if(model.getTmsMdFlexStructures2() != null && !"".equals(model.getTmsMdFlexStructures2())){
 			inparam.setBsnflexStructuresDescription(model.getTmsMdFlexStructures2().getFlexStructuresDescription());
-		}else{
-			inparam.setBsnflexStructuresDescription("");
 		}
 		if(model.getTmsMdLegalEntity() != null && !"".equals(model.getTmsMdLegalEntity())){			
 			inparam.setLegalEntityCode(model.getTmsMdLegalEntity().getLegalEntityCode());			
-		}else{
-			inparam.setLegalEntityCode("");	
 		}
 		if(model.getTmsMdLegalEntity() !=null && !"".equals(model.getTmsMdLegalEntity())){
 			inparam.setLegalEntityName(model.getTmsMdLegalEntity().getLegalEntityName());
-		}else{
-			inparam.setLegalEntityName("");
-		}	
+		}
 		ReflectUtils.copyProperties(model, inparam);
 		return inparam;
 	}

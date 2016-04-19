@@ -56,8 +56,7 @@
 										<td><select id="" class="easyui-combobox" name=""
 											style="width: 120px">
 												<option value=""></option>
-												<option value="1">是</option>
-												<option value="2">否</option>
+												<option value="1">预开发票</option>
 										</select></td>
 									</tr>
 									<tr>
@@ -67,7 +66,7 @@
 											name="customerName" class="easyui-textbox" readonly="true"
 											style="width: 120px;"></td>
 										<td><spring:message code="invoiceprint.level" />：</td>
-										<td><input id="invoice_print_newSearch_level"
+										<td><input id="invoice_print_newSearch_level" readonly="true"
 											class="easyui-combobox" name="reqInvoiceRange"
 											style="width: 120px"
 											data-options="
@@ -119,7 +118,7 @@
 											style="width: 120px;"></td>
 										<td>申请单生成日期：</td>
 										<td><input id="invoice_print_newSearch_applyTime"
-											readonly="true" name="invoiceReqDate" readonly="true"
+											readonly="true" name="invoiceReqDate"
 											class="easyui-datebox" style="width: 120px;"></td>
 										<td><spring:message code="invoiceprint.readyStatus" />：</td>
 										<td><input class="easyui-combobox"
@@ -156,7 +155,7 @@
 											type="text" style="width: 0px;" name="pageSize" value=""></input></td>
 									</tr>
 									<tr style="display: none">
-										<td input id="detail_Hid" name="id" class="easyui-textbox"
+										<td input id="detail_Hid" name="id" id="id" class="easyui-textbox"
 											style="height: 20px"></td>
 										<td><input id="uuid" class="easyui-textbox"
 											name="appuseruuid" style="height: 20px"></input></td>
@@ -535,7 +534,8 @@
 								},{
 									field : 'taxRate',
 									title : "税率",
-									width : 120
+									width : 120,
+									readonly:true
 								}] ],
 								onSelect : function (rowIndex,rowData) {
 									var row = $('#dgrequestdetail').datagrid('getSelected');
@@ -581,7 +581,7 @@
 						align : 'center',
 						editor : 'text'
 					}, {
-						field : 'taxTrxTypeCode',
+						field : 'inventoryItemQty',
 						title : '数量',
 						width : 100,
 						align : 'center',
@@ -593,7 +593,7 @@
 						}
 					
 					}, {
-						field : 'legalEntityName',
+						field : 'priceOfUnit',
 						title : '单价',
 						width : 100,
 						align : 'center',
@@ -605,7 +605,7 @@
 						      }
 						}
 					}, {
-						field : 'legalEntityCode',
+						field : 'invoiceAmount',
 						title : '合计金额',
 						width : 100,
 						align : 'center',
@@ -622,13 +622,13 @@
 						align : 'center',
 						editor : 'numberbox'
 					}, {
-						field : 'trxDate',
+						field : 'acctdAmountCr',
 						title : '净额',
 						width : 100,
 						align : 'center',
 						editor : 'numberbox'
 					}, {
-						field : 'inventory',
+						field : 'vatAmount',
 						title : '税额',
 						width : 100,
 						align : 'center',
@@ -657,7 +657,6 @@
 			onBeforeLoad : function () {
 				$(this).datagrid('rejectChanges');
 			},onDblClickRow:function(index,data){
-		           
 	             $(this).datagrid('beginEdit', index);
 	             
 	  },
@@ -709,7 +708,6 @@
 	function inventoryItemSave(){
 		$('#dgrequestdetail').datagrid('acceptChanges');
 		var rows = $("#dgrequestdetail").datagrid('getRows');
-		console.info(rows);
 	}
 	/**
 	 * 添加交易信息
@@ -732,16 +730,16 @@
 		 	if(rows>0){
 			 	inventoryItemSave();
 				var rowdata = $("#dgrequestdetail").datagrid('getSelected');
-				var legalEntityName = parseInt(rowdata.legalEntityName);//单价
+				var legalEntityName = parseInt(rowdata.priceOfUnit);//单价
 				var taxTrxTypeCode = parseInt(rowdata.taxTrxTypeCode);//数量
-				var taxRate = parseInt(rowdata.taxRate)/100;//税率
+				var taxRate = parseInt(rowdata.taxRate)/100.0;//税率
 				var sumCount = legalEntityName*taxTrxTypeCode;//合计金额
 				var inventory = (sumCount/(1+taxRate))*taxRate;//税额
 				var trxDate = sumCount-inventory;//净额
 				leijisumCount = leijisumCount+sumCount;
 				$('#dgrequestdetail').datagrid('updateRow',{index:0,row:{legalEntityCode:sumCount,inventory:inventory,trxDate:trxDate}});
-				if(isReceiptsid==="1"){//
-					$("#invoice_print_newSearch_amountAll").textbox("setValue",leijisumCount);
+				if(isReceiptsid==="1"){
+					$("#invoice_print_newSearch_amountAll").textbox("setValue",fmoney(leijisumCount,2));
 				}else{
 					$("#invoice_print_newSearch_amountAll").textbox("setValue",0);
 				}
@@ -801,14 +799,57 @@
 		});
 	}
 	function editDetail() {//编辑申请单
-		var rows = $('#dg').datagrid('getSelections');//得到选择数据行
-
+		var rows = $('#dg').datagrid('getChecked');//得到选择数据行
 		if (rows.length == 1) {//判断行数
 			var row = $('#dg').datagrid('getSelected');//得到行数据
 			if ("10" == row.reqStatus) {//判断申请单状态
+				//load data
+				var id=row.id;
+				if(id!=''){
+	    			$.messager.progress({title:'Please waiting',
+						msg:'数据加载中'});
+	    			$.post('${vat}/invoiceSpecial/loadModifyInvoiceDetail.do',
+	            			{id:id}, 
+	            			function(result) {
+	            				$.messager.progress('close');
+	            				if(result){console.log(result);
+	            					$("#id").textbox('setValue',result.data.id);
+	            			    	$('#dgrequestdetail').datagrid('loadData', result.data.reqPList);
+	            			    	$('#invoice_print_newSearch_bank').textbox('setValue',
+	            			    			result.data.custDepositBankName);
+	            					$('#invoice_print_newSearch_bankNum').textbox('setValue',
+	            							result.data.custDepositBankAccountNum);
+	            					$('#invoice_print_newSearch_contactName').textbox('setValue',
+	            							result.data.contactName);
+	            					$('#invoice_print_newSearch_address').textbox('setValue',
+	            							result.data.custRegistrationAddress);
+	            					$('#invoice_print_newSearch_buyerCompanyName').textbox(
+	            							'setValue', result.data.customerName);
+	            					$('#invoice_print_newSearch_customerCode').val(result.data.customerNumber);
+	            					$('#invoice_print_newSearch_applyTime').datebox('setValue',result.data.invoiceReqDate);
+	            					$('#invoice_print_newSearch_customerId').textbox('setValue', result.data.customerId);
+	            					$('#invoice_print_newSearch_level').combobox('setValue','3');
+	            					$('#invoice_print_newSearch_validNo').val(result.data.custRegistrationNumber);
+	            					$('#invoice_print_searchOut_validType').combobox('setValue',result.data.custRegistrationCode);
+	            					$('#invoice_print_newSearch_reqStatus').combobox('setValue',result.data.status);
+	            					$('#invoice_print_newSearch_readyNo').textbox('setValue', result.data.crvatInvoiceReqNumber);
+	            					$('#isTaxid').combobox('setValue',result.data.isTax);
+	            					$('#isReceiptsid').combobox('setValue',result.data.isReceipts);
+	            					if (result.data.customerId) {
+	            						$('#newsearchbtn').linkbutton('enable');
+	            					}
+	            	        	}else{
+	            	        		$.messager.alert('<spring:message code="system.alert"/>',result.errorMessage);
+	            	        	}
+	    					},
+	    					'json');
+		        	}else{
+		        		$.messager.alert('<spring:message code="system.alert"/>','编辑的记录不能为空');
+		        	}
+				
 				$('#layoutid').layout('expand', 'east');//关闭右侧滑动面板
 				enableOrdisable(true);
-				$("#newDetailForm").form('load',row);
+				//$("#newDetailForm").form('load',row);
 			} else {
 				$.messager.confirm(
 						'<spring:message code="invoiceprint.reqinfo"/>',
@@ -905,7 +946,7 @@
 						url : '${vat}/invoiceReqAll/updateCommitStatus.do',
 						success : function(object) {
 							var object = $.parseJSON(object);
-							clearNewSearchForm();
+							//clearNewSearchForm();
 							$.messager.alert(
 									'<spring:message code="system.alert"/>',
 									object.msg);
@@ -939,7 +980,7 @@
 						url : '${vat}/invoiceReqAll/saveInvoiceReqAll.do',
 						success : function(object) {
 							var object = $.parseJSON(object);
-							clearNewSearchForm();
+							//clearNewSearchForm();
 							$.messager.alert(
 									'<spring:message code="system.alert"/>',
 									object.msg);
@@ -957,8 +998,9 @@
 		$('#layoutid').layout('expand', 'east');
 		$('#invoice_print_newSearch_reqStatus').combobox('select','10');//默认将申请状态设置为草稿
 		$('#invoice_print_newSearch_applyTime').datebox('setValue', formatterDate(new Date()));//默认将申请单生成日期设置为当前日期
-		
-		$.ajax({
+		$('#invoice_print_newSearch_readyNo').textbox('setValue', '');
+		$('#invoice_print_newSearch_level').combobox('setValue','3');//层级默认都是同城
+		/* $.ajax({
 			url : "${vat}/invoiceSpecial/getCreanumber.do",
 			dataType : "json",
 			cache : false,
@@ -966,7 +1008,7 @@
 				$('#invoice_print_newSearch_readyNo').textbox('setValue', object.invoicereq);
 				$('#dlg_number').textbox('setValue', object.invoicereq);
 			}
-		});
+		}); */
 	}
 	//通过购方编码带出其他条件
 	function getCustomerInfoByNumber() {
@@ -996,8 +1038,8 @@
 						'setValue', object.customer.customerName);
 				$('#invoice_print_newSearch_customerId').textbox('setValue',
 						object.customer.id);
-				$('#invoice_print_newSearch_customerCode').val(object.customer.customerNumber);
-				$('#invoice_print_newSearch_validNo').val(object.customer.custRegistrationNumber);
+				$('#invoice_print_newSearch_customerCode').textbox('setValue',object.customer.customerNumber);
+				$('#invoice_print_newSearch_validNo').textbox('setValue',object.customer.custRegistrationNumber);
 				$('#invoice_print_searchOut_validType').combobox('setValue',object.customer.custRegistrationCode);
 				if (object.customer.id) {
 					$('#newsearchbtn').linkbutton('enable');
@@ -1016,7 +1058,7 @@
 		}
 		if(validNo){
 			$.ajax({
-				url : "${vat}/invoiceReqH/getCustomerParam.do?custRegistrationNumber="
+				url : "${vat}/invoiceSpecial/getCustomerParam.do?custRegistrationNumber="
 						+ validNo + "&customerNumber=" + number+"&custRegistrationCode="+code,
 				dataType : "json",
 				cache : false,
@@ -1058,7 +1100,7 @@
 						$("#layoutid").layout('collapse', 'east');
 						Search();
 						var object = $.parseJSON(object);
-						clearNewSearchForm();
+						//clearNewSearchForm();
 						$.messager.alert(
 								'<spring:message code="system.alert"/>',
 								object.msg);
@@ -1201,6 +1243,7 @@
 		$("#invoice_print_newSearch_contactName").textbox({ disabled: enable });
 		$("#invoice_print_newSearch_address").textbox({ disabled: enable });
 		$("#invoice_print_newSearch_amountAll").textbox({ disabled: enable });
+		$('#invoice_print_newSearch_level').combobox({ disabled: enable });
 	}
 </script>
 

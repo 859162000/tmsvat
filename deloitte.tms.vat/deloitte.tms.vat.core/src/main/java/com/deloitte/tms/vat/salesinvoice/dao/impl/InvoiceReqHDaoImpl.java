@@ -8,26 +8,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.deloitte.tms.base.cache.utils.LegalEntityCacheUtils;
+import com.deloitte.tms.base.cache.utils.PrintOrgCacheUtils;
 import com.deloitte.tms.base.enums.PrintRangeEnums;
 import com.deloitte.tms.base.masterdata.model.BaseOrg;
 import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
-import com.deloitte.tms.pl.core.commons.utils.Assert;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.DateUtils;
 import com.deloitte.tms.pl.core.dao.impl.BaseDao;
 import com.deloitte.tms.vat.base.enums.CrvatTaxPoolStatuEnums;
+import com.deloitte.tms.vat.salesinvoice.dao.InvoiceReqHDao;
+import com.deloitte.tms.vat.salesinvoice.dao.InvoiceTrxPoolDao;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqH;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqL;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxPool;
-import com.deloitte.tms.vat.salesinvoice.dao.InvoiceReqHDao;
-import com.deloitte.tms.vat.salesinvoice.dao.InvoiceTrxPoolDao;
-import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreP;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoiceReqP;
 /**
  * Home object for domain model class InvoiceReqH.
  * @see com.deloitte.tms.vat.salesinvoice.model
@@ -89,6 +89,12 @@ public class InvoiceReqHDaoImpl extends BaseDao<InvoiceReqH> implements InvoiceR
 		    //String[] customerId=new String[]{params.get("customerId").toString()};
 		    values.put("customerId", params.get("customerId"));
 		}
+		if(AssertHelper.notEmpty(params.get("invoiceReqType"))){
+			query.append(" and invoiceReqType=:invoiceReqType");
+		    //String[] customerId=new String[]{params.get("customerId").toString()};
+		    values.put("invoiceReqType", params.get("invoiceReqType"));
+		}
+		
 		query.append(" and flag=:flag");
 		values.put("flag", "1");
 		query.append(" order by   crvatInvoiceReqNumber desc");
@@ -171,15 +177,30 @@ public class InvoiceReqHDaoImpl extends BaseDao<InvoiceReqH> implements InvoiceR
 				values.put("customerNumber",params.get("customerNumber") );
 			}*/
 			//受理层级
-			if(AssertHelper.isOrNotEmpty_assert(params.get("reqInvoiceRange"))){
-				PrintRangeEnums enums=findEnumsByValue(params.get("reqInvoiceRange").toString());
-				if(enums!=PrintRangeEnums.all){
-					List<String>list=LegalEntityCacheUtils.legalEntityCodesByOrgId(params.get("orgId").toString(),enums);
-					String[]legalEntityCode=(String[]) list.toArray(new String[list.size()]);
-					query.append(" and legalEntityCode in :legalEntityCode");
-					values.put("legalEntityCode", legalEntityCode);
+			String findMethod = (String) params.get("orgName_findmethod");
+			if("zhongxin".equals(findMethod)){
+				if(AssertHelper.isOrNotEmpty_assert(params.get("reqInvoiceRange"))){
+					PrintRangeEnums enums=findEnumsByValue(params.get("reqInvoiceRange").toString());
+					if(enums!=PrintRangeEnums.all){
+						List<String> orgIds = PrintOrgCacheUtils.getOrgIdsByCity(params.get("orgId").toString().trim());
+						//List<String>list=LegalEntityCacheUtils.legalEntityCodesByOrgId(params.get("orgId").toString(),enums);
+						String[]orgId=(String[]) orgIds.toArray(new String[orgIds.size()]);
+						query.append(" and orgId in :orgId");
+						values.put("orgId", orgId);
+					}
+				}
+			}else {
+				if(AssertHelper.isOrNotEmpty_assert(params.get("reqInvoiceRange"))){
+					PrintRangeEnums enums=findEnumsByValue(params.get("reqInvoiceRange").toString());
+					if(enums!=PrintRangeEnums.all){					
+						List<String>list=LegalEntityCacheUtils.legalEntityCodesByOrgId(params.get("orgId").toString(),enums);
+						String[]legalEntityCode=(String[]) list.toArray(new String[list.size()]);
+						query.append(" and legalEntityCode in :legalEntityCode");
+						values.put("legalEntityCode", legalEntityCode);
+					}
 				}
 			}
+			
 			//客户账号
 			if(AssertHelper.isOrNotEmpty_assert(params.get("custBankAccountNum"))){
 				query.append(" and inventoryItemNumber=:inventoryItemNumber");
@@ -249,6 +270,11 @@ public class InvoiceReqHDaoImpl extends BaseDao<InvoiceReqH> implements InvoiceR
 			query.append(" and trxNumber=:trxNumber ");
 			values.put("trxNumber", map.get("trxNumber").toString().trim());
 		}
+		if(AssertHelper.isOrNotEmpty_assert(map.get("invoiceCategory"))&&"2".equals(map.get("invoiceCategory"))){
+			 //专票的只能搜出专票交易,普票可以搜出所有交易
+			query.append(" and invoiceCategory=:invoiceCategory ");
+			values.put("invoiceCategory", map.get("invoiceCategory"));
+		}
 		query.append(" and customerId is null");
 		query.append(" and ( status in :status");
 		String[] status=new String[]{CrvatTaxPoolStatuEnums.APPFORM_FREE.getValue(),CrvatTaxPoolStatuEnums.APPFORM_REVOKED.getValue(),CrvatTaxPoolStatuEnums.PREP_FORM_REVOKED.getValue()};
@@ -317,6 +343,51 @@ public class InvoiceReqHDaoImpl extends BaseDao<InvoiceReqH> implements InvoiceR
 		}
 		executeSql(query, values);
 		
+	}
+	@Override
+	public List<InvoiceReqH> findInvoiceReqHByParamsForSpecial(Map params) {
+		StringBuffer query=new StringBuffer();
+		Map<String,Object> values=new HashMap<String,Object>();
+		buildInvoiceReqHQueryForSpecial(query, values, params);
+		List<InvoiceReqH> list = findBy(query, values);
+		for(InvoiceReqH invoiceReqH:list){
+			List<TmsCrvatInvoiceReqP> invoiceReqPs = getInvoiceReqPs(invoiceReqH.getId());
+			invoiceReqH.setInvoiceReqPs(invoiceReqPs);
+			
+		}
+		return list;
+	}
+	
+	@Override
+	public List<TmsCrvatInvoiceReqP> getInvoiceReqPs(String reqHid) {
+		// TODO Auto-generated method stub
+		 StringBuffer query=new StringBuffer();
+		 query.append(" from TmsCrvatInvoiceReqP where 1=1 ");
+		 Map values=new HashMap();
+		 if(AssertHelper.isOrNotEmpty_assert(reqHid))
+		 {
+			query.append(" and crvatInvoiceReqHId=:crvatInvoiceReqHId");
+			values.put("crvatInvoiceReqHId", reqHid);
+		}
+		 query.append(" and flag=1");
+		return findBy(query, values);
+	}
+	private void buildInvoiceReqHQueryForSpecial(StringBuffer query,Map values,Map params)  {
+		query.append(" from InvoiceReqH where 1=1 ");
+		Object value=params.get("status");
+		if(AssertHelper.isOrNotEmpty_assert(value))
+		{
+			query.append(" and status=:status");
+			values.put("status", value);
+		}
+		if(AssertHelper.notEmpty(params.get("invoiceReqType"))){
+			query.append(" and invoiceReqType=:invoiceReqType");
+		    //String[] customerId=new String[]{params.get("customerId").toString()};
+		    values.put("invoiceReqType", params.get("invoiceReqType"));
+		}
+		query.append(" and flag=:flag");
+		values.put("flag", "1");
+		query.append(" order by   crvatInvoiceReqNumber desc");
 	}
 }
 

@@ -6,12 +6,22 @@ import java.util.List;
 
 public class TmsCrvatInvoicePreLInParam  extends TmsCrvatInvoicePreL {
 	
+	public String getVatAmountStr() {
+		return vatAmountStr;
+	}
+
+	public void setVatAmountStr(String vatAmountStr) {
+		this.vatAmountStr = vatAmountStr;
+	}
+
 	//交易流水信息
 	InvoiceTrxPoolInParam  invoiceTrxPoolInParam ;
 	
 	private String invoiceCategory;
 	
 	private BigDecimal taxRate;
+	
+	private String taxRateStr;
 	
 	private String trxSquence;
 	
@@ -26,6 +36,8 @@ public class TmsCrvatInvoicePreLInParam  extends TmsCrvatInvoicePreL {
 	private String orgName;
 	
 	private String trxBatchNum;
+	
+	private String vatAmountStr;
 	
 	public String getTrxBatchNum() {
 		return trxBatchNum;
@@ -124,6 +136,16 @@ public class TmsCrvatInvoicePreLInParam  extends TmsCrvatInvoicePreL {
 	public void setInvoicePreLList(List<TmsCrvatInvoicePreLInParam> invoicePreLList) {
 		this.invoicePreLList = invoicePreLList;
 	}
+
+	public String getTaxRateStr() {
+		return taxRateStr;
+	}
+
+	public void setTaxRateStr(String taxRateStr) {
+		this.taxRateStr = taxRateStr;
+	}
+	
+	
 	
 	
 	

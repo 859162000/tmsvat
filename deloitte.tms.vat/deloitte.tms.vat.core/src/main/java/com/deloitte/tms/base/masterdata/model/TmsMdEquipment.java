@@ -76,10 +76,10 @@ public class TmsMdEquipment extends BaseEntity implements Serializable {
 
 	@Column(name="PARENT_EQUIPMENT_ID")
 	private String parentEquipmentId;
-	@ManyToOne
+	/*@ManyToOne
 	@JoinColumn(name="PARENT_EQUIPMENT_ID",insertable=false,updatable=false)
 	@Cascade(CascadeType.REFRESH)
-	TmsMdEquipment parent;
+	TmsMdEquipment parent;*/
 	
 /*	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
 	@Cascade(CascadeType.REFRESH)
@@ -117,13 +117,13 @@ public class TmsMdEquipment extends BaseEntity implements Serializable {
 		this.enabledFlag = enabledFlag;
 	}
 
-	public TmsMdEquipment getParent() {
+	/*public TmsMdEquipment getParent() {
 		return parent;
 	}
 
 	public void setParent(TmsMdEquipment parent) {
 		this.parent = parent;
-	}
+	}*/
 	
 	public TmsMdEquipment() {
 	}

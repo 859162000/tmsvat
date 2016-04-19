@@ -20,14 +20,17 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import com.deloitte.tms.base.masterdata.dao.CustomerDao;
 import com.deloitte.tms.base.masterdata.model.Customer;
+import com.deloitte.tms.pl.core.commons.exception.BusinessException;
 import com.deloitte.tms.pl.job.task.JobTest;
 import com.deloitte.tms.vat.salesinvoice.common.StringPool;
 import com.deloitte.tms.vat.salesinvoice.jobs.model.TmsMdCustomersInf;
@@ -68,34 +71,74 @@ public class PostCustomerInfJob implements Job, JobTest {
 
 	@Value("${ling2.xmlPath}")
 	String socketReturnXmlPath;
+	
+	private final static Logger log = Logger.getLogger(PostCustomerInfJob.class);
 
 	/**
 	 * @see 详细参考父方法
 	 */
 	@Override
 	public void execute() {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("interfaceTrxFlag", StringPool.READY);
-		map.put("startDate", new Date());// 处理生效日期为当天的
-		map.put("sourceCustomerCode", StringPool.NCBS);// 针对核心客户
-		List<TmsMdCustomersInf> listTmsMdCustomersInf = tmsMdCustomersInfService.findTmsMdCustomersInf(map);
-		System.out.println("*there are " + listTmsMdCustomersInf.size() + "listTmsMdCustomersInf ***");
+		
+		
+		List<TmsMdCustomersInf> listTmsMdCustomersInf = genValidData();
+		
 		List<String> customerIds = new ArrayList<String>();
 		int count = 0;
 		for (TmsMdCustomersInf list : listTmsMdCustomersInf) {
 			customerIds.add(list.getCustomerId());
 			count++;
 		}
-		System.out.println("*testing****Socket***");
-		Map<String, String> mapSocket = new HashMap<String, String>();
-		mapSocket.put("socketHostIP", socketHostIP);
-		mapSocket.put("socketHostPort", socketHostPort);
-		mapSocket.put("socketHostTimeout", socketHostTimeout);
-		mapSocket.put("socketReturnXmlPath", socketReturnXmlPath);
+		
+		Map<String,String> map = getSocketInfo();
+		
 		// 向socket服务器提交请求
-		List<Customer> list = CustomersPreUtils.postCustomerSocket(customerIds, count, mapSocket);
-		System.out.println("get back socket result" + list.size() + "************");
+		List<Customer> list = CustomersPreUtils.postCustomerSocket(customerIds, count, map);
+		
+		log.info("****server response data size " + list.size() +"****");
+		
 		customerDao.saveOrUpdateAll(list);
+	}
+
+	
+	
+	/** 
+	 *〈一句话功能简述〉 
+	 * 功能详细描述
+	 * @return
+	 * @see [相关类/方法]（可选）
+	 * @since [产品/模块版本] （可选）
+	 */
+	
+	private Map<String, String> getSocketInfo() {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("socketHostIP", socketHostIP);
+		map.put("socketHostPort", socketHostPort);
+		map.put("socketHostTimeout", socketHostTimeout);
+		map.put("socketReturnXmlPath", socketReturnXmlPath);
+		return map;
+	}
+
+
+	/** 
+	 * 查询出合适的文件
+	 * @return
+	 * @see [相关类/方法]（可选）
+	 * @since [产品/模块版本] （可选）
+	 */
+	
+	private List<TmsMdCustomersInf> genValidData() {
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("interfaceTrxFlag", StringPool.READY);
+		map.put("startDate", new Date());// 处理生效日期为当天的
+		map.put("sourceCustomerCode", StringPool.NCBS);// 针对核心客户
+		List<TmsMdCustomersInf> listTmsMdCustomersInf = tmsMdCustomersInfService.findTmsMdCustomersInf(map);
+
+		if(CollectionUtils.isEmpty(listTmsMdCustomersInf)) {
+			throw new BusinessException("没有合适的文件!");
+		}
+		return listTmsMdCustomersInf;
 	}
 
 	/**

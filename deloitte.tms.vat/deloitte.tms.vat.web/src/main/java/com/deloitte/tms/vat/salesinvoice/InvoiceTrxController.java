@@ -238,6 +238,41 @@ public class InvoiceTrxController extends BaseController{
 		retJson(response, result);
 	}
 	
+	@RequestMapping(value = "/determineExistOrNot", method = RequestMethod.POST)
+	public void determineExistOrNot(@RequestParam Map<String,Object> parameter,HttpServletResponse response) throws IOException {
+		int newStart = Integer.parseInt((String)parameter.get("startInvoiceNumber"));
+		int newEnd = Integer.parseInt((String)parameter.get("endInvoiceNumber"));
+		
+		List<InvoiceTrxL> invoiceTrxLs =invoiceTrxService.findAllInvoiceTrxL(parameter);
+		int flag = 0;
+		for (Iterator<InvoiceTrxL> i = invoiceTrxLs.iterator(); i.hasNext(); ) {
+			InvoiceTrxL entity = i.next();
+			int oldStart = Integer.parseInt(entity.getStartInvoiceNumber());
+			int oldEnd = Integer.parseInt(entity.getEndInvoiceNumber());
+			if(newStart < oldStart){
+				if(newEnd < oldEnd){
+					flag = 0;
+				}else{
+					flag = 1;
+					break;
+				}
+			}else if(newStart > oldEnd){
+				flag = 0;
+			}else{
+				flag = 1;
+				break;
+			}
+		}
+		
+		JSONObject result = new JSONObject();
+		if(flag == 0){
+			result.put("existOrNot", "false");
+		}else{
+			result.put("existOrNot", "true");
+		}
+		retJson(response, result);
+	}
+	
 	@ResponseBody
 	@RequestMapping(value = "/loadInvoiceTrx", method = RequestMethod.GET)
 	public Collection<InvoiceTrxHInParam> loadInvoiceTrx(Map<String, Object> map) throws Exception {

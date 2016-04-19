@@ -47,11 +47,14 @@ public class CustBankAccount extends BaseEntity{
 	@Column(name="CUST_BANK_NUMBER")
 	@ModelProperty(comment="购方银行或资金账户代码 ")
 	private String custBankNumber;
+	
+	@Column(name="CUST_BANK_ORG_CODE",length=100)
+	@ModelProperty(comment="购方银行或资金账户所属机构号")
+	private String custBankOrgCode;	
 
 	@Column(name="CUSTOMER_ID")
 	@ModelProperty(comment="购方ID ")
 	private String customerId;
-
 
 	@Column(name="ENABLED_FLAG")
 	@ModelProperty(comment="是否有效(Y/N)")
@@ -201,5 +204,14 @@ public class CustBankAccount extends BaseEntity{
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
+
+	public String getCustBankOrgCode() {
+		return custBankOrgCode;
+	}
+
+	public void setCustBankOrgCode(String custBankOrgCode) {
+		this.custBankOrgCode = custBankOrgCode;
+	}
+
 
 }

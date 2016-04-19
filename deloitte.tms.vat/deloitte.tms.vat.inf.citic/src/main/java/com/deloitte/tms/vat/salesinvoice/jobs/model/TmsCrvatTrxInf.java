@@ -308,6 +308,10 @@ public class TmsCrvatTrxInf extends BaseEntity implements Serializable {
 	
 	@Column(name="CUSTOMER_ACCOUNT_LE_CODE")
 	private String customerAccountLeCode;
+	
+	@Column(name="CUST_BANK_ORG_CODE",length=100)
+	@ModelProperty(comment="购方银行或资金账户所属机构号")
+	private String custBankOrgCode;	
 
 	public TmsCrvatTrxInf() {
 	}
@@ -1039,6 +1043,14 @@ public class TmsCrvatTrxInf extends BaseEntity implements Serializable {
 
 	public void setCustomerAccountLeCode(String customerAccountLeCode) {
 		this.customerAccountLeCode = customerAccountLeCode;
+	}
+
+	public String getCustBankOrgCode() {
+		return custBankOrgCode;
+	}
+
+	public void setCustBankOrgCode(String custBankOrgCode) {
+		this.custBankOrgCode = custBankOrgCode;
 	}
 	
 }

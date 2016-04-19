@@ -8,11 +8,8 @@ import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.service.IService;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEquipment;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEquipmentInParam;
-import com.deloitte.tms.base.masterdata.dao.TmsMdLegalEquipmentDao;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
-import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntityInParam;
 import com.deloitte.tms.base.masterdata.model.TmsMdEquipment;
-import com.deloitte.tms.base.masterdata.model.TmsMdEquipmentInParam2;
 /**
  * Home object for domain model class TmsMdLegalEquipment.
  * @see com.deloitte.tms.base.masterdata.model

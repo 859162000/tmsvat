@@ -133,7 +133,6 @@ public class LegalEntityNode extends OrgNode{
 
 	public void setPrintSiteNode(PrintSiteNode printSiteNode) {
 		this.printSiteNode = printSiteNode;
-		this.printSiteNode.legalEntityNode=this;
 		this.printSiteId=printSiteNode.getId();
 	}
 
@@ -214,7 +213,7 @@ public class LegalEntityNode extends OrgNode{
 		StringBuilder result=new StringBuilder();
 		result.append(warp+"ID：" + id + " 名称：" + name + " 代码：" + code);
 		if(getLicenseNoId()!=null){
-			result.append("\n"+warp+"------纳税人识别号:"+getLicenseNo()+" 纳税人id"+getLicenseNoId()+"\n");
+			result.append("\n"+warp+"------纳税人识别号:"+getLicenseNo()+" 纳税人id:"+getLicenseNoId()+"\n");
 		}
 		if(getPrintSiteId()!=null){
 			result.append("\n"+warp+"------打印点id:"+getPrintSiteId()+"\n");

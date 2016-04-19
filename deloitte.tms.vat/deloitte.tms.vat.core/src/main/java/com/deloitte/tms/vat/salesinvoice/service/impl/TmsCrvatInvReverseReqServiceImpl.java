@@ -73,7 +73,8 @@ public class TmsCrvatInvReverseReqServiceImpl extends BaseService implements Tms
 		inparam.setPrintHId((String)model[i++]);
 		inparam.setOriInventoryInvoiceId((String)model[i++]);
 		inparam.setCategory(categoryMap.get((String)model[i++]));
-		inparam.setVersion((BigDecimal)model[i++]);
+		BigDecimal version = new BigDecimal(model[i++].toString());
+		inparam.setVersion(version);
 		inparam.setOriInvoiceCode((String)model[i++]);
 		inparam.setOriInvoiceNumber((String)model[i++]);
 		inparam.setPrintTerminalNumber((String)model[i++]);

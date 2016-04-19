@@ -8,11 +8,11 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
-import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.dao.impl.BaseDao;
-import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreH;
 import com.deloitte.tms.vat.salesinvoice.dao.TmsCrvatInvoicePreHDao;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreH;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreL;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreP;
 /**
  * Home object for domain model class TmsCrvatInvoicePreH.
  * @see com.deloitte.tms.vat.salesinvoice.model
@@ -70,6 +70,30 @@ public class TmsCrvatInvoicePreHDaoImpl extends BaseDao<TmsCrvatInvoicePreH> imp
 		{
 			value=value.toString();
 			query.append(" and invoicePeHid=:tmsCrvatInvoicePreHId");
+			values.put("tmsCrvatInvoicePreHId", value);
+		}
+		value=params.get("status");
+		if(value!=null)
+		{
+			query.append(" and status=:status");
+			values.put("status", value);
+		}
+	}
+	@Override
+	public List<TmsCrvatInvoicePreP> findTmsCrvatInvoicePrePByParams(Map params) {
+		StringBuffer query=new StringBuffer();
+		Map values=new HashMap();
+		buildTmsCrvatInvoicePrePQuery(query, values, params);
+		return findBy(query, values);
+	}
+	
+	private void buildTmsCrvatInvoicePrePQuery(StringBuffer query,Map values,Map params) {
+		query.append(" from TmsCrvatInvoicePreP where 1=1 ");
+		Object value=params.get("tmsCrvatInvoicePreHId");
+		if(value!=null&&!"".equals(value))
+		{
+			value=value.toString();
+			query.append(" and crvatInvoicePreHId=:tmsCrvatInvoicePreHId");
 			values.put("tmsCrvatInvoicePreHId", value);
 		}
 		value=params.get("status");

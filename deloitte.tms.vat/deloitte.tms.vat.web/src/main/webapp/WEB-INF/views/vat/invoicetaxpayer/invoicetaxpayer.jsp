@@ -51,7 +51,7 @@
 							</tr>
 							<tr>
 								<td><spring:message code="com.vat.base.model.customer.customerEntityNum.text" />：</td>
-								<td><input id="invoice_print_newSearch_clientEntityNum" name="legalEntityCode" class="easyui-validatebox" required="true" onblur="getLegalInfo()" style="width: 120px;"></td>
+								<td><input id="invoice_print_newSearch_clientEntityNum" name="registrationNumber" class="easyui-validatebox" required="true" onblur="getLegalInfo()" style="width: 120px;"></td>
 								<td><spring:message code="orgTaxpayerRelation.taxpayerName" />：</td>
 								<td><input id="invoice_print_newSearch_taxpayerName" name="legalEntityName" class="easyui-textbox" style="width: 120px;"></td>  
 								<td><spring:message code="taxItemsmaintain.isUsed" />：</td>
@@ -120,7 +120,7 @@
 						<table>
 							<tr>
 								<td><spring:message code="com.vat.base.model.customer.customerEntityNum.text"/>:</td>
-								<td> <input id="invoice_dlg_clientEntityNum" class="easyui-textbox" style="width:120px;" name="legalEntityCode" /></input></td>
+								<td> <input id="invoice_dlg_clientEntityNum" class="easyui-textbox" style="width:120px;" name="registrationNumber" /></input></td>
 				    			<%-- <td><spring:message code="invoiceprint.readyStatus"/>:</td>
 				    			<td>
 				    				<input:select id="invoice_dlg_bootStatus"
@@ -205,7 +205,7 @@
 			idField:'id', //主键字段  
 			columns:[[
 				{field:'ck',checkbox:true,width:2}, //显示复选框     
-				{ field:'legalEntityCode', title:'<spring:message code="client.clientEntityNum"/>',width:100,align:'center'},
+				{ field:'registrationNumber', title:'<spring:message code="client.clientEntityNum"/>',width:100,align:'center'},
 				{ field:'legalEntityName', title:'<spring:message code="client.search.entityName"/>',width:100,align:'center'},
 				{ field:'invoiceTypeName', title:'<spring:message code="invoiceAbolish.category"/>',width:100,align:'center'}, 
 				{ field:'invoiceLimitAmountValue', title:'<spring:message code="invoiceprint.quota"/>',width:100,align:'center'},
@@ -285,7 +285,7 @@
 	function Search(){
 		$("#dg").datagrid("loading");
 		$('#searchform').form('submit', {
-			url:'loadTmsMdLegalInvoicePage.do',			
+			url:'${vat}/taxpayerinvoicetype/loadTmsMdLegalInvoicePage.do',			
 			 success : function(result) {
 			   var result = $.parseJSON(result);
 			   $("#dg").datagrid("loaded");
@@ -324,10 +324,10 @@
 		}
 	}
 	function getLegalInfo(){
-		var legalEntityCode=$('#invoice_print_newSearch_clientEntityNum').val();
+		var registrationNumber=$('#invoice_print_newSearch_clientEntityNum').val();
 		$('#invoice_print_newSearch_taxpayerName').textbox('setValue','');
 		$.ajax({
-			url : "getLegalInfoList.do?legalEntityCode="+legalEntityCode,
+			url : "${vat}/taxpayerinvoicetype/getLegalInfoList.do?registrationNumber="+registrationNumber,
             dataType : "json",
             cache:false,
             success : function(object) {

@@ -49,7 +49,7 @@ public interface TmsCrvatTrxInfJobTask {
 	 */
 	public int executeTransactionInfDatas(List<TmsCrvatTrxInf> tmsCrvatTrxInfs
 			,List<TmsMdLegalEntity> allLegalEntities
-			,List<TmsMdOrgLegalEntity> allOrgLegalEntities
+//			,List<TmsMdOrgLegalEntity> allOrgLegalEntities
 			,List<BaseOrg> allOrgs
 			,List<Customer> allCustomers, 
 			List<CustomerSite> allListSite,

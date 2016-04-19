@@ -21,5 +21,7 @@ public interface TmsMdContractDao extends IDao<TmsMdContract>{
 
 
 	public void removeTmsMdContractById(String contractId);
+
+	public TmsMdContract getContractByNumber(String contractNumber);
 }
 

@@ -77,6 +77,7 @@ public class InvoiceTrxPoolController extends BaseController{
 				parameter.put("customerId", list.get(0).getId());
 			}
 		}*/
+		
 		DaoPage daoPage=invoiceTrxPoolService.findInvoiceTrxPoolByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
 		
 		JsonConfig jsonConfig = new JsonConfig();
@@ -90,8 +91,34 @@ public class InvoiceTrxPoolController extends BaseController{
 		//return daoPage;
 	}
 	
+	/////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
+	@RequestMapping(value = "invoiceTrxPool/searchInvoiceTrxPool")
+	public void searchInvoiceTrxPool(@RequestParam Map<String,Object> parameter, HttpServletResponse response) throws Exception {
 	
-	
+		//System.out.println("*********************************test in InvoiceTrxPoolController -- searchInvoiceTrxPool");
+		Object selectOption = parameter.get("selectOption");
+		System.out.println("================selectOption=============="+selectOption);
+		Object selectValue = parameter.get("selectValue");
+		System.out.println("================selectValue=============="+selectValue);
+		
+		DaoPage daoPage=invoiceTrxPoolService.findInvoiceTrxPoolByParams4Query(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
+		
+		JsonConfig jsonConfig = new JsonConfig();
+		jsonConfig.registerJsonValueProcessor(Date.class,
+		new JsonDateValueProcessor("yyyy-MM-dd"));
+		JSONArray jsonArray = JSONArray.fromObject(daoPage.getResult(), jsonConfig);
+		
+		JSONObject result = new JSONObject();
+		result.put("total", daoPage.getRecordCount());
+		result.put("rows", jsonArray.toString());
+		retJson(response, result);
+		
+		//return daoPage;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
+
 	@ResponseBody
 	@RequestMapping(value = "invoiceTrxPool/getOrgList", method = RequestMethod.POST)
 	public List<BaseOrgInParam> getOrgList(HttpServletResponse response) throws Exception {

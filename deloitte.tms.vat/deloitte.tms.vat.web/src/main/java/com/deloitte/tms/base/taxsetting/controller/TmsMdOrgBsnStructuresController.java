@@ -193,10 +193,16 @@ public class TmsMdOrgBsnStructuresController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/saveTmsMdOrgBsnStructures", method = RequestMethod.POST)
-	public void saveTmsMdOrgBsnStructures(TmsMdOrgBsnStructuresInParam inParam)
-			throws Exception {
-		TmsMdOrgBsnStructures entity = tmsMdOrgBsnStructuresService
-				.convertTmsMdOrgBsnStructuresInParamToEntity(inParam);
+	public void saveTmsMdOrgBsnStructures(TmsMdOrgBsnStructuresInParam inParam)throws Exception {
+			
+		TmsMdOrgBsnStructures entity = tmsMdOrgBsnStructuresService.convertTmsMdOrgBsnStructuresInParamToEntity(inParam);
+	       
+		if(inParam.getOrgId()!=null && !"".equals(inParam.getOrgId())){
+			entity.setOrgId(inParam.getOrgId());
+		}
+		if(inParam.getBsnFlexStructuresId()!=null&&!"".equals(inParam.getBsnFlexStructuresId())){
+			entity.setBsnFlexStructuresId(inParam.getBsnFlexStructuresId());
+		}
 		if (AssertHelper.empty(entity.getId())) {
 			entity.setId(IdGenerator.getUUID());
 			tmsMdOrgBsnStructuresService.save(entity);

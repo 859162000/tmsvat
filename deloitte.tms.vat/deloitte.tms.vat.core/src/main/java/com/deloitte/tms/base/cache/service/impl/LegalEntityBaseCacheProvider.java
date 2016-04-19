@@ -207,8 +207,8 @@ public abstract class LegalEntityBaseCacheProvider implements CacheProvider {
 		//设置纳税实体关联的所属机构,和对应的BizOrgNode
 		for(TmsMdOrgLegalEntity tmsMdOrgLegalEntity:orgLegalEntities){
 //			AssertHelper.notEmpty_assert(tmsMdOrgLegalEntity.getLegalEntityId(),"纳税实体主键不能为空");
-//			AssertHelper.notEmpty_assert(tmsMdOrgLegalEntity.getBizOrgCode(),"纳税实体关联的机构数据不能为空");
-			if(tmsMdOrgLegalEntity.getLegalEntityId()!=null&&tmsMdOrgLegalEntity.getBizOrgCode()!=null){
+//			AssertHelper.notEmpty_assert(tmsMdOrgLegalEntity.getOrgId(),"纳税实体关联的机构数据不能为空");
+			if(tmsMdOrgLegalEntity.getLegalEntityId()!=null&&tmsMdOrgLegalEntity.getOrgId()!=null){
 				LegalEntityNode legalEntityNode=(LegalEntityNode) rootlLegalEntityNode.getPosterities().get(tmsMdOrgLegalEntity.getLegalEntityId());
 				//AssertHelper.notEmpty_assert(legalEntityNode,"纳税实体没有找到 id:"+tmsMdOrgLegalEntity.getLegalEntityId());
 				if(legalEntityNode!=null){
@@ -259,6 +259,9 @@ public abstract class LegalEntityBaseCacheProvider implements CacheProvider {
 		}
 //		if("700000".equals(legalEntityNode.getCode())){
 //			System.out.println(11);
+//		}
+//		if("eab4db60-0064-46f7-acae-94b99b561068".equals(legalEntityNode.getId())){
+//			System.out.println(111);
 //		}
 		//处理当前节点
 		if(legalEntityNode.isPrintSite()){//自己就是打印点			
@@ -313,6 +316,7 @@ public abstract class LegalEntityBaseCacheProvider implements CacheProvider {
 //	}
 	protected PrintSiteNode assemblePrintSiteNode(LegalEntityNode parentLegalEntityNode) {
 		PrintSiteNode printSiteNode=new PrintSiteNode(parentLegalEntityNode.getId(), parentLegalEntityNode.getName());
+		printSiteNode.setLegalEntityNode(parentLegalEntityNode);
 		return printSiteNode;
 	}
 	/**
@@ -384,6 +388,7 @@ public abstract class LegalEntityBaseCacheProvider implements CacheProvider {
 		node.setType(legalEntity.getLegalEntityType());
 		node.setSelfLicenseName(legalEntity.getLicenseName());
 		node.setSelfLicenseNo(legalEntity.getLicenseNo());
+		node.setLicenseNoId(legalEntity.getId());
 		node.setBankAccountNum(legalEntity.getBankAccountNum());
 		node.setBankBranchName(legalEntity.getBankBranchName());
 		node.setRegistrationContactAddress(legalEntity.getRegistrationContactAddress());

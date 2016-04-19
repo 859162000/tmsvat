@@ -257,6 +257,8 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 		String legalEntityCode = StringUtils.trim(baseLegalEntityInf.getLegalEntityId());// 机构号
 		if(legalEntityCode!=null){
 			String parentId = StringUtils.trim(baseOrgParent.getId());
+			//父子相同,上级id为null
+			parentId=legalEntityCode.equals(baseOrgParent.getOrgCode())?null:baseOrgParent.getId();
 			BaseOrg baseOrg = orgMap.get(legalEntityCode);
 			
 			if(baseOrg==null) {
@@ -292,6 +294,7 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 				tmsMdLegalEntityParent = new TmsMdLegalEntity();
 				tmsMdLegalEntityParent.setIsEnablePrint(StringPool.IS_PRINT_ENABLED);
 				tmsMdLegalEntityParent.setLegalEntityCode(parentId);
+				tmsMdLegalEntityParent.setLegalEntityName(parentId);
 				tmsMdLegalEntityDao.save(tmsMdLegalEntityParent);
 				legalEntityMap.put(parentId,tmsMdLegalEntityParent);
 			}else{
@@ -321,6 +324,7 @@ public class BaseLegalEntityInfJobTaskImpl implements BaseLegalEntityInfJobTask 
 				tmsMdLegalEntityChild = new TmsMdLegalEntity();
 				tmsMdLegalEntityChild.setIsEnablePrint(StringPool.IS_PRINT_UNENABLED);
 				tmsMdLegalEntityChild.setLegalEntityCode(legalEntityCode);
+				tmsMdLegalEntityChild.setLegalEntityName(legalEntityCode);
 				tmsMdLegalEntityDao.save(tmsMdLegalEntityChild);
 				legalEntityMap.put(legalEntityCode,tmsMdLegalEntityChild);
 			} else {//补全父节点先处理的问题

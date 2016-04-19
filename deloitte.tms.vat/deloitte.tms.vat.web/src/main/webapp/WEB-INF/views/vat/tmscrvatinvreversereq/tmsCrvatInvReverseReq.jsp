@@ -15,29 +15,29 @@
 			<form id="TmsCrvatInvReverseReq_searchform" method="post" scroll="no">
 				<table cellpadding="5">	
 			<tr>
-				<td>蓝字发票种类：</td>
+				<td>蓝字发票种类:</td>
 			 	 <td><input:select id="categoryId" name="category" value="$categoryId" easyuiClass="easyui-combobox" easyuiStyle="width:150px;" >
 							            <option value="" ></option>
 							            <input:systemStatusOption parentCode="VAT_CR_INVOICE_TYPE"/>
 							</input:select></td>
-		    	<td>蓝字发票代码：</td>
+		    	<td>蓝字发票代码:</td>
 			 	 <td><input id="invoiceCodeId" class="easyui-textbox" type="text" style="width: 150px;" name="oriInvoiceCode" value="" />
 			 	 	</td>
-				<td>蓝字发票号码：</td>
+				<td>蓝字发票号码:</td>
 			 	 <td><input id="invoiceNumberId" class="easyui-textbox" type="text" style="width: 150px;" name="oriInvoiceNumber" value="">
 			 	 	</input></td>
-			 	<td>蓝字开票日期：</td>
+			 	<td>蓝字开票日期:</td>
 			 	 <td>
 			 	 	<input class="easyui-datebox" style="width: 150px" name="invoicePrintDate" data-options="formatter:myformatter,parser:myparser,required:false">
 			 	 	</input></td>
 			</tr>                              
 			<tr>
-				<td>购方证件类型：</td>
+				<td>购方证件类型:</td>
 			 	 <td><input:select id="customRegisterTypeId" name="customRegisterType" value="$customRegisterTypeId" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">
 							            <option value=""></option>
 							            <input:systemStatusOption parentCode="VAT_CUSTOMER_DISC_OPTION"/>
 							</input:select></td>
-			 	<td>购方证件号码：</td>
+			 	<td>购方证件号码:</td>
 			 	 <td><input id="customRegisterNumberId" name="customRegisterNumber" class="easyui-textbox" type="text" style="width: 150px;"  value=""></input></td>
 			</tr>                              
 			                              

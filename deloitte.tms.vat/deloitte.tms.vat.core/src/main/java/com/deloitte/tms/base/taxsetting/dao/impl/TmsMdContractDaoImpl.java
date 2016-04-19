@@ -32,7 +32,7 @@ public class TmsMdContractDaoImpl extends BaseDao<TmsMdContract> implements TmsM
 	}
 	
 	private void buildTmsDBContractQuery(StringBuffer query,Map values,Map params) {
-		query.append(" from TmsMdContract where 1=1");
+		query.append(" from TmsMdContract where DELETED_FLAG=1");
 		Object value=params.get("status");
 		if(value!=null){
 			query.append(" and status=:status");
@@ -41,23 +41,14 @@ public class TmsMdContractDaoImpl extends BaseDao<TmsMdContract> implements TmsM
 		
 		Object contractName = params.get("contractName");//合同名称
 		if (contractName != null && !"".equals(contractName)){
-			query.append(" and contract_name=:contractName");
-			values.put("contractName", contractName);
+			query.append(" and contract_name like:contractName");
+			values.put("contractName", "%"+contractName+"%");
 		}
+		
 		Object contractNumber = params.get("contractNumber");//合同号码
 		if (contractNumber != null && !"".equals(contractNumber)){
-			query.append(" and contract_number=:contractNumber");
-			values.put("contractNumber", contractNumber);
-		}
-		Object startDate = params.get("startDate");//开始日期
-		if(startDate !=null && !"".equals(startDate)){		
-			query.append(" and startDate like :startDate");	
-			values.put("startDate","%"+startDate+"%");		
-		}
-		Object endDate = params.get("endDate");//结束日期
-		if (endDate != null && !"".equals(endDate)){
-			query.append(" and endDate like :endDate");	
-			values.put("endDate","%"+endDate+"%");	
+			query.append(" and contract_number like:contractNumber");
+			values.put("contractNumber", "%"+contractNumber+"%");
 		}
 	}
 
@@ -79,11 +70,28 @@ public class TmsMdContractDaoImpl extends BaseDao<TmsMdContract> implements TmsM
 
 	@Override
 	public void removeTmsMdContractById(String contractId) {
-		//this.removeById(TmsMdContract.class, contractId);
 		StringBuffer query=new StringBuffer();
 		Map values=new HashMap<String, Object>();
-		query.append("delete from TmsMdContract where id =:contractId ");
+		query.append("update TmsMdContract set DELETED_FLAG = 0 where id =:contractId ");
 		values.put("contractId", contractId);
 		executeHqlProduce(query.toString(), values);
+	}
+
+	@Override
+	public TmsMdContract getContractByNumber(String contractNumber) {
+		String hql = "from TmsMdContract where contractNumber =:contractNumber";
+		StringBuffer query = new StringBuffer();
+		query.append(hql);
+		
+		Map values = new HashMap<String,Object>();
+		values.put("contractNumber", contractNumber);
+		
+		List<TmsMdContract> contracts=findBy(query, values);
+		if(contracts.size()==0){
+			return null;		
+		}else{
+			TmsMdContract contract=(TmsMdContract)contracts.get(0);
+			return contract;
+		}
 	}
 }

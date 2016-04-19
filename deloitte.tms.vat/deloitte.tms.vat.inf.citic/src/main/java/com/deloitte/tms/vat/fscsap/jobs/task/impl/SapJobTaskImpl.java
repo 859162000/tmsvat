@@ -141,10 +141,8 @@ public class SapJobTaskImpl implements SapJobTask {
 	
 	public void getFscSapConfig(){
 
-
-		try {
-	
-			InputStream in = null ;
+		InputStream in = null ;
+		try {		
 			
 			in =this.getClass().getResourceAsStream("/config/sap.properties");
 					
@@ -169,6 +167,15 @@ public class SapJobTaskImpl implements SapJobTask {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}finally{
+
+			if(in!=null){
+				try{
+				in.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}			
 		}
 	
 	}
@@ -365,8 +372,8 @@ public class SapJobTaskImpl implements SapJobTask {
 		 }
 		 
 		 if(listInpara.size() > 1){
-			 System.out.println("find4ExistByInput > exception: result size: "+listInpara.size() +", should be only 1");
-			 return null;
+			 System.out.println("sap > find4ExistByInput >  result size: "+listInpara.size() +", only 1 is perfect");
+			// return null;
 		 }
 		 
 		 record = listInpara.get(0);
@@ -477,9 +484,12 @@ public class SapJobTaskImpl implements SapJobTask {
 					sb.append(   UsefulUtil.getDay8StrByDate( one.getInvoicingDate())   ).append(sep);
 					//sb.append(one.getEnteredAmount() + one.getVatAmount()).append(sep);
 					
-					sb.append(UsefulUtil.getNotNull(one.getAttribute6())  ).append(sep);
+					sb.append(UsefulUtil.getNotNull(one.getAttribute6())  ).append(sep);//含税金额
 					
-					sb.append( UsefulUtil.getNotNull( one.getVatAmount()    )   ).append(sep);//税金
+					//sb.append( UsefulUtil.getNotNull( one.getVatAmount()    )   ).append(sep);//税金
+					sb.append( UsefulUtil.getNotNull( one.getAttribute7()    )   ).append(sep);//税金
+					
+					
 					sb.append(UsefulUtil.getNotNull( one.getVenderName() )).append(sep);
 					sb.append( UsefulUtil.getNotNull( one.getAttribute3() ) ).append(sep);
 					sb.append( UsefulUtil.getNotNull( one.getAttribute4()  )).append(sep);

@@ -13,9 +13,7 @@
 package com.deloitte.tms.vat.salesinvoice.job;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -34,15 +32,12 @@ import com.deloitte.tms.base.masterdata.model.CustBankAccount;
 import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.base.masterdata.model.CustomerSite;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
-import com.deloitte.tms.base.masterdata.model.TmsMdOrgLegalEntity;
 import com.deloitte.tms.pl.core.commons.constant.PageConstant;
-import com.deloitte.tms.pl.core.commons.exception.BusinessException;
 import com.deloitte.tms.pl.job.task.JobTest;
 import com.deloitte.tms.vat.salesinvoice.common.StringPool;
 import com.deloitte.tms.vat.salesinvoice.jobs.dao.TmsCrvatTrxInfDao;
 import com.deloitte.tms.vat.salesinvoice.jobs.model.TmsCrvatTrxInf;
 import com.deloitte.tms.vat.salesinvoice.jobs.service.TmsCrvatTrxInfJobTask;
-import com.deloitte.tms.vat.salesinvoice.jobs.service.TmsCrvatTrxInfService;
 
 /**
  * 文件处理job,从接口表中抽取数据到相应的表中
@@ -84,35 +79,48 @@ public class PostTmsCrvatTrxInfJob implements Job, JobTest {
 		Long totalsapstart = System.currentTimeMillis();
 		//缓存需要的文件
 		List<TmsMdLegalEntity> allLegalEntities=tmsMdLegalEntityDao.findAllTmsMdLegalEntity();	
-		List<TmsMdOrgLegalEntity> allOrgLegalEntities=tmsMdOrgLegalEntityDao.findAllTmsMdOrgLegalEntities();
+//		List<TmsMdOrgLegalEntity> allOrgLegalEntities=tmsMdOrgLegalEntityDao.findAllTmsMdOrgLegalEntities();
 		List<BaseOrg> allOrgs=baseOrgDao.findAllBaseOrg();
 		List<Customer> allCustomers=getAllCustomer();	
 		List<CustomerSite> allListSite=getALLCustomerSite();
 		List<CustBankAccount> allCustBankAccount=getAllCustBankAccount();
+		/*
+		Map<String,BaseOrg> orgMap = new HashMap<String,BaseOrg>();
+		for(BaseOrg baseOrg:allOrgs){
+			orgMap.put(baseOrg.getOrgCode(), baseOrg);
+		}
+		Map<String,Customer> customerMap = new HashMap<String,Customer>();
+		for(Customer customer:allCustomers){
+			customerMap.put(customer.getCustomerNumber(), customer);
+		}
+		Map<String,CustomerSite> CustomerSiteMap = new HashMap<String,CustomerSite>();
+		for(CustomerSite customerSite:allListSite){
+			customerMap.put(customer.getCustomerNumber(), customer);
+		}
+		*/
+		
 		//分页业务处理
-		int pageIndex = 1;
 		int pageSize=2000;
 		int totalsucess=0;
-		int size = 0;
 		int totalsize=0;
 		
-		do {
+		//分页查询的时候写数据,导致数据状态在变,所以会丢数据,所以先查询出总数,算出分页数
+		int totalNum=tmsCrvatTrxInfDao.findTmsCrvatTrxInfNum(StringPool.READY);
+		int pageNum=totalNum/pageSize+1;
+		for(int i=0;i<pageNum;i++){
 			//分批查询数据
-			List<TmsCrvatTrxInf> batchCrvatTrxInfs = tmsCrvatTrxInfDao.findTmsCrvatTrxInf(StringPool.READY,pageIndex, pageSize);
+			List<TmsCrvatTrxInf> batchCrvatTrxInfs = tmsCrvatTrxInfDao.findTmsCrvatTrxInf(StringPool.READY,1, pageSize);
 			//总数计数
 			totalsize=totalsize+batchCrvatTrxInfs.size();
 			//执行业务
-			int sucessnum = processList(allLegalEntities,allOrgLegalEntities
-					, allOrgs, batchCrvatTrxInfs,allCustomers
+			int sucessnum = processList(batchCrvatTrxInfs
+					,allLegalEntities
+					, allOrgs,allCustomers
 					,allListSite
 					,allCustBankAccount);
 			//成功计数
 			totalsucess=totalsucess+sucessnum;
-
-			//计数器变化
-			size = batchCrvatTrxInfs.size();
-			pageIndex++;
-		} while (size == pageSize);
+		}
 		//输出统计日志
 		log.info("PostTmsCrvatTrxInfJob "+totalsize+" data costs:："
 				+ (System.currentTimeMillis() - totalsapstart) + " ms"
@@ -162,16 +170,18 @@ public class PostTmsCrvatTrxInfJob implements Job, JobTest {
 	}
 	
 	
-	private int processList(List<TmsMdLegalEntity> allLegalEntities,
-			List<TmsMdOrgLegalEntity> allOrgLegalEntities,
-			List<BaseOrg> allOrgs, List<TmsCrvatTrxInf> batchCrvatTrxInfs
+	private int processList(
+			List<TmsCrvatTrxInf> batchCrvatTrxInfs
+			,List<TmsMdLegalEntity> allLegalEntities
+//			,List<TmsMdOrgLegalEntity> allOrgLegalEntities,
+			,List<BaseOrg> allOrgs
 			,List<Customer> allCustomers
 			, List<CustomerSite> allListSite
 			, List<CustBankAccount> allCustBankAccount) {
 		Long sapstart = System.currentTimeMillis();
-		int sucessnum=tmsCrvatTrxInfJob.executeTransactionInfDatas(batchCrvatTrxInfs,
-				allLegalEntities,allOrgLegalEntities,
-				allOrgs,allCustomers
+		int sucessnum=tmsCrvatTrxInfJob.executeTransactionInfDatas(batchCrvatTrxInfs
+				,allLegalEntities
+				,allOrgs,allCustomers
 				,allListSite
 				,allCustBankAccount);
 		log.info("PostTmsCrvatTrxInfJob "+batchCrvatTrxInfs.size()+" data costs:："

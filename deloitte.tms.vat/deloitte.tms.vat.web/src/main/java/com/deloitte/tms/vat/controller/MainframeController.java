@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.deloitte.tms.pl.cache.CacheUtils;
 import com.deloitte.tms.pl.core.context.utils.ContextUtils;
+import com.deloitte.tms.pl.security.controller.impl.UserUrlCacheUtils;
 import com.deloitte.tms.pl.security.exception.NoneLoginException;
 import com.deloitte.tms.pl.security.model.SecurityUser;
 import com.deloitte.tms.pl.security.model.impl.DefaultUrl;
@@ -149,7 +150,7 @@ public class MainframeController extends BaseController {
 	@RequestMapping(value = "mainframe/getUserManus")
 	public void getUserManus(HttpServletResponse response) {
 		ArrayList<MenuNode2> menuList = new ArrayList<MenuNode2>();
-		Collection<DefaultUrl> subordinates= loadMeunUrlsFromCache(null);	
+		Collection<DefaultUrl> subordinates= UserUrlCacheUtils.loadMeunUrlsFromCache(null);	
 		for (DefaultUrl subordinate : subordinates) {			
 			MenuNode2 menuNode=new MenuNode2();
 			menuNode.setId(subordinate.getId());
@@ -237,138 +238,138 @@ public class MainframeController extends BaseController {
 		// TODO Auto-generated method stub
 		iUrlService.deleteDefaultUrlById(id);
 	}
-	@SuppressWarnings("unchecked")
-	public Collection<DefaultUrl> loadMeunUrlsFromCache(String parentId) {
-		SecurityUser user = ContextUtils.getCurrentUser();
-		if (user == null) {
-			throw new NoneLoginException("Please login first");
-		}
-		String companyId=user.getCompanyId();
-		List<DefaultUrl> cacheUrls=(List<DefaultUrl>)CacheUtils.getCacheObject(URL_FOR_NAVI_CACHE_KEY);
-		if(cacheUrls==null){
-			cacheNavigatorUrls();
-			cacheUrls=(List<DefaultUrl>)CacheUtils.getCacheObject(URL_FOR_NAVI_CACHE_KEY);
-		}
-		Collection<DefaultUrl> urls = getCacheUrls(cacheUrls,companyId,parentId);
-		UserAuthentication authentication = new UserAuthentication(user);
-		Collection<DefaultUrl> result = new ArrayList<DefaultUrl>();
-		authorityCheck(urls,authentication,result);
-		return result;
-	}
-	private List<DefaultUrl> getCacheUrls(List<DefaultUrl> urls,String companyId,String parentId){
-		List<DefaultUrl> resultUrls=new ArrayList<DefaultUrl>();
-		this.buildCacheUrls(urls,resultUrls,companyId, parentId);
-		return resultUrls;
-	}	
-	private void buildCacheUrls(List<DefaultUrl> urls,List<DefaultUrl> resultUrls,String companyId,String parentId){
-		for(DefaultUrl url:urls){
-			if(url.getChildren()!=null&&url.getChildren().size()>0){
-				url.setHasChild(true);
-			}else {
-				url.setHasChild(false);
-			}
-			if(StringUtils.isEmpty(parentId)){
-				if(StringUtils.isEmpty(url.getParentId()) && url.getCompanyId()!=null && url.getCompanyId().equals(companyId)){
-					resultUrls.add(url);
-				}
-			}else{
-				if(StringUtils.isNotEmpty(url.getParentId()) && url.getParentId().equals(parentId)){
-					resultUrls.add(url);
-				}
-			}
-			if(url.getChildren()!=null){
-				this.buildCacheUrls(url.getChildren(), resultUrls, companyId, parentId);
-			}
-		}
-	}
-	public void cacheNavigatorUrls(){
-		Collection<DefaultUrl> urls = loadUrls();
-		CacheUtils.putCacheObject(URL_FOR_NAVI_CACHE_KEY, urls);
-	}
-	private Collection<DefaultUrl> loadUrls(){
-		List<DefaultUrl> allurls=getAllDefaultUrls();
-		Map<String, Collection<DefaultUrl>> subordinateRelations = new HashMap<String, Collection<DefaultUrl>>();
-		for (DefaultUrl url : allurls) {
-			//根据上級ID把下属的机构都归在一个集合下
-			if (subordinateRelations.keySet().contains(url.getParentId())) {
-				Collection<DefaultUrl> subordinates = subordinateRelations.get(url.getParentId());
-				subordinates.add(url);
-			} else {
-				Collection<DefaultUrl> subordinates = new ArrayList<DefaultUrl>();
-				subordinates.add(url);
-				subordinateRelations.put(url.getParentId(), subordinates);
-			}			
-		}
-		//根据顶层节点组件树
-		Collection<DefaultUrl> urls=subordinateRelations.get(null);
-		for(DefaultUrl parent:urls){
-			assembleTree(parent,subordinateRelations);
-		}		
-		/* 
-		 //改变方式为一次加载,再组合
-		urls= loadUrlsByParentId(parentId);
-		for(DefaultUrl url:urls){
-			url.setChildren(this.loadUrls(url.getId()));
-		}*/
-		return urls;
-	}
-	protected void assembleTree(DefaultUrl superior, Map<String, Collection<DefaultUrl>> subordinateRelations) {
-		String superiorId = superior.getId();
-		superior.setChildren(new ArrayList());
-		Collection<DefaultUrl> subordinates = subordinateRelations.get(superiorId);
-		if (subordinates == null || subordinates.isEmpty()) {
-			return;
-		}		
-		for (DefaultUrl subordinate : subordinates) {			
-			superior.getChildren().add(subordinate);
-			subordinate.setParent(superior);
-			assembleTree(subordinate, subordinateRelations);
-		}
-	}
-	private List<DefaultUrl> getAllDefaultUrls(){
-		return iUrlService.loadAllUrls();
-	}
-	private void authorityCheck(Collection<DefaultUrl> urls,UserAuthentication authentication,Collection<DefaultUrl> result){
-		for (DefaultUrl url : urls) {
-			String targetUrl = url.getUrl();
-			List<DefaultUrl> children=url.getChildren();
-			int childrenCount = 0;
-			if(children!=null){
-				childrenCount=children.size();
-			}
-			if (childrenCount==0 && StringUtils.isEmpty(targetUrl)) {
-				continue;
-			}
-			if(StringUtils.isEmpty(targetUrl)){
-				targetUrl = url.getName();				
-			}
-			try {
-//				if("销项发票开具".equals(targetUrl)){
-//					System.out.println(11);
+//	@SuppressWarnings("unchecked")
+//	public Collection<DefaultUrl> loadMeunUrlsFromCache(String parentId) {
+//		SecurityUser user = ContextUtils.getCurrentUser();
+//		if (user == null) {
+//			throw new NoneLoginException("Please login first");
+//		}
+//		String companyId=user.getCompanyId();
+//		List<DefaultUrl> cacheUrls=(List<DefaultUrl>)CacheUtils.getCacheObject(URL_FOR_NAVI_CACHE_KEY);
+//		if(cacheUrls==null){
+//			cacheNavigatorUrls();
+//			cacheUrls=(List<DefaultUrl>)CacheUtils.getCacheObject(URL_FOR_NAVI_CACHE_KEY);
+//		}
+//		Collection<DefaultUrl> urls = getCacheUrls(cacheUrls,companyId,parentId);
+//		UserAuthentication authentication = new UserAuthentication(user);
+//		Collection<DefaultUrl> result = new ArrayList<DefaultUrl>();
+//		authorityCheck(urls,authentication,result);
+//		return result;
+//	}
+//	private List<DefaultUrl> getCacheUrls(List<DefaultUrl> urls,String companyId,String parentId){
+//		List<DefaultUrl> resultUrls=new ArrayList<DefaultUrl>();
+//		this.buildCacheUrls(urls,resultUrls,companyId, parentId);
+//		return resultUrls;
+//	}	
+//	private void buildCacheUrls(List<DefaultUrl> urls,List<DefaultUrl> resultUrls,String companyId,String parentId){
+//		for(DefaultUrl url:urls){
+//			if(url.getChildren()!=null&&url.getChildren().size()>0){
+//				url.setHasChild(true);
+//			}else {
+//				url.setHasChild(false);
+//			}
+//			if(StringUtils.isEmpty(parentId)){
+//				if(StringUtils.isEmpty(url.getParentId()) && url.getCompanyId()!=null && url.getCompanyId().equals(companyId)){
+//					resultUrls.add(url);
 //				}
-				SecurityUtils.checkUrl(authentication, targetUrl);
-//				System.out.println("check:"+targetUrl+" pass");
-				DefaultUrl newUrl=buildNewUrl(url);
-				result.add(newUrl);
-				if(children!=null){
-					List<DefaultUrl> childrenUrls=new ArrayList<DefaultUrl>();
-					newUrl.setChildren(childrenUrls);
-					authorityCheck(children,authentication,childrenUrls);				
-				}
-			} catch (AccessDeniedException ex) {
-//				System.out.println("check:"+targetUrl+" fail");
-			}
-		}
-	}
-	private DefaultUrl buildNewUrl(DefaultUrl oldUrl){
-		DefaultUrl url=new DefaultUrl();
-		url.setId(oldUrl.getId());
-		url.setName(oldUrl.getName());
-		url.setDesc(oldUrl.getDesc());
-		url.setUrl(oldUrl.getUrl());
-		url.setIcon(oldUrl.getIcon());
-		url.setParentId(oldUrl.getParentId());
-		url.setCompanyId(oldUrl.getCompanyId());
-		return url;
-	}
+//			}else{
+//				if(StringUtils.isNotEmpty(url.getParentId()) && url.getParentId().equals(parentId)){
+//					resultUrls.add(url);
+//				}
+//			}
+//			if(url.getChildren()!=null){
+//				this.buildCacheUrls(url.getChildren(), resultUrls, companyId, parentId);
+//			}
+//		}
+//	}
+//	public void cacheNavigatorUrls(){
+//		Collection<DefaultUrl> urls = loadUrls();
+//		CacheUtils.putCacheObject(URL_FOR_NAVI_CACHE_KEY, urls);
+//	}
+//	private Collection<DefaultUrl> loadUrls(){
+//		List<DefaultUrl> allurls=getAllDefaultUrls();
+//		Map<String, Collection<DefaultUrl>> subordinateRelations = new HashMap<String, Collection<DefaultUrl>>();
+//		for (DefaultUrl url : allurls) {
+//			//根据上級ID把下属的机构都归在一个集合下
+//			if (subordinateRelations.keySet().contains(url.getParentId())) {
+//				Collection<DefaultUrl> subordinates = subordinateRelations.get(url.getParentId());
+//				subordinates.add(url);
+//			} else {
+//				Collection<DefaultUrl> subordinates = new ArrayList<DefaultUrl>();
+//				subordinates.add(url);
+//				subordinateRelations.put(url.getParentId(), subordinates);
+//			}			
+//		}
+//		//根据顶层节点组件树
+//		Collection<DefaultUrl> urls=subordinateRelations.get(null);
+//		for(DefaultUrl parent:urls){
+//			assembleTree(parent,subordinateRelations);
+//		}		
+//		/* 
+//		 //改变方式为一次加载,再组合
+//		urls= loadUrlsByParentId(parentId);
+//		for(DefaultUrl url:urls){
+//			url.setChildren(this.loadUrls(url.getId()));
+//		}*/
+//		return urls;
+//	}
+//	protected void assembleTree(DefaultUrl superior, Map<String, Collection<DefaultUrl>> subordinateRelations) {
+//		String superiorId = superior.getId();
+//		superior.setChildren(new ArrayList());
+//		Collection<DefaultUrl> subordinates = subordinateRelations.get(superiorId);
+//		if (subordinates == null || subordinates.isEmpty()) {
+//			return;
+//		}		
+//		for (DefaultUrl subordinate : subordinates) {			
+//			superior.getChildren().add(subordinate);
+//			subordinate.setParent(superior);
+//			assembleTree(subordinate, subordinateRelations);
+//		}
+//	}
+//	private List<DefaultUrl> getAllDefaultUrls(){
+//		return iUrlService.loadAllUrls();
+//	}
+//	private void authorityCheck(Collection<DefaultUrl> urls,UserAuthentication authentication,Collection<DefaultUrl> result){
+//		for (DefaultUrl url : urls) {
+//			String targetUrl = url.getUrl();
+//			List<DefaultUrl> children=url.getChildren();
+//			int childrenCount = 0;
+//			if(children!=null){
+//				childrenCount=children.size();
+//			}
+//			if (childrenCount==0 && StringUtils.isEmpty(targetUrl)) {
+//				continue;
+//			}
+//			if(StringUtils.isEmpty(targetUrl)){
+//				targetUrl = url.getName();				
+//			}
+//			try {
+////				if("销项发票开具".equals(targetUrl)){
+////					System.out.println(11);
+////				}
+//				SecurityUtils.checkUrl(authentication, targetUrl);
+////				System.out.println("check:"+targetUrl+" pass");
+//				DefaultUrl newUrl=buildNewUrl(url);
+//				result.add(newUrl);
+//				if(children!=null){
+//					List<DefaultUrl> childrenUrls=new ArrayList<DefaultUrl>();
+//					newUrl.setChildren(childrenUrls);
+//					authorityCheck(children,authentication,childrenUrls);				
+//				}
+//			} catch (AccessDeniedException ex) {
+////				System.out.println("check:"+targetUrl+" fail");
+//			}
+//		}
+//	}
+//	private DefaultUrl buildNewUrl(DefaultUrl oldUrl){
+//		DefaultUrl url=new DefaultUrl();
+//		url.setId(oldUrl.getId());
+//		url.setName(oldUrl.getName());
+//		url.setDesc(oldUrl.getDesc());
+//		url.setUrl(oldUrl.getUrl());
+//		url.setIcon(oldUrl.getIcon());
+//		url.setParentId(oldUrl.getParentId());
+//		url.setCompanyId(oldUrl.getCompanyId());
+//		return url;
+//	}
 }

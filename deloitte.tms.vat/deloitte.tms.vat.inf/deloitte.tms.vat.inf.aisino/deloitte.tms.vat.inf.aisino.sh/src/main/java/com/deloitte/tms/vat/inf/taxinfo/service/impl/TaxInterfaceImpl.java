@@ -67,26 +67,29 @@ public class TaxInterfaceImpl implements TaxInterface{
 				result.setInvoiceAmount(totalAmout);
 			}
 		}	
-		
+		//开具
 		genInvoiceCodeAndNo(request,result);
 		response.addResult(result);		
+		
+		//修改数据库
 		processTaxInterface.processIssueInvoiceResponse(request,response);
 		return response;
 	}
 	
 	@Override
 	public PrintInvoiceResponse processPrintInvoice(InvoicePrintRequest request) {
-		AssertHelper.notEmpty_assert(request, "打印内容不能为空");
-		request.check();
+		//AssertHelper.notEmpty_assert(request, "打印内容不能为空");
+		//request.check();
 		PrintInvoiceResponse response=new PrintInvoiceResponse();
 		for(InvoicePrint print:request.getRecords()){
 			InvoicePrintResult result=new InvoicePrintResult();
-			result.setErroCode(AisinoResponseCodeDef.PRINT_SITE_SUCESS);
+			
 			result.setInvoiceCode(print.getInvoiceCode());
 			result.setInvoiceNo(print.getInvoiceNo());
 			result.setInvoiceType(print.getInvoiceType());
+			//打印
 			printInvoice(print.getInvoiceCode(),print.getInvoiceNo(),Integer.parseInt(print.getInvoiceType()));
-			//printInvoice(request);
+			//printInvoice(request,result);
 			
 			response.addResult(result);
 		}
@@ -108,29 +111,28 @@ public class TaxInterfaceImpl implements TaxInterface{
 			if( "S".equalsIgnoreCase(sajtResponse.getStatus())){
 				System.out.println("发票打印成功！！");
 			}else{
-				System.out.println("发票打印失败！！"+sajtResponse.getCmdMessage());
+				throw new BusinessException(sajtResponse.getCmdMessage());
 			}
 		}catch(Exception e){
-			throw new BusinessException("打印发票出现异常！！");
+			e.printStackTrace();
+			throw new BusinessException("发票开具出现异常，可能数据不完整，  您可以先打印其他发票！！");
 		}
 	}
 
-	private void printInvoice(InvoicePrintRequest request) {
+	private void printInvoice(InvoicePrintRequest request,InvoicePrintResult result) {
 		
 		try{
-			//String printCommand = GeneratPrintCommand(invoiceCode,invoiceNo,parseInt);
 			String printCommand = ObjectToXMLUtils.formatXML(aisinoTaxObjectSerialize.outObject(request));
-			System.out.println(printCommand);
 			
 			SajtIssueInvoiceResponse sajtResponse = service.saveDocument(printCommand);
-			System.out.println(sajtResponse.getStatus());
 			if( "S".equalsIgnoreCase(sajtResponse.getStatus())){
-				System.out.println("发票打印成功！！");
+				result.setErroCode(AisinoResponseCodeDef.PRINT_SITE_SUCESS);
 			}else{
-				System.out.println("发票打印失败！！"+sajtResponse.getCmdMessage());
+				throw new BusinessException(sajtResponse.getCmdMessage());
 			}
 		}catch(Exception e){
-			throw new BusinessException("打印发票出现异常！！");
+			e.printStackTrace();
+			throw new BusinessException("打印发票出现异常，可能原因：数据不完整！ 您可以先打印其他发票！！");
 		}
 		
 	}
@@ -138,31 +140,32 @@ public class TaxInterfaceImpl implements TaxInterface{
 	private void genInvoiceCodeAndNo(InvoiceIssueRequest request,InvoiceIssueResult result) {
 		try{
 			String invoiceString = ObjectToXMLUtils.formatXML(aisinoTaxObjectSerialize.outObject(request));
-			System.out.println(invoiceString);
 			
+			long begin = System.currentTimeMillis();
 			SajtIssueInvoiceResponse sajtResponse = service.saveDocument(invoiceString);
-			System.out.println(sajtResponse.getStatus());
+			long end = System.currentTimeMillis();
+			
+			System.out.println("调用航信接口花费的时间："+(end-begin));
 			
 			//打印发票成功
 			if( "S".equalsIgnoreCase(sajtResponse.getStatus()) ){
 				//获取开具代码和开局号码
 				String cmdMessageString = sajtResponse.getCmdMessage();
-				System.out.println(cmdMessageString);
 				String strCode = getINVInformation(cmdMessageString,"<binvcode>","</binvcode>");
 				String strNum = getINVInformation(cmdMessageString,"<binvnr>","</binvnr>");
 				
 				result.setInvoiceCode(strCode);
 				result.setInvoiceNo(strNum);
-				result.setErroCode(AisinoResponseCodeDef.PRINT_SITE_SUCESS);				
+				result.setErroCode(AisinoResponseCodeDef.PRINT_SITE_SUCESS);	
+				result.setErroMsg("开具成功");
 				
 			}else{
-				//System.out.println(sajtResponse.getCmdMessage());
 				throw new BusinessException(sajtResponse.getCmdMessage());
 			}
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			//throw new BusinessException("获取发票代码和发票号码出错");
+			throw new BusinessException("开具发票出现异常，可能原因：数据不完整！ 您可以先打印其他发票！！");
 		}
 		
 	}
@@ -197,6 +200,5 @@ public class TaxInterfaceImpl implements TaxInterface{
 		 			.append("</invnr></key></printinv></siiscmd>"); 
 		 return PrintQuery.toString();   
 	 }
-
 
 }

@@ -7,11 +7,13 @@ import java.util.Map;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
+
 
 
 
@@ -194,7 +196,17 @@ public class TmsMdTaxTrxTypeController extends BaseController{
 	@ResponseBody
 	@RequestMapping(value = "/loadTmsMdTaxTrxTypePageName", method = RequestMethod.POST)
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
-	public DaoPage loadTmsMdTaxTrxTypePageName(@RequestParam Map<String,Object> parameter) throws Exception {
+	public DaoPage loadTmsMdTaxTrxTypePageName(@RequestParam Map<String,Object> parameter,HttpServletRequest request) throws Exception {
+		
+		String param = request.getParameter("taxTrxTypeCode");
+		String PageNumber = request.getParameter("pageNumber");
+		String pageSize = request.getParameter("pageSize");
+		if(param!=null && !"".equals(param)){
+			parameter.put("taxTrxTypeCode", param);
+		}
+		parameter.put("PageNumber", PageNumber);
+		parameter.put("pageSize", pageSize);
+		
 		DaoPage daoPage=tmsMdTaxTrxTypeService.findTmsMdTaxTrxTypeByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
 		return daoPage;
 	}

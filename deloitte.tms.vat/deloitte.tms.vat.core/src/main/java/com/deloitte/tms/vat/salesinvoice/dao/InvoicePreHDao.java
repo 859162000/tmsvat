@@ -5,9 +5,9 @@ import java.util.Map;
 
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.dao.IDao;
-import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqH;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreH;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreL;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreP;
 
 public interface InvoicePreHDao extends IDao<TmsCrvatInvoicePreH>{
 	public static final String BEAN_ID="invoicePreHDao";
@@ -16,4 +16,5 @@ public interface InvoicePreHDao extends IDao<TmsCrvatInvoicePreH>{
 	public DaoPage findTmsCrvatInvoicePreLById(String preHid,int pageIndex,int pageNumber);
 	public List<TmsCrvatInvoicePreL> getCrvatInvoicePreLsByPreHId(String preHid);
 	public void updateTrxPoolStatusByPreHid(String prehid,String status);
+	public List<TmsCrvatInvoicePreP> getCrvatInvoicePrePsByPreHId(String preHid);
 }

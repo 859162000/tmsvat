@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.deloitte.tms.pl.job.task.JobTest;
 import com.deloitte.tms.vat.base.enums.AppFormStatuEnums;
+import com.deloitte.tms.vat.base.enums.InvoiceReqTypeEnums;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqH;
 import com.deloitte.tms.vat.salesinvoice.service.CrvatInvoiceReToPreService;
 @Component("invoiceResToPre")
@@ -26,6 +27,7 @@ public class InvoiceResToPre implements Job,JobTest{
 	public void execute() {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("status", AppFormStatuEnums.SUBMITTED.getValue());
+		params.put("invoiceReqType", InvoiceReqTypeEnums.COUNTER.getValue());
 		List<InvoiceReqH> list =  crvatInvoiceReToPreService.findInvoiceReqHByParams(params);
 		
 		/*for(InvoiceReqH invoiceReqH:list){

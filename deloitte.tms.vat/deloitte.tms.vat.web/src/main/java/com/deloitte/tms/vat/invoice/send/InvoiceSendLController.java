@@ -64,19 +64,24 @@ public class InvoiceSendLController extends BaseController{
 	@RequestMapping(value = "/loadInvoiceSendLPage", method = RequestMethod.POST)
 	public void loadInvoiceSendLPage(HttpServletResponse response,@RequestParam Map<String,Object> parameter) throws Exception {
 		//获取发票池数据
-		DaoPage daopage= (DaoPage) invoicePrintPoolHService.findInvoicePrintPoolHByParams(parameter,1,10);
-		List<InvoiceSendLInParam> currentTable=invoiceSendLService.findInvoiceSendLByParams(parameter);//拿出当前表数据
+		List<InvoicePrintPoolHInParam> invoicePrintPoolHList=  invoicePrintPoolHService.findInvoicePrintPoolHByParams(parameter);
+		//List<InvoiceSendLInParam> currentTable=invoiceSendLService.findInvoiceSendLByParams(parameter);//拿出当前表数据
+		List<InvoiceSendL> currentTable=invoiceSendLService.findInvoiceSendLByParams(parameter);//拿出当前表数据
+		
 		List<String> ids =new ArrayList<String>();//当前表数据ID列表
 		List<InvoicePrintPoolHInParam>  frontList =new ArrayList<InvoicePrintPoolHInParam>();
-		Iterator<InvoiceSendLInParam> idIterator=currentTable.iterator();
+		//Iterator<InvoiceSendLInParam> idIterator=currentTable.iterator();
+		Iterator<InvoiceSendL> idIterator=currentTable.iterator();
 		while(idIterator.hasNext())
 		{
 			ids.add(idIterator.next().getInvoicePrtPoolHId());//打印池ID集合
 		}
-		for(Object send:daopage.getResult())
+		for(Object send:invoicePrintPoolHList)
 		{
-			if(!ids.contains(((InvoicePrintPoolHInParam)send).getId()));//过滤已经有的数据
+			if(!ids.contains(((InvoicePrintPoolHInParam)send).getId()))//过滤已经有的数据
+			{
 			frontList.add((InvoicePrintPoolHInParam) send);
+			}
 		}
 		JsonConfig jsonConfig = new JsonConfig();  
 		 jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor()); 
@@ -93,16 +98,19 @@ public class InvoiceSendLController extends BaseController{
 	@RequestMapping(value = "/loadInvoiceSendLPageBySelected", method = RequestMethod.POST)
 	public void loadInvoiceSendLPageBySelected(HttpServletResponse response,@RequestParam Map<String,Object> parameter) throws Exception {
 		//获取发票池数据
-		DaoPage daopage= (DaoPage) invoicePrintPoolHService.findInvoicePrintPoolHByParams(parameter,1,10);
-		List<InvoiceSendLInParam> currentTable=invoiceSendLService.findInvoiceSendLByParams(parameter);//拿出当前表数据
+		List<InvoicePrintPoolHInParam> invoicePrintPoolHList=  invoicePrintPoolHService.findInvoicePrintPoolHByParams(parameter);
+		//List<InvoiceSendLInParam> currentTable=invoiceSendLService.findInvoiceSendLByParams(parameter);//拿出当前表数据
+		List<InvoiceSendL> currentTable=invoiceSendLService.findInvoiceSendLByParams(parameter);//拿出当前表数据
+		
 		List<String> ids =new ArrayList<String>();//当前表数据ID列表
 		List<InvoicePrintPoolHInParam>  frontList =new ArrayList<InvoicePrintPoolHInParam>();
-		Iterator<InvoiceSendLInParam> idIterator=currentTable.iterator();
+		//Iterator<InvoiceSendLInParam> idIterator=currentTable.iterator();
+		Iterator<InvoiceSendL> idIterator=currentTable.iterator();
 		while(idIterator.hasNext())
 		{
 			ids.add(idIterator.next().getInvoicePrtPoolHId());//打印池ID集合
 		}
-		for(Object send:daopage.getResult())
+		for(Object send:invoicePrintPoolHList)
 		{
 			if(!ids.contains(((InvoicePrintPoolHInParam)send).getId()));//过滤已经有的数据
 			frontList.add((InvoicePrintPoolHInParam) send);
@@ -128,13 +136,19 @@ public class InvoiceSendLController extends BaseController{
 		InvoicePrintPoolH invoicePrintPoolH = new InvoicePrintPoolH();
 		List<InvoiceSendL> invoiceSendLTempList = new ArrayList<InvoiceSendL>();
 		InvoiceSendL tempInvoiceSendL = new InvoiceSendL();//寄送单列信息, 跟发票一对一关联
-		for(String clientId:clientKeys.split(",")){
-			invoicePrintPoolH=(InvoicePrintPoolH) invoicePrintPoolHService.findById(InvoicePrintPoolH.class, clientId);
+		String sendId = clientKeys.split(",")[clientKeys.split(",").length-1];//把 寄送单头ID提取出来
+		String[] clientIdStrings = clientKeys.split(",");
+		for(int i=0;i<clientKeys.split(",").length-1;i++)
+		{
+			invoicePrintPoolH=(InvoicePrintPoolH) invoicePrintPoolHService.findById(InvoicePrintPoolH.class, clientIdStrings[i]);
 			ReflectUtils.copyProperties(invoicePrintPoolH, tempInvoiceSendL);
-			tempInvoiceSendL.setInvoicePrtPoolHId(clientId);//把发票打印池ID添加到寄送单 列信息
-			invoiceSendLTempList.add(tempInvoiceSendL);
+			tempInvoiceSendL.setId(IdGenerator.getUUID());
+			tempInvoiceSendL.setInvoicePrtPoolHId(clientIdStrings[i]);//把发票打印池ID添加到寄送单 列信息
+			tempInvoiceSendL.setInvoiceDeliveryHId(sendId);//关联头表
+			invoiceSendLService.save(tempInvoiceSendL);
+			//invoiceSendLTempList.add(tempInvoiceSendL);
 		}
-		invoiceSendLService.saveAll(invoiceSendLTempList);//批量保存
+		//invoiceSendLService.saveAll(invoiceSendLTempList);//批量保存
 		 JsonConfig jsonConfig = new JsonConfig();  
 		 jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor()); 
 		 JSONArray jsonArray = JSONArray.fromObject(inParams,jsonConfig);

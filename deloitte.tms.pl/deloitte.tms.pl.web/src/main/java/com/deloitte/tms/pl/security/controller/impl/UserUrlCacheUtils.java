@@ -15,7 +15,9 @@ package com.deloitte.tms.pl.security.controller.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.security.access.AccessDeniedException;
@@ -151,12 +153,47 @@ public class UserUrlCacheUtils {
 	}
 	
 	private static List<DefaultUrl> loadUrls(String parentId){
-		List<DefaultUrl> urls = new ArrayList<DefaultUrl>();
-		urls= getUrlService().loadUrlsByParentId(parentId);
-		for(DefaultUrl url:urls){
-			url.setChildren(loadUrls(url.getId()));
+		List<DefaultUrl> allurls=getAllDefaultUrls();
+		Map<String, Collection<DefaultUrl>> subordinateRelations = new HashMap<String, Collection<DefaultUrl>>();
+		for (DefaultUrl url : allurls) {
+			//根据上級ID把下属的机构都归在一个集合下
+			if (subordinateRelations.keySet().contains(url.getParentId())) {
+				Collection<DefaultUrl> subordinates = subordinateRelations.get(url.getParentId());
+				subordinates.add(url);
+			} else {
+				Collection<DefaultUrl> subordinates = new ArrayList<DefaultUrl>();
+				subordinates.add(url);
+				subordinateRelations.put(url.getParentId(), subordinates);
+			}			
 		}
-		return urls;
+		//根据顶层节点组件树
+		Collection<DefaultUrl> urls=subordinateRelations.get(null);
+		for(DefaultUrl parent:urls){
+			assembleTree(parent,subordinateRelations);
+		}		
+		/* 
+		 //改变方式为一次加载,再组合
+		urls= loadUrlsByParentId(parentId);
+		for(DefaultUrl url:urls){
+			url.setChildren(this.loadUrls(url.getId()));
+		}*/
+		return (List<DefaultUrl>) urls;
+	}
+	private static List<DefaultUrl> getAllDefaultUrls(){
+		return getUrlService().loadAllUrls();
+	}
+	protected static void assembleTree(DefaultUrl superior, Map<String, Collection<DefaultUrl>> subordinateRelations) {
+		String superiorId = superior.getId();
+		superior.setChildren(new ArrayList());
+		Collection<DefaultUrl> subordinates = subordinateRelations.get(superiorId);
+		if (subordinates == null || subordinates.isEmpty()) {
+			return;
+		}		
+		for (DefaultUrl subordinate : subordinates) {			
+			superior.getChildren().add(subordinate);
+			subordinate.setParent(superior);
+			assembleTree(subordinate, subordinateRelations);
+		}
 	}
 	private static DefaultUrl buildNewUrl(DefaultUrl oldUrl){
 		DefaultUrl url=new DefaultUrl();

@@ -48,13 +48,14 @@ public class InvoiceSendLServiceImpl extends BaseService implements InvoiceSendL
 		return daoPage;
 	}
 	@Override
-	public List<InvoiceSendLInParam> findInvoiceSendLByParams(Map params) {
+	public List<InvoiceSendL> findInvoiceSendLByParams(Map params) {
 		if(params==null)
 		{
 			params=new HashMap();
 		}
 		List<InvoiceSendL> temp= invoiceSendLDao.findInvoiceSendLByParams(params);
-		return convertInvoiceSendLToInParam(temp);
+		return temp;
+		//return convertInvoiceSendLToInParam(temp);
 	}
 	@Override
 	public void saveInvoiceSendLDataListsMap(Map dataListsMap) {

@@ -1,6 +1,7 @@
 package com.deloitte.tms.vat.salesinvoice.model;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import javax.persistence.Column;
 
@@ -18,6 +19,17 @@ public class TmsCrvatInvReqBatchesLInParam extends TmsCrvatInvReqBatchesL{
 	private String crvatInvoiceReqNumber;
 	//是否已收款
 	private String isReceipts;
+	//审批人
+	private String approvalBy;
+	//申请部门
+    private String attribute10;
+    //申请单处理状态
+    private int tips;
+    //申请日期
+    private Date invoiceReqDate;
+    //最后审批日期
+    private Date approvalDate;
+	
 	
 	//-----Customer--客户表----
 	//购方名称
@@ -329,7 +341,37 @@ public class TmsCrvatInvReqBatchesLInParam extends TmsCrvatInvReqBatchesL{
 	public void setInvoiceAmounts(BigDecimal invoiceAmounts) {
 		this.invoiceAmounts = invoiceAmounts;
 	}
-
+	public String getApprovalBy() {
+		return approvalBy;
+	}
+	public void setApprovalBy(String approvalBy) {
+		this.approvalBy = approvalBy;
+	}
+	public String getAttribute10() {
+		return attribute10;
+	}
+	public void setAttribute10(String attribute10) {
+		this.attribute10 = attribute10;
+	}
+	public Date getInvoiceReqDate() {
+		return invoiceReqDate;
+	}
+	public void setInvoiceReqDate(Date invoiceReqDate) {
+		this.invoiceReqDate = invoiceReqDate;
+	}
+	public int getTips() {
+		return tips;
+	}
+	public Date getApprovalDate() {
+		return approvalDate;
+	}
+	public void setApprovalDate(Date approvalDate) {
+		this.approvalDate = approvalDate;
+	}
+	public void setTips(int tips) {
+		this.tips = tips;
+	}
+	
 	
 	
 	

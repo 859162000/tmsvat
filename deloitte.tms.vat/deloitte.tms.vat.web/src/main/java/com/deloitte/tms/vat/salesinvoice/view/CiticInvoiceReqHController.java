@@ -139,6 +139,7 @@ public class CiticInvoiceReqHController extends BaseController{
 		map.put("orgId", ContextUtils.getCurrentOrgId());
 		JSONObject result=new JSONObject();
 		try {
+			map.put("orgName_findmethod", "zhongxintext");
 			DaoPage page=invoiceReqHService.findInvoiceTrxPoolByParams(map, PageUtils.getPageNumber(map),PageUtils.getPageSize(map));
 			//List<InvoiceTrxPoolInParam>list=invoiceTrxPoolService.getAlltransaction(map);
 			JsonConfig jsonConfig = new JsonConfig();  
@@ -335,7 +336,7 @@ public class CiticInvoiceReqHController extends BaseController{
 	
 	
 	@RequestMapping(value = "citicInvoiceReq/deletetempbyusername", method = RequestMethod.POST)
-	public void deleteTempCrvatReql() throws IOException{		
+	public void deleteTempCrvatReql(HttpServletResponse response) throws IOException{		
 		invoiceTrxPoolService.deleteTempCrvatInvoiceRelByUserName(ContextUtils.getCurrentUserName());	
 	}
 	/*@RequestMapping(value = "citicInvoiceReq/updateCommitStatus", method = RequestMethod.POST)

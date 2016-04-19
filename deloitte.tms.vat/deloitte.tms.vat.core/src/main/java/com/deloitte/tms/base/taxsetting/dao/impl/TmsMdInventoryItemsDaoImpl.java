@@ -41,6 +41,34 @@ public class TmsMdInventoryItemsDaoImpl extends BaseDao<TmsMdInventoryItems> imp
 			query.append(" and status=:status");
 			values.put("status", value);
 		}
+		if(AssertHelper.isOrNotEmpty_assert(params.get("inventoryItemNumber"))){
+			query.append(" and inventoryItemNumber=:inventoryItemNumber");
+			values.put("inventoryItemNumber", params.get("inventoryItemNumber"));
+		}
+		if(AssertHelper.isOrNotEmpty_assert(params.get("inventoryItemDescripton"))){
+			query.append(" and inventoryItemDescripton like :inventoryItemDescripton");
+			values.put("inventoryItemDescripton", "%"+params.get("inventoryItemDescripton")+"%");
+		}
+		if(AssertHelper.isOrNotEmpty_assert(params.get("inventoryItemModels"))){
+			query.append(" and inventoryItemModels=:inventoryItemModels");
+			values.put("inventoryItemModels", params.get("inventoryItemModels"));
+		}
+		if(AssertHelper.isOrNotEmpty_assert(params.get("inventoryCategoryCode"))){
+			query.append(" and inventoryCategoryCode=:inventoryCategoryCode");
+			values.put("inventoryCategoryCode", params.get("inventoryCategoryCode"));
+		}
+		if(AssertHelper.isOrNotEmpty_assert(params.get("taxItemId"))){
+			query.append(" and taxItemId=:taxItemId");
+			values.put("taxItemId", params.get("taxItemId"));
+		}
+		if(AssertHelper.isOrNotEmpty_assert(params.get("taxRate"))){
+			query.append(" and taxRate=:taxRate");
+			values.put("taxRate", params.get("taxRate"));
+		}
+		if(AssertHelper.isOrNotEmpty_assert(params.get("enabledFlag"))){
+			query.append(" and enabledFlag=:enabledFlag");
+			values.put("enabledFlag", params.get("enabledFlag"));
+		}
 	}
 }
 

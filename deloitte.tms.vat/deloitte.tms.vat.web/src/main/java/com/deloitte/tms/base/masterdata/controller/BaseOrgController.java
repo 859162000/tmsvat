@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
-
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.reflect.ReflectUtils;
 import com.deloitte.tms.pl.core.commons.utils.PageUtils;
@@ -96,5 +96,22 @@ public class BaseOrgController extends BaseController{
 		List result=baseOrgService.findBaseOrgByParams(map);
 		return result;
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/loadBaseOrgPageRequest", method = RequestMethod.POST)
+	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
+	public DaoPage loadBaseOrgPageRequest(@RequestParam Map<String,Object> parameter,HttpServletRequest request) throws Exception {
+	    
+		 String param =(String)request.getParameter("orgName");
+		    if(param!=null&&!"".equals(param)){
+			    parameter.put("orgName", param);
+		}
+		DaoPage daoPage=baseOrgService.findBaseOrgByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
+		return daoPage;
+	}
+	
+	
+	
+	
 }
 

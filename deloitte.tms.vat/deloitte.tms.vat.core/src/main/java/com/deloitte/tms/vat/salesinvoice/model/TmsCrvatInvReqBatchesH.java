@@ -132,6 +132,10 @@ public class TmsCrvatInvReqBatchesH extends BaseEntity {
 	@ModelProperty(comment="失效日期")
 	private Date endDate;
     
+    @Column(name="ATTRIBUTE10", length=7)
+   	@ModelProperty(comment="申请部门")
+    private String attribute10;
+    
 	public String getId() {
 		return id;
 	}
@@ -314,6 +318,14 @@ public class TmsCrvatInvReqBatchesH extends BaseEntity {
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public String getAttribute10() {
+		return attribute10;
+	}
+
+	public void setAttribute10(String attribute10) {
+		this.attribute10 = attribute10;
 	}
 
 

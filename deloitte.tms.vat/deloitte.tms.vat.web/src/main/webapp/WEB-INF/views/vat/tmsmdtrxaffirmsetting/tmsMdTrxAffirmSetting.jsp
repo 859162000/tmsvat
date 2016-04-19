@@ -23,7 +23,7 @@
 						 <td style="display: none;"><input id="searchform_taxTrsTypeList_select_Id" name="taxTrxTypeId" class="easyui-textbox"  style="width: 150px;" ></input></td>     
 						 <td>涉税交易类型:</td>
 		    			 <td>					
-					    	<input id="searchform_taxTrsTypeList_select" name="taxTransactionType" easyuiClass="easyui-combogrid" easyuiStyle="width:150px;">										
+					    	<input id="searchform_taxTrsTypeList_select" name="taxTransactionType" easyuiClass="easyui-combogrid" style="width:150px;">										
 							</input>				    	
 						</td>
 		    		</tr>
@@ -156,9 +156,9 @@
             </tr>
             <tr>
             	<td align="right">生效日期：</td> 
-               <td><input id="startDate" name="startDate" class="easyui-datebox" type="text" style="width:150px;" name="trxEndDate" data-options="required:true"></input></td>
+               <td><input id="startDate" name="startDate" class="easyui-datebox" type="text" style="width:150px;"  data-options="required:true"></input></td>
                <td align="right">有效日期：</td>
-               <td><input id="endDate" name="endDate"  class="easyui-datebox" type="text" style="width:150px;" name="trxEndDate" data-options="required:true"></input></td>             
+               <td><input id="endDate" name="endDate"  class="easyui-datebox" type="text" style="width:150px;"  data-options="required:true"></input></td>             
             </tr>
            </table>
       </form>
@@ -607,14 +607,19 @@ function initTaxEntity() {
 						} ] ],
 						toolbar : [
 								{
-									text : '组织:<input type="text" id="taxEntityId" class="easyui-textbox"/>'
+									text : '组织:<input type="text" id="taxEntityId3" class="easyui-textbox"/>'
 								}, {
 									text : "查询",
 									iconCls : 'icon-search',
 									handler : function() {
-										findTaxEntity();
+										var param = $("#taxEntityId3").val();
+										findTwoBaseOrgEntity(param);
 									}
 								}, '-' ],
+								onSelect: function(index,value){
+									var selected = $('#org_addEdit').combogrid('grid').datagrid('getSelected');
+									$("#org_addEditId").textbox('setValue',selected.id);
+								},
 						keyHandler : {
 							up : function() { //【向上键】押下处理
 								//取得选中行
@@ -693,13 +698,7 @@ function initTaxEntity() {
 				  pageSize : $('#org_addEdit').combogrid("grid").datagrid('options').pageSize
 			});
 	searchBaseOrg();
-	
-	$('#org_addEdit').combogrid('grid').datagrid({
-		onSelect: function(index,value){
-			var selected = $('#org_addEdit').combogrid('grid').datagrid('getSelected');
-			$("#org_addEditId").textbox('setValue',selected.id);
-		}
-	});	
+
 }
 	
 function searchBaseOrg(){	
@@ -875,9 +874,14 @@ function judgeIsNull(){
 							text : "查询",
 							iconCls : 'icon-search',
 							handler : function() {
-								findTaxEntity();
+								var param = $("#taxEntityId").val();
+								findFirstBaseOrgEntity(param);
 							}
 						}, '-' ],
+						onSelect: function(index,value){
+							var selected = $('#org_addEdit_search').combogrid('grid').datagrid('getSelected');
+							$("#org_addEdit_searchId").textbox('setValue',selected.id);
+						},
 				keyHandler : {
 					up : function() { //【向上键】押下处理
 						//取得选中行
@@ -930,39 +934,33 @@ $(pager).pagination(
 						$('#getByBaseOrg').form('clear');
 						$("#pageNumber1").textbox('setValue',pageNumber);
 						$("#pageSize1").textbox('setValue',pageSize);										
-						searchBaseOrg();
+						searchBaseOrgSearch();
 					},
 					//改变页显示条数的处理
 			
-	/* 				onChangePageSize : function(pageNumber, pageSize) {
+	 				onChangePageSize : function(pageNumber, pageSize) {
 						$("#pageNumber1").textbox('setValue',pageNumber);
 						$("#pageSize1").textbox('setValue',pageSize);										
-						searchBaseOrg();
-					}, */
+						searchBaseOrgSearch();
+					}, 
 				
 				onRefresh : function(pageNumber, pageSize) {
 						//按分页的设置取数据
 					$('#getByBaseOrg').form('clear');
 					$("#pageNumber1").textbox('setValue',pageNumber);
 					$("#pageSize1").textbox('setValue',pageSize);										
-					searchBaseOrg();
+					searchBaseOrgSearch();
 					}
 				});
 }
 $('#getByBaseOrg').form('clear');
 $('#getByBaseOrg').form('load',
 	{
-		pageNumber : $('#org_addEdit').combogrid("grid").datagrid('options').pageNumber,
-		  pageSize : $('#org_addEdit').combogrid("grid").datagrid('options').pageSize
+		pageNumber : $('#org_addEdit_search').combogrid("grid").datagrid('options').pageNumber,
+		  pageSize : $('#org_addEdit_search').combogrid("grid").datagrid('options').pageSize
 	});
 searchBaseOrgSearch();
 
-$('#org_addEdit_search').combogrid('grid').datagrid({
-onSelect: function(index,value){
-	var selected = $('#org_addEdit_search').combogrid('grid').datagrid('getSelected');
-	$("#org_addEdit_searchId").textbox('setValue',selected.id);
-}
-});	
 }
 
 function searchBaseOrgSearch(){	
@@ -1018,14 +1016,19 @@ function judgeIsNull2(){
 				} ] ],
 				toolbar : [
 						{
-							text : '交易类型名称:<input type="text" id="taxEntityId" class="easyui-textbox"/>'
+							text : '交易类型名称:<input type="text" id="taxEntityId2" class="easyui-textbox"/>'
 						}, {
 							text : "查询",
 							iconCls : 'icon-search',
 							handler : function() {
-								findTaxEntity();
+								var param = $("#taxEntityId2").val();
+								findTypeEntity(param);
 							}
 						}, '-' ],
+						onSelect: function(index,value){
+							var selected = $('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('getSelected');
+							$("#searchform_taxTrsTypeList_select_Id").textbox('setValue',selected.id);
+							},
 				keyHandler : {
 					up : function() { //【向上键】押下处理
 						//取得选中行
@@ -1078,22 +1081,23 @@ function judgeIsNull2(){
 						$('#getByBaseOrg').form('clear');
 						$("#pageNumber1").textbox('setValue',pageNumber);
 						$("#pageSize1").textbox('setValue',pageSize);										
-						searchBaseOrg();
+						searchTaxTrsTypeSearch();
 					},
 					//改变页显示条数的处理
 			
-	/* 				onChangePageSize : function(pageNumber, pageSize) {
+					onChangePageSize : function(pageNumber, pageSize) {
+						$('#getByBaseOrg').form('clear');
 						$("#pageNumber1").textbox('setValue',pageNumber);
 						$("#pageSize1").textbox('setValue',pageSize);										
-						searchBaseOrg();
-					}, */
+						searchTaxTrsTypeSearch();
+					}, 
 				
 				onRefresh : function(pageNumber, pageSize) {
-						//按分页的设置取数据
+						//按分页的设置取数据	
 					$('#getByBaseOrg').form('clear');
 					$("#pageNumber1").textbox('setValue',pageNumber);
 					$("#pageSize1").textbox('setValue',pageSize);										
-					searchBaseOrg();
+					searchTaxTrsTypeSearch();
 					}
 				});
 	}
@@ -1104,13 +1108,6 @@ function judgeIsNull2(){
 		  pageSize : $('#searchform_taxTrsTypeList_select').combogrid("grid").datagrid('options').pageSize
 	});
 	searchTaxTrsTypeSearch();
-
-	$('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid({
-	onSelect: function(index,value){
-	var selected = $('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('getSelected');
-	$("#searchform_taxTrsTypeList_select_Id").textbox('setValue',selected.id);
-	}
-	});
 
 	}
 
@@ -1161,17 +1158,11 @@ function initTaxCategoryPanl() {
 							field : 'categoryName',
 							title : '税种名称',
 							width : 300
-						} ] ],
-						toolbar : [
-								{
-									text : '税种:<input type="text" id="taxEntityId" class="easyui-textbox"/>'
-								}, {
-									text : "查询",
-									iconCls : 'icon-search',
-									handler : function() {
-										findTaxEntity();
-									}
-								}, '-' ],
+						} ] ],			
+								onSelect: function(index,value){
+									var selected = $('#taxCategoryId').combogrid('grid').datagrid('getSelected');
+									$("#EditCategoryId").textbox('setValue',selected.id);
+								},
 						keyHandler : {
 							up : function() { //【向上键】押下处理
 								//取得选中行
@@ -1250,12 +1241,7 @@ function initTaxCategoryPanl() {
 				  pageSize : $('#taxCategoryId').combogrid("grid").datagrid('options').pageSize
 			});
 	searchTaxCategory();
-	$('#taxCategoryId').combogrid('grid').datagrid({
-		onSelect: function(index,value){
-			var selected = $('#taxCategoryId').combogrid('grid').datagrid('getSelected');
-			$("#EditCategoryId").textbox('setValue',selected.id);
-		}
-	});	
+	
 }
 	
 function searchTaxCategory(){	
@@ -1299,16 +1285,10 @@ function initItemsPanl() {
 							title : '税目',
 							width : 300
 						} ] ],
-						toolbar : [
-								{
-									text : '税目:<input type="text" id="taxEntityId" class="easyui-textbox"/>'
-								}, {
-									text : "查询",
-									iconCls : 'icon-search',
-									handler : function() {
-										findTaxEntity();
-									}
-								}, '-' ],
+								onSelect: function(index,value){
+									var selected = $('#taxItemId').combogrid('grid').datagrid('getSelected');
+									$("#EdittaxItemId").textbox('setValue',selected.id);
+								},
 						keyHandler : {
 							up : function() { //【向上键】押下处理
 								//取得选中行
@@ -1365,14 +1345,16 @@ function initItemsPanl() {
 							},
 							//改变页显示条数的处理
 					
-			/* 				onChangePageSize : function(pageNumber, pageSize) {
+			 				onChangePageSize : function(pageNumber, pageSize) {
+			 					
+			 					$('#getByBaseOrg').form('clear');
 								$("#pageNumber1").textbox('setValue',pageNumber);
 								$("#pageSize1").textbox('setValue',pageSize);										
 								searchBaseOrg();
-							}, */
+							}, 
 						
 						onRefresh : function(pageNumber, pageSize) {
-								//按分页的设置取数据
+								//按分页的设置取数据					
 							$('#getByBaseOrg').form('clear');
 							$("#pageNumber1").textbox('setValue',pageNumber);
 							$("#pageSize1").textbox('setValue',pageSize);										
@@ -1387,12 +1369,7 @@ function initItemsPanl() {
 				  pageSize : $('#taxCategoryId').combogrid("grid").datagrid('options').pageSize
 			});
 	searchItems();
-	$('#taxItemId').combogrid('grid').datagrid({
-		onSelect: function(index,value){
-			var selected = $('#taxItemId').combogrid('grid').datagrid('getSelected');
-			$("#EdittaxItemId").textbox('setValue',selected.id);
-		}
-	});	
+
 }
 	
 function searchItems(){	
@@ -1506,6 +1483,69 @@ function onFormat6(val,row){
 }
 
 }
+
+//###############################################################################################
+//查询框 组织框内查询方法
+function findFirstBaseOrgEntity(param){
+	
+	$.ajax({
+		url : "${vat}/baseOrg/loadBaseOrgPageRequest.do",
+		type : "POST",
+		async : true,
+		data : "pageNumber="+$("#pageNumber1").textbox('getValue')+"&pageSize="+$("#pageSize1").textbox('getValue')+"&orgName="+param, //不能直接写成 {id:"123",code:"tomcat"}  
+		dataType : "json",
+		// contentType: "charset=utf-8",  
+		cache : false,
+		success : function(result) {
+			//clearSaveForm();
+			$('#org_addEdit_search').combogrid('grid').datagrid('loadData', result.data.rows);
+		}
+	});
+}
+
+//查询框  涉税交易类型内查询方法
+
+function findTypeEntity(param){
+	
+	$.ajax({
+		url : "${vat}/tmsMdTaxTrxType/loadTmsMdTaxTrxTypePageName.do",
+		type : "POST",
+		async : true,
+		data : "pageNumber="+$("#pageNumber1").textbox('getValue')+"&pageSize="+$("#pageSize1").textbox('getValue')+"&taxTrxTypeCode="+param, //不能直接写成 {id:"123",code:"tomcat"}  
+		dataType : "json",
+		// contentType: "charset=utf-8",  
+		cache : false,
+		success : function(result) {
+			//clearSaveForm();
+			$('#searchform_taxTrsTypeList_select').combogrid('grid').datagrid('loadData', result.data.rows);
+		}
+	});
+}
+
+//新增框 组织查询方法
+function findTwoBaseOrgEntity(param){
+	
+	$.ajax({
+		url : "${vat}/baseOrg/loadBaseOrgPageRequest.do",
+		type : "POST",
+		async : true,
+		data : "pageNumber="+$("#pageNumber1").textbox('getValue')+"&pageSize="+$("#pageSize1").textbox('getValue')+"&orgName="+param, //不能直接写成 {id:"123",code:"tomcat"}  
+		dataType : "json",
+		// contentType: "charset=utf-8",  
+		cache : false,
+		success : function(result) {
+			//clearSaveForm();
+			$('#org_addEdit').combogrid('grid').datagrid('loadData', result.data.rows);
+		}
+	});
+}
+
+
+
+
+
+
+
 </script>
 
 

@@ -8,14 +8,20 @@ import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.dao.IDao;
 
 public interface EquipmentDao extends IDao<TmsMdEquipment> {
-	public static final String BEAN_ID="equipmentDao";
+	static final String BEAN_ID="equipmentDao";
 
-	public DaoPage findEquipmentByParams(Map params, Integer pageIndex,Integer pageSize);
+	DaoPage findEquipmentByParams(Map params, Integer pageIndex,Integer pageSize);
 	
-	public List<TmsMdEquipment> loadEquipmentData(Map params);
+	List<TmsMdEquipment> loadEquipmentData(Map params);
+	
+	/**
+	 * 获取子节点
+	 * @param parentEquipmentId
+	 * @return
+	 */
+	List<TmsMdEquipment> loadSonEquipments(String parentEquipmentId);
 
-	public DaoPage findLegalEntityByParams(Map params, Integer pageIndex,Integer pageSize);
+	DaoPage findLegalEntityByParams(Map params, Integer pageIndex,Integer pageSize);
 
-	public void deleteEquipment(String id);
-
+	void deleteEquipment(String id);
 }

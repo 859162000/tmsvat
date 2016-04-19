@@ -188,7 +188,7 @@ body
 	    	//alert('请使用IE6或以上版本浏览器打开！');
 	    }
 	    function validate() {
-	    	console.log(document.getElementById("password").value)
+	    	//console.log(document.getElementById("password").value)
 	    	if (document.getElementById("username").value == "") {
 	    		$$("error").innerHTML='请输入用户名';
 	    		return false;

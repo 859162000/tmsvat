@@ -8,14 +8,14 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body class="easyui-layout" id="layoutid" style="overflow-y: hidden;" scroll="no" >
-	<div data-options="region:'center',iconCls:'icon-ok'" title="数据结构定义" split="true" style="width: 100%;height: 100%;overflow: hidden;" >
+	<div data-options="region:'center',iconCls:'icon-ok'" title="数据结构查询" split="true" style="width: 100%;height: 100%;overflow: hidden;" >
 	<div  class="easyui-layout" style="width: 100%; height: 100%;">
 		<div region="north" split="true" border="false" split="true" style="overflow: hidden; height: 10%;">
 			<div class="easyui-panel" title="" style="width: 100%; height: 100%; background-color: #E0ECFF" >
 				<form id="TmsMdFlexStructures_searchform" method="post" scroll="no">
 					<table id="TmsMdFlexStructures_table_search">
 						<tr>						 												 							
-							<td>来源数据结构：</td>
+							<td>数据结构：</td>
 							<td><select id="TmsMdFlexStructuresListInSendForm" name="flexStructuresDescription" class="easyui-combogrid" style="width: 150px;"></select></td>																 
 							<td colspan="2"><a href="#" id="searchbtnTmsMdFlexStructures" class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width: 120px" onclick="SearchTmsMdFlexStructures()"><spring:message code='client.search.button.find'/></a>	</td>
 							<td colspan="2"><a href="#" id="searchbtnTmsMdFlexStructures" class="easyui-linkbutton" style="width: 120px" onclick="clearSelect()">重置</a>	</td>									
@@ -52,15 +52,15 @@
 							<td><input id="idInDialog" name="id" style="width: 150px;" class="easyui-textbox" type="text"></td>
 						</tr>
 						<tr>	
-							<td><spring:message code="TmsMdFlexStructures.flexStructuresCode" />：</td>
+							<td align="right">数据结构编码：</td>
 							<td><input id="flexStructuresCodeInDialog" name="flexStructuresCode" style="width: 150px;" class="easyui-textbox" type="text"></td>
 						</tr>
 						<tr>
-							<td><spring:message code="TmsMdFlexStructures.flexStructuresDescription" />：</td>
+							<td align="right">数据结构说明：</td>
 							<td><input id="flexStructuresDescriptionInDialog" name="flexStructuresDescription" style="width: 150px;" class="easyui-textbox" type="text"></td>
 						</tr>
-						<tr>	
-							<td><spring:message code="TmsMdFlexStructures.flexStructuresType" />：</td>														
+						<tr >	
+							<td align="right"><spring:message code="TmsMdFlexStructures.flexStructuresType" />：</td>														
 							<td><input:select  easyuiStyle="width:150px;" id="flexStructuresTypeInDialog" name="flexStructuresType" value="$customerManageInit_editform_enabledFlag" easyuiClass="easyui-combobox">
             					<option  value=""></option>
             					<input:systemStatusOption parentCode="VAT_DATA_MAPPING_TYPE"/>
@@ -79,19 +79,19 @@
 							<td><input id="descriptionInDialog" name="description" style="width: 150px;" class="easyui-textbox" type="text"></td>
 						</tr>
 						<tr >	
-							<td><spring:message code="TmsMdFlexStructures.enabledFlag" />：</td>
+							<td align="right">是否启用：</td>
 							<td><input:select easyuiStyle="width:150px;required:true," id="enabledFlagInDialog" name="enabledFlag" value="$customerManageInit_editform_enabledFlag" easyuiClass="easyui-combobox" >           						 
             		        <option value=""></option>
  		                    <input:systemStatusOption parentCode="BASE_IS_VALID"/>	
 			                </input:select></td>																				
 						</tr>
 						<tr>
-							<td><spring:message code="TmsMdFlexStructures.startDate" />：</td>
-							<td><input id="startDateInDialog" name="startDate" style="width: 150px;" class="easyui-textbox" type="text"></td>
+							<td align="right"><spring:message code="TmsMdFlexStructures.startDate" />：</td>
+							<td><input id="startDateInDialog" name="startDate" style="width: 150px;" type="text" class="easyui-datebox" data-options="required:true"></input></td>							
 						</tr>
 						<tr>	
-							<td><spring:message code="TmsMdFlexStructures.endDate" />：</td>
-							<td><input id="endDateInDialog" name="endDate" style="width: 150px;" class="easyui-textbox" type="text"></td>
+							<td align="right"><spring:message code="TmsMdFlexStructures.endDate" />：</td>
+							<td><input id="endDateInDialog" name="endDate" style="width: 150px;" class="easyui-datebox" type="text"></td>
 						</tr>
 						<tr style="display: none;">
 							<td><spring:message code="TmsMdFlexStructures.parentId" />：</td>
@@ -133,56 +133,52 @@
 		   <div   id="tmsmdflexstructures_flexsegments_dlg" class="easyui-dialog" style="width: 800px; height: 500px;" closed="true" buttons="#TmsMdflexsegments_addOrEdit_dlg_dlg-buttons">
 			<form id="flexsegments_searchform" class="easyui-form" method="post" data-options="novalidate:true">
 				<table id="tmsmdflexstructures_flexsegments_table">
-					<tr> 
+					<tr > 
 					    <td style="display: none;"></td>
 					    <td style="display: none;"><input class="easyui-textbox" type="text" name=id /></td>
 					    <td style="display: none;"></td>
-					    <td style="display: none;"><input class="easyui-textbox" type="text" name=flexStructuresId /></td>
-						<td>段编码:</td>
-						<td><input class="easyui-textbox" id="flexsegments.segmentNum" type="text" name=segmentNum /></td>
+					    <!-- 非常重要 获取数据结构ID -->
+					    <td td style="display: none;"><input id="flexsegments_StructuresId" class="easyui-textbox" type="text" name=flexStructuresId /></td>
 					</tr>
 					<tr>
-						<td>段说明:</td>
-						<td><input class="easyui-textbox" id="flexsegments.segmentName" type="text" name="segmentName" /></td>													
+						<td align="right">段编码:</td>
+						<td><input class="easyui-textbox" id="flexsegments.segmentNum" type="text" name=segmentNum style="width: 150px; "/></td>
 					</tr>
 					<tr>
-						<td>段属性:</td>
-						<td><input id="flexsegments.segmentAttribute" type="text" class="easyui-textbox" width="90" name="segmentAttribute" /></td>
+						<td align="right">段说明:</td>
+						<td><input class="easyui-textbox" id="flexsegments.segmentName" type="text" name="segmentName" style="width: 150px; "/></td>													
+					</tr>
+					<tr style="display: none;">
+						<td align="right">段属性:</td>
+						<td><input id="flexsegments.segmentAttribute" type="text" class="easyui-textbox" style="width: 150px; " name="segmentAttribute" /></td>
 					</tr>
 					<tr>
-						<td>值集:</td>
-						<td><input id="flexsegments.flexValueSetId" type="text" class="easyui-textbox" width="90" name="flexValueSetId" /></td>
-						      <td style="display: none;"></td>
-						      <td style="display: none;"><input class="easyui-textbox" type="text" name=invoiceCode /></td>								 
-							  <td style="display: none;"></td>
-							  <td style="display: none;"><input class="easyui-textbox" type="text" name=invoiceCode /></td>
-							  <td style="display: none;"></td>
-							  <td style="display: none;"><input class="easyui-textbox" type="text" name=invoiceCode /></td>
-							   <td style="display: none;"></td>
-							  <td style="display: none;"><input class="easyui-textbox" type="text" name=invoiceCode /></td>							
+					    <td style="display: none;"><input id="flexsegments_flexValueSetId_getId" type="text" class="easyui-textbox" width="150" name="flexValueSetId" /></td>
+						<td align="right">值集:</td>
+					    <td><select id="flexsegments_flexValueSetId" name="flexValueSetName" class="easyui-combogrid" style="width: 150px; " ></select></td>  
 					</tr>
-					<tr>	
+					<tr style="display: none;">	
 					  <td >是否显示：</td>
 						 <td><input:select easyuiStyle="width:150px;required:true" id="displayFlagInDialog" name="displayFlag" value="$customerManageInit_editform_enabledFlag" easyuiClass="easyui-combobox" >           						 
             		        <option value=""></option>
             		        <input:systemStatusOption parentCode="BASE_IS_VALID"/>				
 			                </input:select></td>	
 					</tr>
-					<tr> 
+					<tr > 
 					  <td >是否必须：</td>
 					 <td><input:select easyuiStyle="width:150px;required:true" id="requiredFlagInDialog" name="requiredFlag" value="$customerManageInit_editform_enabledFlag" easyuiClass="easyui-combobox" >           						 
             		        <option value=""></option>
             		        <input:systemStatusOption parentCode="BASE_IS_VALID"/>				
 			                </input:select></td>
 					</tr>
-					<tr>
+					<tr >
 					  <td>启用:</td>	 
   						<td><input:select easyuiStyle="width:150px;required:true" id="enabledFlagInDialog2" name="enabledFlag" value="$customerManageInit_editform_enabledFlag" easyuiClass="easyui-combobox" >           						 
             		        <option value=""></option>
             		        <input:systemStatusOption parentCode="BASE_IS_VALID"/>				
 			                </input:select></td>
   					</tr>
-  					<tr>		
+  					<tr  style="display: none;">		
 					  <td>组织:</td>
 				      <td><input id="flexsegments。orgId" class="easyui-textbox" width="90" name="orgId" /></td>	
 					</tr>
@@ -192,6 +188,16 @@
 				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="TmsMdFlexSegmentsEditSave()"><spring:message code="button.Save" />
 				</a> <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#tmsmdflexstructures_flexsegments_dlg').dialog('close')"><spring:message code="button.Close" /></a>
 			</div>
+		   <div class="easyui-dialog" closed="true">
+      		 <from id="getByBaseOrg" method="post">
+        		<table>
+          			<tr style="display:none">
+		        	<td><input id="pageNumber2" class="easyui-textbox" type="text" style="width:0px;" name="pageNumber" value=""></input></td>
+		       	 	<td><input id="pageSize2" class="easyui-textbox" type="text" style="width:0px;" name="pageSize" value=""></input></td>
+		    		</tr>
+        		</table>
+       		</from>
+     	  </div>
 		</div>   				
 	  </div>
 	</div>
@@ -300,6 +306,9 @@ $(document).keydown(function(e){
 				TmsMdFlexStructuresEdit1();
 				// addTwo();
 			
+		
+				
+				
 			});
 
 	
@@ -309,7 +318,8 @@ $(document).keydown(function(e){
 						{
 							url : '',
 							fitColumns : true,
-							nowrap : false,
+							nowrap : false,							
+							remoteSort:false,
 							pagination : true,
 							rownumbers : true,
 							singleSelect : true,
@@ -325,13 +335,13 @@ $(document).keydown(function(e){
 									},  */
 									{
 										field : 'flexStructuresCode',
-										title : '<spring:message code="TmsMdFlexStructures.flexStructuresCode"/>',
+										title : '数据结构编码',
 										width : 80,
 										align : 'center'
 									},
 									{
 										field : 'flexStructuresDescription',
-										title : '<spring:message code="TmsMdFlexStructures.flexStructuresDescription"/>',
+										title : '数据结构说明',
 										width : 80,
 										align : 'center'
 									},
@@ -372,7 +382,8 @@ $(document).keydown(function(e){
 										field : 'startDate',
 										title : '<spring:message code="TmsMdFlexStructures.startDate"/>',
 										width : 80,
-										align : 'center'
+										align : 'center',
+										sortable:true
 									},
 									{
 										field : 'endDate',
@@ -404,13 +415,15 @@ $(document).keydown(function(e){
 								handler : function() {
 									TmsMdFlexStructuresEdit();
 								}
-							}, '-', {
+							}
+						/* 	, '-', {
 								text : '删除',
 								iconCls : 'icon-remove',
 								handler : function() {
 									TmsMdFlexStructuresRemove();
 								}
-							} ],
+							} */ 
+							],
 							onLoadSuccess : function() {
 								$('#TmsMdFlexStructuresInit_dataGrid')
 										.datagrid('clearSelections')
@@ -527,6 +540,16 @@ $(document).keydown(function(e){
 		$("#TmsMdFlexStructures_addOrEdit_dlg").dialog('open').dialog('setTitle',"<spring:message code='client.dialog.clientadd.title'/>");		
 		clearSaveFormTwoS();	
 	    $('#TmsMdFlexStructures_table').datagrid('loadData', { total: 0, rows: [] });
+		$("#startDateInDialog").datebox({
+			required:true	
+		});
+		$("#flexStructuresTypeInDialog").combobox({
+				panelHeight:'auto'
+				});
+		$("#enabledFlagInDialog").combobox('setValue','是');
+		$("#enabledFlagInDialog").combobox({
+				panelHeight:'auto'
+				});
 	}
 	
 	//编辑
@@ -581,8 +604,8 @@ $(document).keydown(function(e){
   //保存
 	function TmsMdFlexStructuresEditSave() {
 	  
-		var getId =　$('#idInDialog').textbox('getValue');
-		if(getId){  $.messager
+		
+		 $.messager
 			.confirm(
 					"<spring:message code='client.datacommit.formsave.confirm.title'/>",
 					"<spring:message code='client.datacommit.formsave.confirm.text'/>",
@@ -618,13 +641,7 @@ $(document).keydown(function(e){
 						}
 							
 						
-					});
-                }else{
-                	
-                	$.messager.alert('<spring:message code="system.alert"/>','请输入数据');	
-                }
-	  
-		
+					});       
 	}
 	//删除一条记录
 
@@ -772,53 +789,58 @@ $(document).keydown(function(e){
 										field : 'segmentAttribute',
 										title : '段属性',
 										width : 80,
-										align : 'center'
+										align : 'center',
+										hidden:true
 									},
 									{   //这是值集ID 页面显示值集名称
 										field : 'flexValueSetId',
-										title : '值集',
+										title : '值集ID',
 										width : 80,
 										align : 'center',
-									 formatter:getFlexValueName
+										hidden:true
+								//	 formatter:getFlexValueName
 									},  
-							/*		{
+									{
 										field : 'flexValueSetName',
 										title : '值集',
 										width : 80,
 										align : 'center',
-								//	 formatter:getFlexValueName2
-									},  */  
+								//	 formatter:setFlexValueName
+									},   
 									{
 										field : 'displayFlag',
 										title : '是否显示',
 										width : 80,
 										align : 'center',
-										 formatter:orgFormat2	
+										hidden:true,
+									 formatter:orgFormat2	
 									},
 									{
 										field : 'requiredFlag',
 										title : '是否必须',
 										width : 80,
 										align : 'center',
-										 formatter:orgFormat2	
+									 formatter:orgFormat2	
 									},
 									{
 										field : 'enabledFlag',
 										title : '启用',
 										width : 80,
 										align : 'center',
-										 formatter:orgFormat2	
+								     formatter:orgFormat2	
 									} ,
 									{
 										field : 'orgId',
 										title : '组织',
 										width : 80,
+										hidden:true,
 										align : 'center'
 									}] ],
 							toolbar : [ {
 								text : '新增',
 								iconCls : 'icon-add',
 								handler : function() {
+									
 									TmsMdFlexSegmentsAdd();
 								}
 							}, '-', {
@@ -826,14 +848,18 @@ $(document).keydown(function(e){
 								iconCls : 'icon-edit',
 								handler : function() {
 									TmsMdFlexSegmentsEdit();
+									
+									var getFlexValueName = $("#TmsMdFlexStructures_table").datagrid('getSelected');
+									$("#flexsegments_flexValueSetId").combobox('setValue',getFlexValueName.rows[0].flexValueSetName);
 								}
-							}, '-', {
+							}
+					/* 		, '-', {
 								text : '删除',
 								iconCls : 'icon-remove',
 								handler : function() {
 									TmsMdFlexStructuresRemove();
 								}
-							} 
+							}  */
 							],
 							onLoadSuccess : function() {
 								$('#TmsMdFlexStructures_table')
@@ -870,6 +896,24 @@ $(document).keydown(function(e){
 	function TmsMdFlexSegmentsAdd(){
 		clearSaveFormTwo();
 		$("#tmsmdflexstructures_flexsegments_dlg").dialog('open').dialog('setTitle',"<spring:message code='client.dialog.clientadd.title'/>");	
+	   
+		$("#displayFlagInDialog").combobox('setValue','1');
+	    $("#displayFlagInDialog").combobox('setText','是');
+	   
+	    $("#requiredFlagInDialog").combobox('setValue','1');
+	    $("#requiredFlagInDialog").combobox('setText','是');
+	  
+	    $("#enabledFlagInDialog2").combobox('setValue','1');	    
+	    $("#enabledFlagInDialog2").combobox('setText','是');
+	   
+	    getFlexValuePanl();
+	    
+	    //设置数据段面板数据结构ID
+	    var getFlexStructuresId = $("#TmsMdFlexStructuresInit_dataGrid").datagrid('getSelected');
+	    $("#flexsegments_StructuresId").textbox('setValue',getFlexStructuresId.id);   
+	    
+	    
+	    
 	}
 	
 	//清除3级页面from
@@ -1267,7 +1311,7 @@ function orgFormat2(val,row){
 }
 
 //###################################获取值集名称 同步加载
-var str;
+/* var str;
 function getFlexValueName(page, rows){  
 str = null;
 $("#TmsMdFlexStructures_table").datagrid("loading");
@@ -1283,18 +1327,165 @@ $("#TmsMdFlexStructures_table").datagrid("loading");
 						error : function(XMLHttpRequest, textStatus, errorThrown) {
 						},
 						success : function(data) {
-
 						str =	data.rows[0].flexValueSetName;
-					
 						
 						}
 					});
 	}
 //	alert(str);
-	return str;	
-//	flexValueSetId
+	return page;	
+//	flexValueSetId	
+} */
+
+function setFlexValueName(page, rows){ 
 	
+	page= str;
+	   return page;
 }
+
+function getFlexValuePanl(){
+
+		$('#flexsegments_flexValueSetId').combogrid(
+						{
+							required:true,
+						    valueField: 'value',
+							panelWidth : 500,
+							idField : 'id', //ID字段  
+							textField : 'flexValueSetName', //显示的字段  
+							url : "",
+							fitColumns : true,
+							striped : true,
+					//		pageSize:'10',
+							editable : false,
+							pagination : true, //是否分页
+							rownumbers : true, //序号
+							collapsible : false, //是否可折叠的
+							fit : false, //自动大小
+							method : 'post',
+							columns : [ [ {
+								field : 'flexValueSetCode',
+								title : '值集编码',
+								width : 200
+							},{
+								field : 'flexValueSetName',
+								title : '值集名称',
+								width : 300
+							} ] ],
+							toolbar : [
+									{
+										text : '值集:<input type="text" id="taxEntityId" class="easyui-textbox"/>'
+									}, {
+										text : "查询",
+										iconCls : 'icon-search',
+										handler : function() {
+											findTaxEntity();
+										}
+									}, '-' ],
+							keyHandler : {
+								up : function() { //【向上键】押下处理
+									//取得选中行
+									var selected = $('#flexsegments_flexValueSetId').combogrid('grid').datagrid('getSelected');
+									if (selected) {
+										//取得选中行的rowIndex
+										var index = $('#flexsegments_flexValueSetId').combogrid('grid').datagrid('getRowIndex',selected);
+										//向上移动到第一行为止
+										if (index > 0) {
+											$('#flexsegments_flexValueSetId').combogrid('grid').datagrid('selectRow',index - 1);
+										}
+									} else {
+										var rows = $('#flexsegments_flexValueSetId').combogrid('grid').datagrid('getRows');
+										$('#flexsegments_flexValueSetId').combogrid('grid').datagrid('selectRow',rows.length - 1);
+									}
+								},
+								down : function() { //【向下键】押下处理
+									//取得选中行
+									var selected = $('#flexsegments_flexValueSetId').combogrid('grid').datagrid('getSelected');
+									if (selected) {
+										//取得选中行的rowIndex
+										var index = $('#flexsegments_flexValueSetId').combogrid('grid').datagrid('getRowIndex',selected);
+										//向下移动到当页最后一行为止
+										if (index < $('#flexsegments_flexValueSetId').combogrid('grid').datagrid('getData').rows.length - 1) {
+											$('#flexsegments_flexValueSetId').combogrid('grid').datagrid('selectRow',index + 1);
+										}
+									} else {
+										$('#flexsegments_flexValueSetId').combogrid('grid').datagrid('selectRow', 0);
+									}
+								},
+
+							},
+
+						});
+
+		//取得分页组件对象
+		var pager = $('#flexsegments_flexValueSetId').combogrid('grid').datagrid('getPager');
+
+		if (pager) {
+			$(pager).pagination(
+							{
+								pageSize : 10,//每页显示的记录条数，默认为10           
+								//pageList: [5,10,15,20],//可以设置每页记录条数的列表           
+								beforePageText : '<spring:message code="pagination.beforePageText"/>',//页数文本框前显示的汉字           
+								afterPageText : '<spring:message code="pagination.afterPageText"/>',
+								displayMsg : '<spring:message code="pagination.displayMsg"/>',
+								//选择页的处理
+								onSelectPage : function(pageNumber, pageSize) {
+									//按分页的设置取数据
+									$('#getByBaseOrg').form('clear');
+									$("#pageNumber2").textbox('setValue',pageNumber);
+									$("#pageSize2").textbox('setValue',pageSize);										
+									searchFlexValue();
+								},
+								//改变页显示条数的处理
+						
+				/* 				onChangePageSize : function(pageNumber, pageSize) {
+									$("#pageNumber1").textbox('setValue',pageNumber);
+									$("#pageSize1").textbox('setValue',pageSize);										
+									searchBaseOrg();
+								}, */
+							
+							onRefresh : function(pageNumber, pageSize) {
+									//按分页的设置取数据
+								$('#getByBaseOrg').form('clear');
+								$("#pageNumber2").textbox('setValue',pageNumber);
+								$("#pageSize2").textbox('setValue',pageSize);										
+								searchFlexValue();
+								}
+							});
+		}
+		$('#getByBaseOrg').form('clear');
+		$('#getByBaseOrg').form('load',
+				{
+					pageNumber : $('#flexsegments_flexValueSetId').combogrid("grid").datagrid('options').pageNumber,
+					  pageSize : $('#flexsegments_flexValueSetId').combogrid("grid").datagrid('options').pageSize
+				});
+		searchFlexValue();
+		$('#flexsegments_flexValueSetId').combogrid('grid').datagrid({
+			onSelect: function(index,value){
+				var selected = $('#flexsegments_flexValueSetId').combogrid('grid').datagrid('getSelected');
+				$("#flexsegments_flexValueSetId_getId").textbox('setValue',selected.id);
+			}
+		});	
+	}
+		
+	function searchFlexValue(){	
+			$.ajax({
+				url : "${vat}/tmsMdFlexValueSets/getName.do",
+				type : "POST",
+				async : true,
+				data : "pageNumber="+$("#pageNumber2").textbox('getValue')+"&pageSize="+$("#pageSize2").textbox('getValue'), //不能直接写成 {id:"123",code:"tomcat"}  
+				dataType : "json",
+				// contentType: "charset=utf-8",  
+				cache : false,
+				success : function(result) {
+					//clearSaveForm();
+					$('#flexsegments_flexValueSetId').combogrid('grid').datagrid('loadData', result.rows);
+				}
+			});
+	}
+	
+
+
+
 
 
 

@@ -380,6 +380,10 @@ public class TmsCrvatSsTrxAll extends BaseEntity {
     @Column(name="BANK_ACCOUNT_NUM", length=100)
 	@ModelProperty(comment="银行账号")
 	private String bankAccountNum;
+    
+    @Column(name="CUST_BANK_ACCOUNT_NUM", length=100)
+    @ModelProperty(comment="购方银行或资金账户号码")
+    private String custBankAccountNum;
 
     @Column(name="PRICE_OF_UNIT")
 	@ModelProperty(comment="单价")
@@ -388,6 +392,7 @@ public class TmsCrvatSsTrxAll extends BaseEntity {
     @Column(name="ORG_ID", length=36)
 	@ModelProperty(comment="组织")
 	private String orgId;
+   
 
     @Column(name="IS_AFFIRM", length=10)
 	@ModelProperty(comment="是否已认定")
@@ -1064,6 +1069,15 @@ public class TmsCrvatSsTrxAll extends BaseEntity {
 	public void setIsAffirm(Boolean isAffirm) {
 		this.isAffirm = isAffirm;
 	}
+
+	public String getCustBankAccountNum() {
+		return custBankAccountNum;
+	}
+
+	public void setCustBankAccountNum(String custBankAccountNum) {
+		this.custBankAccountNum = custBankAccountNum;
+	}
+
 	
     
 

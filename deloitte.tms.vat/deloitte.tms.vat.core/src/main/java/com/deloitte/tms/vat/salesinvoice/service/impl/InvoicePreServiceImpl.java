@@ -158,6 +158,7 @@ public class InvoicePreServiceImpl extends BaseService implements InvoicePreServ
 		ReflectUtils.copyProperties(model, inparam);
 		inparam.setAcctdAmountCr(model.getAcctdAmountCr());
 		inparam.setInvoiceAmount(model.getInvoiceAmount());
+		inparam.setVatAmountStr("");
 		inparam.setVatAmount(model.getVatAmount());
 		InvoiceTrxPool invoiceTrxPool = model.getInvoiceTrxPool();
 		if(invoiceTrxPool!=null){
@@ -165,7 +166,14 @@ public class InvoicePreServiceImpl extends BaseService implements InvoicePreServ
 			String trxDateString = DateUtils.format("yyyy-MM-dd",invoiceTrxPool.getTrxDate());
 			inparam.setTrxDate(trxDateString);
 			inparam.setTrxBatchNum(invoiceTrxPool.getTrxBatchNum());
-		
+			if(invoiceTrxPool.getTaxRate()!=null){
+				int  taxRate = invoiceTrxPool.getTaxRate().intValue();				
+				String taxRateStr = String.valueOf(taxRate);
+				inparam.setTaxRateStr(taxRateStr);
+				inparam.setTaxRate(new BigDecimal(taxRateStr));
+			}else {
+				inparam.setTaxRateStr("");
+			}
 		}
 		TmsMdTaxTrxType tmsMdTaxTrxType = model.getTmsMdTaxTrxType();
 		if(tmsMdTaxTrxType!=null){
@@ -178,6 +186,8 @@ public class InvoicePreServiceImpl extends BaseService implements InvoicePreServ
 			inparam.setOrgCode(orgNode.getCode());
 			inparam.setOrgName(orgNode.getName());
 		}
+		inparam.setOrgCode(model.getOrigLegalEntityCode());
+		inparam.setOrgName(model.getOrigLegalEntityName());
 		return inparam;
 	}
 	@Override
@@ -196,14 +206,7 @@ public class InvoicePreServiceImpl extends BaseService implements InvoicePreServ
 			InvoiceTrxPool invoiceTrxPool = tmsCrvatInvoicePreL.getInvoiceTrxPool();
 			invoiceTrxPool.setStatus(CrvatTaxPoolStatuEnums.PREP_FORM_APPROVED.getValue());
 			update(invoiceTrxPool);
-		}*/
-		String taskId = tmsCrvatInvoicePreHForUpdate.getWfTaskId();
-		if(!AssertHelper.empty(taskId)){
-			long id = Long.valueOf(taskId.trim());
-			WorkFlowUtils.completeTask(id);
-		}else {
-		   update(tmsCrvatInvoicePreHForUpdate);
-		}
+		}*/		
 		
 	}
 	@Override
@@ -212,14 +215,15 @@ public class InvoicePreServiceImpl extends BaseService implements InvoicePreServ
 		TmsCrvatInvoicePreH tmsCrvatInvoicePreHForUpdate = (TmsCrvatInvoicePreH) get(TmsCrvatInvoicePreH.class, tmsCrvatInvoicePreH.getId());
 		tmsCrvatInvoicePreHForUpdate.setApprovalStatus(CrvaInvoicePreStatusEnums.REVOKED.getValue());
 		tmsCrvatInvoicePreHForUpdate.setApproveDate(null);
-		tmsCrvatInvoicePreHForUpdate.setApprovalBy(null);				
+		tmsCrvatInvoicePreHForUpdate.setApprovalBy(null);	
+		invoicePreHDao.updateTrxPoolStatusByPreHid(tmsCrvatInvoicePreHForUpdate.getId(), CrvatTaxPoolStatuEnums.PREP_FORM_REVOKED.getValue());
 		//Hibernate.initialize(tmsCrvatInvoicePreHForUpdate.getTmsCrvatInvoicePreLs());
-		tmsCrvatInvoicePreHForUpdate.setTmsCrvatInvoicePreLs(invoicePreHDao.getCrvatInvoicePreLsByPreHId(tmsCrvatInvoicePreH.getId()));
+		/*tmsCrvatInvoicePreHForUpdate.setTmsCrvatInvoicePreLs(invoicePreHDao.getCrvatInvoicePreLsByPreHId(tmsCrvatInvoicePreH.getId()));
 		for(TmsCrvatInvoicePreL tmsCrvatInvoicePreL:tmsCrvatInvoicePreHForUpdate.getTmsCrvatInvoicePreLs()){	
 			InvoiceTrxPool invoiceTrxPool = tmsCrvatInvoicePreL.getInvoiceTrxPool();
 			invoiceTrxPool.setStatus(CrvatTaxPoolStatuEnums.PREP_FORM_REVOKED.getValue());
 			update(invoiceTrxPool);
-		}
+		}*/
 		update(tmsCrvatInvoicePreHForUpdate);
 	}
 	

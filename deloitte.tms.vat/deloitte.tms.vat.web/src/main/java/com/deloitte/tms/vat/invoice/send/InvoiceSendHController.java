@@ -45,6 +45,7 @@ import com.deloitte.tms.vat.core.common.JsonDateValueProcessor;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceSendH;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceSendHInParam;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceSendL;
+import com.deloitte.tms.vat.salesinvoice.model.InvoiceSendLInParam;
 import com.deloitte.tms.vat.salesinvoice.service.InvoicePrintPoolHService;
 import com.deloitte.tms.vat.salesinvoice.service.InvoiceSendHService;
 import com.deloitte.tms.vat.salesinvoice.service.InvoiceSendLService;
@@ -191,7 +192,14 @@ public class InvoiceSendHController extends BaseController {
 	public void removeInvoiceSendHs(@RequestParam("id") String clientKeys,
 			HttpServletResponse response) throws IOException {
 		AssertHelper.notEmpty_assert(clientKeys, "需要删除的用户不能为空");
+		Map<String, Object> invoiceHIdsMap = new HashMap<String, Object>();
 		for (String clientId : clientKeys.split(",")) {
+			invoiceHIdsMap.put("invoiceHId", clientId);
+			List<InvoiceSendL> invoiceSendLList =invoiceSendLService.findInvoiceSendLByParams(invoiceHIdsMap);
+			for(InvoiceSendL invoiceSendL:invoiceSendLList)
+			{
+				dao.remove((InvoiceSendL)invoiceSendL);
+			}
 			InvoiceSendH entity = (InvoiceSendH) invoiceSendHService.get(
 					InvoiceSendH.class, clientId);
 			dao.remove(entity);

@@ -1,5 +1,6 @@
 package com.deloitte.tms.vat.salesinvoice.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -53,15 +54,15 @@ public class TmsCrvatInvoicePreP extends BaseEntity {
 
     @Column(name="ACCTD_AMOUNT_CR")
 	@ModelProperty(comment="本次开票金额(不含税)")
-	private Long acctdAmountCr;
+	private BigDecimal acctdAmountCr;
 
     @Column(name="VAT_AMOUNT")
 	@ModelProperty(comment="本次开票税额")
-	private Long vatAmount;
+	private BigDecimal vatAmount;
 
     @Column(name="INVOICE_AMOUNT")
 	@ModelProperty(comment="本次开票总金额")
-	private Long invoiceAmount;
+	private BigDecimal invoiceAmount;
 
     @Column(name="TAX_TRX_TYPE_ID", length=36)
 	@ModelProperty(comment="涉税交易类型ID")
@@ -191,27 +192,27 @@ public class TmsCrvatInvoicePreP extends BaseEntity {
 		this.sourceCode = sourceCode;
 	}
 
-	public Long getAcctdAmountCr() {
+	public BigDecimal getAcctdAmountCr() {
 		return acctdAmountCr;
 	}
 
-	public void setAcctdAmountCr(Long acctdAmountCr) {
+	public void setAcctdAmountCr(BigDecimal acctdAmountCr) {
 		this.acctdAmountCr = acctdAmountCr;
 	}
 
-	public Long getVatAmount() {
+	public BigDecimal getVatAmount() {
 		return vatAmount;
 	}
 
-	public void setVatAmount(Long vatAmount) {
+	public void setVatAmount(BigDecimal vatAmount) {
 		this.vatAmount = vatAmount;
 	}
 
-	public Long getInvoiceAmount() {
+	public BigDecimal getInvoiceAmount() {
 		return invoiceAmount;
 	}
 
-	public void setInvoiceAmount(Long invoiceAmount) {
+	public void setInvoiceAmount(BigDecimal invoiceAmount) {
 		this.invoiceAmount = invoiceAmount;
 	}
 

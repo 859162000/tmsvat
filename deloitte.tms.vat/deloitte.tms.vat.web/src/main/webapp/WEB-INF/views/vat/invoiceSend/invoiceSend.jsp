@@ -110,10 +110,10 @@
 							<td>寄送类型</td>
 							<td><input type="radio" id="internalIsSelected"
 								name="sendType" value="internal" checked
-								onclick="changeTypeToInternal()" /> 内部寄送</td>
+								onclick="changeTypeToInternal()" />内部寄送</td>
 							<td><input type="radio" id="externalIsSelected"
 								name="sendType" value="external"
-								onclick="changeTypeToExternal()" /> 外部寄送</td>
+								onclick="changeTypeToExternal()" />外部寄送</td>
 							<td></td>
 						</tr>
 					</table>
@@ -766,7 +766,7 @@
 			url : '',
 			loadMsg : "发票信息列表",
 			striped : true,//奇偶行颜色不同
-			singleSelect : true, //多选
+			singleSelect : false, //多选
 			collapsible : false,//可折叠  
 			fitColumns : true,//自动调整各列，用了这个属性，下面各列的宽度值就只是一个比例。
 			nowrap : false,
@@ -897,7 +897,10 @@
 					if (index == 0) {
 						id = item.id;
 					}
+					else
+						id += "," + item.id;//ID 以 "," 隔开
 				});
+			    id+=","+$('#invoiceSendHID').textbox('getValue');//把寄送单的ID 放在最后面
 				if (id != '') {
 					$
 							.post(
@@ -922,8 +925,9 @@
 															'<spring:message code="system.alert"/>',
 															'导入成功');
 											//根据当前页面头ID重新查询数据:invoiceSendHID 开始
-											var invoiceSendHID = $("#invoiceSendHID").value;
-											alert(invoiceSendHID);
+											var invoiceSendHID = $('#invoiceSendHID').textbox('getValue');
+											//alert(invoiceSendHID);
+										//	alert(11111);
 											if (invoiceSendHID != null) {
 														$.post(
 																'${vat}/invoiceSend/getModifyInvoiceSendH.do',
@@ -944,7 +948,7 @@
 																				.alert(
 																						'<spring:message code="system.alert"/>',
 																						result.errorMsg);
-																		Search();
+																		//Search();
 																	}
 																}, 'json');
 											}
@@ -1028,6 +1032,7 @@
 							$("#addInvoiceSend_searchform").form('load',
 									result.editInvoiceSendHForm);//得到数据库的数据信息*/
 							loadAddVoiceList();
+									//alert($('#invoiceSendHID').textbox('getValue'));
 						} else if (result.success == 'false') {
 							$.messager.alert(
 									'<spring:message code="system.alert"/>',
@@ -1286,7 +1291,7 @@
 										if (index == 0)
 											urlString += "id=" + item.id;
 										else
-											urlString += "&id=" + item.id;
+											urlString += "," + item.id;
 									});
 									if (urlString != '') {
 										$

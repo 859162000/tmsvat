@@ -19,17 +19,12 @@
 					<table align="center">
 						<tr>
 							<td>合同编码：</td>
-							<td><select  class="easyui-combogrid" id="contractNumber"
+							<td><select  class="easyui-combogrid" id="search_contractNumber_id"
 								type="text" style="width: 150px;" name="contractNumber" value=""></input></td>
 							<td>合同名称：</td>
-							<td><select  class="easyui-combogrid"  id="contractName" 
+							<td><select  class="easyui-combogrid"  id="search_contractName_id" 
 								type="text" style="width: 150px;" name="contractName"
 								value=""></input></td>
-<!-- 							<td><input id="startDate" class="easyui-datebox"
-								type="text" style="width: 150px;" name="startDate" value=""  data-options="editable:false"></input></td>
-							<td>结束日期：</td>
-							<td><input id="endDate" class="easyui-datebox"
-								type="text" style="width: 150px;" name="endDate" value="" data-options="editable:false"></input></td> -->
 						</tr>
 						<tr style="text-align: center;">
 							<td colspan="10"><a href="#"
@@ -76,41 +71,20 @@
 						<td>合同名称：</td>
 						<td><input id="contractName_id" class="easyui-textbox"
 							type="text" style="width: 150px;" name="contractName" value=""></input></td>
-						<td>是否有效：</td>
-						<td><select id="contract_enabledFlag_id" name="enabledFlag" class="easyui-combobox" style="width: 150px;">
-								<option value="N">否</option>
-								<option value="Y">是</option>
-						</select></input></td>
-						
-					</tr>
-					<tr>
 						<td>合同总金额:</td>
 						<td><input id="contractAmount_id" class="easyui-textbox"
 							type="text" style="width: 150px;" name="contractAmount"
 							value=""></input></td>
+					</tr>
+					<tr>
 						<td>合同累计开票金额:</td>
-						<td><input id="contractTotalAmount_id" class="easyui-textbox"
-							type="text" style="width: 150px;" name="contractTotalAmount"
+						<td><input id="contract_virtualTotalInvoiceAmt_id" class="easyui-textbox"
+							type="text" style="width: 150px;" name="virtualTotalInvoiceAmt"
 							value=""></input></td>
 						<td>合同累计收款金额：</td>
-						<td><input id="contractReceiveAmount_id" class="easyui-textbox"
-							type="text" style="width: 150px;" name="contractReceiveAmount" value=""></input></td>
+						<td><input id="contract_virtualTotalReceiptsAmt_id" class="easyui-textbox"
+							type="text" style="width: 150px;" name="virtualTotalReceiptsAmt" value=""></input></td>
 					</tr>
-					<!-- <tr>
-						<td>是否有效：</td>
-						<td><select id="contract_enabledFlag_id" name="enabledFlag" class="easyui-combobox" style="width: 150px;">
-								<option value="N">否</option>
-								<option value="Y">是</option>
-						</select></input></td>
-						<td>状态：</td>
-						<td><input id="status_id" class="easyui-textbox" type="text" style="width: 150px;" name="status" value=""></input></td>
-						<td>开始日期：</td>
-						<td><input id="contract_startDate_id" class="easyui-datebox"
-							type="text" style="width: 150px;" name="startDate" value=""  data-options="editable:false"></input></td>
-						<td>结束日期：</td>
-						<td><input id="contract_endDate_id" class="easyui-datebox"
-							type="text" style="width: 150px;" name="endDate" value="" data-options="editable:false"></input></td>
-					</tr> -->
 					<tr>
 						<td colspan="8"><a href="#" id="searchbtn"
 							class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:'ture'"
@@ -156,36 +130,21 @@
 						<td>项目名称：</td>
 						<td><input id="projectName_id" class="easyui-textbox"
 							type="text" style="width: 150px;" name="projectName" value=""></input></td>
-						<td>是否有效：</td>
-						<td><select id="project_enabledFlag_id" name="enabledFlag" class="easyui-combobox" style="width: 150px;">
-								<option value="N">否</option>
-								<option value="Y">是</option>
-						</select></input></td>
-					</tr>
-						
-					<tr>
 						<td>项目金额:</td>
 						<td><input id="projectAmount_id" class="easyui-textbox"
 							type="text" style="width: 150px;" name="projectAmount"
 							value=""></input></td>
+					</tr>
+					<tr>
 						<td>项目累计开票金额:</td>
-						<td><input id="projectAmount_id" class="easyui-textbox"
-							type="text" style="width: 150px;" name="projectAmount"
+						<td><input id="project_virtualTotalInvoiceAmt_id" class="easyui-textbox"
+							type="text" style="width: 150px;" name="virtualTotalInvoiceAmt"
 							value=""></input></td>
 						<td>项目累计收款金额:</td>
-						<td><input id="projectAmount_id" class="easyui-textbox"
-							type="text" style="width: 150px;" name="projectAmount"
+						<td><input id="project_virtualTotalReceiptsAmt_id" class="easyui-textbox"
+							type="text" style="width: 150px;" name="virtualTotalReceiptsAmt"
 							value=""></input></td>
 					</tr>
-					<!-- <tr>
-						<td>开始日期：</td>
-						<td><input id="project_startDate_id" class="easyui-datebox"
-							type="text" style="width: 150px;" name="startDate" value=""  data-options="editable:false"></input></td>
-						<td>结束日期：</td>
-						<td><input id="project_endDate_id" class="easyui-datebox"
-							type="text" style="width: 150px;" name="endDate" value="" data-options="editable:false"></input></td>
-						
-					</tr> -->
 					<tr>
 						<td colspan="6"><a href="#" id="searchbtn"
 							class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:'ture'"
@@ -215,6 +174,8 @@ $(document).ready(function() {
 	$("#layoutid").layout('collapse', 'east');//关闭右侧面板
 	initTmsMdContractInit_datagrid();//初始化合同设置数据表格
 	initValues_dialog();//操作窗口初始化
+	initSearchContractNumber('');//初始化合同编码查询框
+	initSearchContractName('');//初始化合同编码查询框
 });
 
 /**
@@ -233,12 +194,15 @@ $(document).ready(function() {
  *打开增加项目弹框
  */
 function tmsMdProjectAdd(){
+	clearProjectForm();//清空弹出框的from表单内容
+	
 	var contract_id = $("#id").val();//合同id
-	//alert(contract_id);
+	//alert("contract_id="+contract_id);
+	$("#contract_id").val(contract_id)//合同id
+	$("#project_virtualTotalInvoiceAmt_id").textbox('enable');
+	$("#project_virtualTotalReceiptsAmt_id").textbox('enable');
 	
 	$("#project_dialog").dialog('open');//打开弹出框
-	$("#contract_id").val(contract_id)//合同id
-	//clearProjectForm();//清空弹出框的from表单内容
 	}
 /**
  * 值修改前赋值
@@ -254,20 +218,20 @@ function tmsMdProjctEdit(){
 		var project_id = row_list[0].id;//项目id
 		var projectNumber = row_list[0].projectNumber;//获取项目编码
 		var projectName = row_list[0].projectName;//获取项目名称
-		var projectAmount = row_list[0].projectAmount;//获取项目类型
-		var enabledFlag = row_list[0].enabledFlag;//获取项目类型
-		/* var startDate = row_list[0].startDate;//获取开始时间
-		var endDate = row_list[0].endDate;//获取结束时间 */
+		var projectAmount = row_list[0].projectAmount;//获取项项目金额
+		var virtualTotalInvoiceAmt = row_list[0].virtualTotalInvoiceAmt;//获取项项目金额
+		var virtualTotalReceiptsAmt = row_list[0].virtualTotalReceiptsAmt;//获取项项目金额
 		
 
 		$("#contract_id").val(contract_id)//设置合同id
 		$("#project_id").val(project_id)//设置项目id
 		$("#projectNumber_id").textbox('setValue', projectNumber)//设置项目编码
 		$("#projectName_id").textbox('setValue', projectName)//设置项目名称
-		$("#projectAmount_id").textbox('setValue', projectAmount)//设置项目分类
-		$("#project_enabledFlag_id").textbox('setValue', enabledFlag);//设置合同总金额
-		/* $("#project_startDate_id").textbox('setValue', startDate)//设置开始日期
-		$("#project_endDate_id").textbox('setValue', endDate)//设置结束日期 */
+		$("#projectAmount_id").textbox('setValue', projectAmount)//设置项目金额
+		$("#project_virtualTotalInvoiceAmt_id").textbox('setValue', virtualTotalInvoiceAmt)//设置项目开具金额
+		$("#project_virtualTotalReceiptsAmt_id").textbox('setValue', virtualTotalReceiptsAmt)//设置项目收款金额
+		$("#project_virtualTotalInvoiceAmt_id").textbox('disable');
+		$("#project_virtualTotalReceiptsAmt_id").textbox('disable');
 	}
 }
 
@@ -290,11 +254,11 @@ function addOrUpdateProject(){
 										success : function(result) {
 											var result = $.parseJSON(result);
 											if (result.status) {
-												clearProjectForm();
 												$.messager.alert('<spring:message code="system.alert"/>','保存成功');
 												$("#project_dialog").dialog('close');
-												addProjectList_datagrid('') ;
 												
+												addProjectList_datagrid('') ;
+												clearProjectForm();
 											}
 										}
 									});
@@ -366,10 +330,8 @@ function setsearchvaluesetthat_id(obj){
  */
 function initTmsMdContractInit_datagrid() {
 	
-    var contractNumber = $("#contractNumber").combogrid("getValue");
-	var contractName = $("#contractName").combogrid("getValue");
-	/* var startDate = $("#startDate").textbox("getValue");
-	var endDate = $("#endDate").textbox("getValue");   */
+    var contractNumber = $("#search_contractNumber_id").combogrid("getValue");
+	var contractName = $("#search_contractName_id").combogrid("getValue");
 	$('#TmsMdContractInit_dataGrid')
 			.datagrid(
 					{
@@ -383,8 +345,6 @@ function initTmsMdContractInit_datagrid() {
 						queryParams : {
 							contractNumber : contractNumber,
 							contractName : contractName,
-							/* startDate : startDate,
-							endDate : endDate,  */
 						},
 						columns : [ [
 										{
@@ -415,62 +375,36 @@ function initTmsMdContractInit_datagrid() {
 											sortable:true
 										},
 										{
-											field : 'enabledFlag',
-											title : '是否可用',
-											width : 120,
-											align : 'center',
-											sortable:true
-										},
-										{
 											field : 'contractAmount',
 											title : '合同总金额',
 											width : 200,
 											align : 'center',
-											sortable:true
+											sortable:true,
+											formatter:function(value,sec){
+												return value.toFixed(2);
+											}
 										},
 										{
-											field : 'contractTotalAmount',
+											field : 'virtualTotalInvoiceAmt',
 											title : '合同累计开票金额',
 											width : 200,
 											align : 'center',
-											sortable:true
+											sortable:true,
+											formatter:function(value,sec){
+												return value.toFixed(2);
+											}
 										},
 										{
-											field : 'contractReceiveAmount',
+											field : 'virtualTotalReceiptsAmt',
 											title : '合同累计首款金额',
 											width : 200,
 											align : 'center',
-											sortable:true
-										}/* ,
-										{
-											field : 'contractCategory',
-											title : '合同类型',
-											width : 120,
-											align : 'center',
-											sortable:true
-										},
-										
-										{
-											field : 'description',
-											title : '描述',
-											width : 120,
-											align : 'center',
-											sortable:true
-										},
-										{
-											field : 'startDate',
-											title : '开始日期',
-											width : 120,
-											align : 'center',
-											sortable:true
-										},
-										{
-											field : 'endDate',
-											title : '结束日期',
-											width : 120,
-											align : 'center',
-											sortable:true
-										} */
+											sortable:true,
+											formatter:function(value,sec){
+												return value.toFixed(2);
+												
+											}
+										}
 										] ],
 						toolbar : [ {
 							text : '新增',
@@ -570,47 +504,35 @@ function addProjectList_datagrid(contract_id) {
 									sortable:true
 								},
 								{
-									field : 'enabledFlag',
-									title : '是否可用',
-									width : 120,
-									align : 'center',
-									sortable:true
-								},
-								{
-									field : 'projectAmount',//项目金额
+									field : 'projectAmount',//项目总金额
 									title : '项目金额',
 									width : 200,
 									align : 'center',
-									sortable:true
+									sortable:true,
+									formatter:function(value,sec){
+										return value.toFixed(2);
+									}
 								},
 								{
-									field : 'projectTotalAmount',//项目累计开票金额
+									field : 'virtualTotalInvoiceAmt',//项目累计开票金额
 									title : '项目累计开票名称',
 									width : 200,
 									align : 'center',
-									sortable:true
+									sortable:true,
+									formatter:function(value,sec){
+										return value.toFixed(2);
+									}
 								},
 								{
-									field : 'projectReceiveAmount',//项目累计首款金额
+									field : 'virtualTotalReceiptsAmt',//项目累计首款金额
 									title : '项目累计收款金额',
 									width : 200,
 									align : 'center',
-									sortable:true
-								}/* ,
-								{
-									field : 'startDate',//开始日期
-									title : '开始日期',
-									width : 150,
-									align : 'center',
-									sortable:true
-								},
-								{
-									field : 'endDate',//结束日期
-									title : '结束日期',
-									width : 150,
-									align : 'center',
-									sortable:true
-								}, */
+									sortable:true,
+									formatter:function(value,sec){
+										return value.toFixed(2);
+									}
+								}
 								] ],
 						toolbar : [ {
 							text : '新增',
@@ -666,6 +588,8 @@ function SearchTmsMdContract() {
  */
 function TmsMdContractAdd() {
 	clearContractForm();
+	$("#contract_virtualTotalInvoiceAmt_id").textbox('enable');
+	$("#contract_virtualTotalReceiptsAmt_id").textbox('enable');
 	$("#layoutid").layout('expand', 'east');//打开右侧面板
 }
 /**
@@ -682,6 +606,8 @@ function TmsMdContractAdd() {
 				    //alert("新增合同id="+result.contract_id);
 					$("#id").val(result.contract_id);//设置合同id
 					//initTmsMdContractInit_datagrid();//刷新合同数据表格
+				}else{
+					$.messager.alert("操作提示", result.errMsg);
 				}
 			}
 		});
@@ -702,17 +628,17 @@ function TmsMdContractEdit() {
 		var contractNumber = row_list[0].contractNumber;
 		var contractName = row_list[0].contractName;
 		var contractAmount = row_list[0].contractAmount;
-		var enabledFlag = row_list[0].enabledFlag;
-	/* 	var startDate = row_list[0].startDate;
-		var endDate = row_list[0].endDate;  */
+		var virtualTotalInvoiceAmt = row_list[0].virtualTotalInvoiceAmt;//获取项项目金额
+		var virtualTotalReceiptsAmt = row_list[0].virtualTotalReceiptsAmt;//获取项项目金额
 
 		$("#id").val(id);//设置合同id
 		$("#contractNumber_id").textbox('setValue', contractNumber);//设置合同编码
 		$("#contractName_id").textbox('setValue', contractName);//设置合同名称
 		$("#contractAmount_id").textbox('setValue', contractAmount);//设置合同总金额
-		$("#contract_enabledFlag_id").textbox('setValue', enabledFlag);//设置合同总金额
-	 	/* $("#contract_startDate_id").textbox('setValue', startDate);//设置开始时间
-		$("#contract_endDate_id").textbox('setValue', endDate);//设置结束时间   */
+		$("#contract_virtualTotalInvoiceAmt_id").textbox('setValue', virtualTotalInvoiceAmt)//设置项目开具金额
+		$("#contract_virtualTotalReceiptsAmt_id").textbox('setValue', virtualTotalReceiptsAmt)//设置项目收款金额
+		$("#contract_virtualTotalInvoiceAmt_id").textbox('disable');
+		$("#contract_virtualTotalReceiptsAmt_id").textbox('disable');
 	}
 }
 /**
@@ -759,6 +685,62 @@ function TmsMdContractEditSave() {
 					});
 
 }
+
+/**
+ * 值集编码下拉列表初始化
+ */
+function initContractEncoding(data) {
+	$("#contractNumber_id")
+			.combogrid(
+					{
+						pagination : true,
+						panelWidth : 450,
+						singleSelect : true,
+						url:'${vat}/tmsMdFlexValueSets/searchivaluesetencoding.do',
+						queryParams : {
+							searchivaluesetencoding_id : data,
+						},
+						toolbar : [
+								{
+									text : "<input type='text' id='searchivaluesetencoding_id' class='easyui-textbox'  onblur='setsearchivaluesetencoding_id(this)'/>"
+								}, {
+									width : 80,
+									text:'查询',
+									iconCls : 'icon-search',
+									handler : function() {
+										var  searchivaluesetencoding_id = $("#hiddensearchvalues_id").val();
+										initIvaluesetencoding_id(searchivaluesetencoding_id);
+										  $("#ivaluesetencoding_id").combogrid('hidePanel');
+										  $("#ivaluesetencoding_id").combogrid('showPanel');
+									}
+								} ],
+						columns : [ [ {
+							field : 'id',
+							title : '值集id',
+							width : 100,
+							hidden:true,
+						}, {
+							field : 'flexValueSetCode',
+							title : '值集编码',
+							width : 100
+						}, {
+							field : 'flexValueSetName',
+							title : '值集名称',
+							width : 100,
+							align : 'right'
+						} ] ],
+						onClickRow : function(index, data) {
+				        	 search = false;
+				        	 $("#ivaluesetencoding_id").combogrid('hidePanel');
+				        	  $("#ivaluesetencoding_id").combogrid('setValue', data.flexValueSetCode);
+					          $("#ivaluesetencoding_id").combogrid('setText', data.flexValueSetName);
+						}
+
+
+					});
+
+}
+
 /**
  * 合同删除
  */
@@ -806,6 +788,132 @@ function TmsMdContractRemove() {
 						});
 	}
 }
+
+/**
+ * 合同编码下拉列表初始化
+ */
+ function initSearchContractNumber(contractNumber) {
+	$("#search_contractNumber_id")
+			.combogrid(
+					{
+						pagination : true,
+						panelWidth : 450,
+						singleSelect : true,
+						url:'${vat}/tmsMdContractDevice/loadTmsMdContractPage.do',
+						queryParams : {
+							contractNumber : contractNumber,
+						},
+						toolbar : [
+								{
+									text : "<input type='text' id='searchContractCode' class='easyui-textbox'  onblur='setsearchivaluesetencoding_id(this)'/>"
+								}, {
+									width : 80,
+									text:'查询',
+									iconCls : 'icon-search',
+									handler : function() {
+										var  searchContractCode = $("#searchContractCode").val();
+										initSearchContractNumber(searchContractCode);
+										$("#search_contractNumber_id").combogrid('hidePanel');
+										$("#search_contractNumber_id").combogrid('showPanel');
+									}
+								} ],
+						columns : [ [ 
+									{
+										field : 'id',
+										title : '合同id',
+										width : 300,
+										align : 'center',
+										sortable:true,
+										hidden:true,
+									},
+									{
+										field : 'contractNumber',
+										title : '合同编号',
+										width : 200,
+										align : 'center',
+										sortable:true
+									},
+									{
+										field : 'contractName',
+										title : '合同名称',
+										width : 200,
+										align : 'center',
+										sortable:true
+									}
+							] ],
+						onClickRow : function(index, data) {
+				        	 search = false;
+				        	 $("#search_contractNumber_id").combogrid('hidePanel');
+				        	  $("#search_contractNumber_id").combogrid('setValue', data.contractNumber);
+					          $("#search_contractNumber_id").combogrid('setText', data.contractNumber);
+						}
+
+					});
+
+}
+
+ /**
+  * 合同名称下拉列表初始化
+  */
+  function initSearchContractName(contractName) {
+ 	$("#search_contractName_id")
+ 			.combogrid(
+ 					{
+ 						pagination : true,
+ 						panelWidth : 450,
+ 						singleSelect : true,
+ 						url:'${vat}/tmsMdContractDevice/loadTmsMdContractPage.do',
+ 						queryParams : {
+ 							contractName : contractName,
+ 						},
+ 						toolbar : [
+ 								{
+ 									text : "<input type='text' id='searchContractName' class='easyui-textbox'  onblur='setsearchivaluesetencoding_id(this)'/>"
+ 								}, {
+ 									width : 80,
+ 									text:'查询',
+ 									iconCls : 'icon-search',
+ 									handler : function() {
+ 										var  searchContractName = $("#searchContractName").val();
+ 										 initSearchContractName(searchContractName);
+ 										  $("#search_contractName_id").combogrid('hidePanel');
+ 										  $("#search_contractName_id").combogrid('showPanel');
+ 									}
+ 								} ],
+ 						columns : [ [ 
+ 									{
+ 										field : 'id',
+ 										title : '合同id',
+ 										width : 300,
+ 										align : 'center',
+ 										sortable:true,
+ 										hidden:true,
+ 									},
+ 									{
+ 										field : 'contractNumber',
+ 										title : '合同编号',
+ 										width : 200,
+ 										align : 'center',
+ 										sortable:true
+ 									},
+ 									{
+ 										field : 'contractName',
+ 										title : '合同名称',
+ 										width : 200,
+ 										align : 'center',
+ 										sortable:true
+ 									}
+ 							] ],
+ 						onClickRow : function(index, data) {
+ 				        	 search = false;
+ 				        	 $("#search_contractName_id").combogrid('hidePanel');
+ 				        	  $("#search_contractName_id").combogrid('setValue', data.contractName);
+ 					          $("#search_contractName_id").combogrid('setText', data.contractName);
+ 						}
+
+ 					});
+
+ }
 
 //清空右侧面板表单内容
 function clearContractForm() {

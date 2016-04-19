@@ -6,6 +6,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +18,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Where;
 
@@ -86,26 +89,39 @@ public class TmsMdOrgBsnStructures extends BaseEntity {
 	@ModelProperty(comment="父结点ID")
 	private String parentId;
 
+    
+    @Column(name="GLOBAL_OR_LOCAL_OGR_TYPE")
+	@ModelProperty(comment="全局/组织")
+    private String allOrBaseOrg;
 
-    @ManyToOne
-	@Cascade(CascadeType.REFRESH)
-	@JoinColumn(name="ORG_ID", insertable=false,updatable=false,nullable=true)
+
+    
+    
+    @ManyToOne(fetch = FetchType.LAZY)  
+    @JoinColumn(name = "ORG_ID",  unique = false, nullable = false, insertable = false, updatable = false)  
+    @NotFound(action=NotFoundAction.IGNORE)
     private BaseOrg baseOrg;
     
-    @ManyToOne
-   	@Cascade(CascadeType.REFRESH)
-   	@JoinColumn(name="ACCD_FLEX_STRUCTURES_ID", insertable=false,updatable=false,nullable=true)
+
+
+    @ManyToOne(fetch = FetchType.LAZY)  
+    @JoinColumn(name = "ACCD_FLEX_STRUCTURES_ID",  unique = false, nullable = false, insertable = false, updatable = false)  
+    @NotFound(action=NotFoundAction.IGNORE)
     private TmsMdFlexStructures tmsMdFlexStructures;
     
+
+
     
-    @ManyToOne
-   	@Cascade(CascadeType.REFRESH)
-   	@JoinColumn(name="BSN_FLEX_STRUCTURES_ID", insertable=false,updatable=false,nullable=true)
+    @ManyToOne(fetch = FetchType.LAZY)  
+    @JoinColumn(name = "BSN_FLEX_STRUCTURES_ID",  unique = false, nullable = false, insertable = false, updatable = false)  
+    @NotFound(action=NotFoundAction.IGNORE)
     private TmsMdFlexStructures tmsMdFlexStructures2;
+
     
-    @ManyToOne
-   	@Cascade(CascadeType.REFRESH)
-   	@JoinColumn(name="LEGAL_ENTITY_ID", insertable=false,updatable=false,nullable=true)
+    
+    @ManyToOne(fetch = FetchType.LAZY)  
+    @JoinColumn(name = "LEGAL_ENTITY_ID",  unique = false, nullable = false, insertable = false, updatable = false)  
+    @NotFound(action=NotFoundAction.IGNORE)
     private TmsMdLegalEntity tmsMdLegalEntity;
     
     
@@ -114,6 +130,14 @@ public class TmsMdOrgBsnStructures extends BaseEntity {
     
     
     
+	public String getAllOrBaseOrg() {
+		return allOrBaseOrg;
+	}
+
+	public void setAllOrBaseOrg(String allOrBaseOrg) {
+		this.allOrBaseOrg = allOrBaseOrg;
+	}
+
 	public BaseOrg getBaseOrg() {
 		return baseOrg;
 	}
@@ -234,7 +258,27 @@ public class TmsMdOrgBsnStructures extends BaseEntity {
 		this.parentId = parentId;
 	}
 
+	@Override
+	public String toString() {
+		return "TmsMdOrgBsnStructures [id=" + id + ", orgId=" + orgId
+				+ ", accdFlexStructuresId=" + accdFlexStructuresId
+				+ ", legalEntityId=" + legalEntityId + ", bsnFlexStructuresId="
+				+ bsnFlexStructuresId + ", costCenter=" + costCenter
+				+ ", description=" + description + ", sourceCode=" + sourceCode
+				+ ", startDate=" + startDate + ", endDate=" + endDate
+				+ ", parentId=" + parentId + ", allOrBaseOrg=" + allOrBaseOrg
+				+ ", baseOrg=" + baseOrg + ", tmsMdFlexStructures="
+				+ tmsMdFlexStructures + ", tmsMdFlexStructures2="
+				+ tmsMdFlexStructures2 + ", tmsMdLegalEntity="
+				+ tmsMdLegalEntity + "]";
+	}
+
     
+	
+	
+	
+	
+	
 }
 
 

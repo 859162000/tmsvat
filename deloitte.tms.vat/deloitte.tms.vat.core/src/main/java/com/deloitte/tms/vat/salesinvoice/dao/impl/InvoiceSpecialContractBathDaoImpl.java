@@ -27,7 +27,6 @@ import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.DateUtils;
 import com.deloitte.tms.pl.core.dao.impl.BaseDao;
 import com.deloitte.tms.vat.salesinvoice.dao.InvoiceSpecialContractBathDao;
-import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatInf;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesH;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesL;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvReqBatchesLInParam;
@@ -292,11 +291,11 @@ public class InvoiceSpecialContractBathDaoImpl  extends BaseDao<TmsCrvatInvReqBa
 		{
 			query.append(" and invoiceReqDate <=:invoiceReqendDate");
 			values.put("invoiceReqendDate", DateUtils.parseTime(invoiceReqendDate, "yyyy-MM-dd"));
-		}		
-		
+		}			
 		
 		query.append(" and flag = :flag");
 		values.put("flag", "1");
+		query.append(" order by createDate desc, crvatInvoiceReqNumber desc");
 		return this.pageBy(query, values, pageNumber, pageSize);
 	
 	}
@@ -353,18 +352,7 @@ public class InvoiceSpecialContractBathDaoImpl  extends BaseDao<TmsCrvatInvReqBa
 		}
 		return list;
 	}
-	/**
-	 * 取得长江证券数据
-	 */
-	@Override
-	public List<TmsCrvatInvReqBatInf> analyzeTmsCrvatInvReqBatchesParam() {
-		List<TmsCrvatInvReqBatInf> list = null;
-		StringBuffer query=new StringBuffer();
-		Map<String,Object> values=new HashMap<String,Object>();
-			query.append(" from TmsCrvatInvReqBatInf where 1=1 ");
-			list =  findBy(query, values);
-		return list;
-	}
+	
 	/**
 	 * 提交申请单
 	 */

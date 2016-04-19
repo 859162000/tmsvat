@@ -41,17 +41,27 @@ public class ProcessTaxInterfaceImpl implements ProcessTaxInterface{
 		AssertHelper.notEmpty_assert(response, "返回数据不能为空");
 		
 		List<InvoiceIssue> invoiceIssueList=request.getRecord();
+		
+		
 		List<InvoiceIssueResult> invoiceIssueResultList=response.getResults();
 		for(int i=0;i<invoiceIssueList.size();i++){
 			InvoiceIssue invoiceIssue=invoiceIssueList.get(i);
 			InvoiceIssueResult invoiceIssueResult=invoiceIssueResultList.get(i);
 			InvoicePrintPoolH entity=(InvoicePrintPoolH)invoicePrintPoolHService.get(InvoicePrintPoolH.class,invoiceIssue.getKey());
+			
+			//长证项目把错误信息和成功信息放在attribute6中
+			if(AssertHelper.notEmpty(invoiceIssueResultList) && AssertHelper.notEmpty(invoiceIssueResultList.get(0))){
+				String messageString = invoiceIssueResultList.get(0).getErroMsg();
+				entity.setAttribute6(messageString);
+			}
+			
 			if(invoiceIssueResult.isIssucess()){//开具成功
 				entity.setInvoicePrintStatus(InvoicePrintStatusEnums.TOBEPRINT.getValue());
 				entity.setInvoicePrintDate(invoicePrintPoolHService.getDatabaseServerDate());
 				entity.setInvoicePrintBy(invoiceIssue.getHead().getDrawer());
 				entity.setInvoiceCode(invoiceIssueResult.getInvoiceCode());
 				entity.setInvoiceNumber(invoiceIssueResult.getInvoiceNo());
+				
 				invoicePrintPoolHService.update(entity);
 				invoiceSyncProvider.changeInvoiceStatu(invoiceIssueResult.getInvoiceCode(), invoiceIssueResult.getInvoiceNo(),"3");
 				/*try {
@@ -60,7 +70,8 @@ public class ProcessTaxInterfaceImpl implements ProcessTaxInterface{
 					// TODO: handle exception
 				}*/
 			}else{//开具失败,异步处理,不抛出异常
-				
+				//错误信息放在attribute6中
+				invoicePrintPoolHService.update(entity);
 			}
 		}
 		
@@ -79,6 +90,7 @@ public class ProcessTaxInterfaceImpl implements ProcessTaxInterface{
 		for(InvoicePrintResult result:response.getResults()){
 			InvoicePrintPoolHInParam inParam=invoiceSyncProvider.getInvoicePrintPoolH(result.getInvoiceCode(), result.getInvoiceNo());
 			InvoicePrintPoolH entity = (InvoicePrintPoolH)invoicePrintPoolHService.get(InvoicePrintPoolH.class, inParam.getId());
+			entity.setAttribute6(result.getErroMsg());
 			if(result.isIssucess()){//打印成功
 				entity.setInvoicePrintStatus(InvoicePrintStatusEnums.PRINTED.getValue());
 				invoicePrintPoolHService.update(entity);

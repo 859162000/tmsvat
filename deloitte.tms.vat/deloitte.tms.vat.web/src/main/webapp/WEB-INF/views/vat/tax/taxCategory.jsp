@@ -108,6 +108,8 @@
 			pageSize : $('#dgTax').datagrid('options').pageSize
 		});
 		loadAll();
+		$('#dgTax').datagrid('acceptChanges');
+	//	saveNewRow();
 	});
 	$.extend($.messager.defaults, {
 		ok : '<spring:message code="confirm"/>',
@@ -136,13 +138,34 @@
 										field : 'categoryName',
 										title : '<spring:message code="taxCategpryMaintain.categoryName"/>',
 										width : 80,
-										align : 'center'
+										align : 'center',
+									    editor: { type: 'text', options: { required: true } }
+										
 									},
 									{
 										field : 'categoryState',
 										title : '<spring:message code="taxCategpryMaintain.categoryState"/>',
 										width : 100,
 										align : 'center',
+										editor: { type: 'combobox', 
+											options: { 
+												panelHeight:'auto',//高度自使用
+												 required:true,
+												valueField: 'value',
+												textField: 'text',
+												editable:false,
+												data: [{
+													text: '国税',
+													value: 'G'
+												},{
+													text: '地方税',
+													value: 'L'
+												},{
+													text: '共享税',
+													value: 'ALL'
+												}]
+												
+											} },
 									 formatter:orgFormat2
 									},
 									{
@@ -150,51 +173,105 @@
 										title : '<spring:message code="taxCategpryMaintain.isUsed"/>',
 										width : 80,
 										align : 'center',
+										editor: { type: 'combobox',
+											options: { 
+												panelHeight:'auto',//高度自使用
+												 required:true,
+												valueField: 'value',
+												textField: 'text',
+												editable:false,
+												data: [{
+													text: '是',
+													value: '1'
+												},{
+													text: '否',
+													value: '0'
+												}]
+											
+											} },
 									 formatter:orgFormat
 									},
 									{
 										field : 'createdBy',
 										title : '<spring:message code="taxCategpryMaintain.createdBy"/>',
 										width : 80,
-										align : 'center'
+										align : 'center',										
 									},
 									{
 										field : 'createDate',
 										title : '<spring:message code="taxCategpryMaintain.createDate"/>',
 										width : 80,
-										align : 'center'
+										align : 'center',
+									  sortable:true,										
 									},
 									{
 										field : 'modifiedBy',
 										title : '<spring:message code="taxCategpryMaintain.modifiedBy"/>',
 										width : 100,
-										align : 'center'
+										align : 'center',										
 									},
 									{
 										field : 'modifiedDate',
 										title : '<spring:message code="taxCategpryMaintain.modifiedDate"/>',
 										width : 80,
-										align : 'center'
+										align : 'center',
+										 sortable:true,										
 									}, ] ],
 							toolbar : [ {
 								text : '新增',
 								iconCls : 'icon-add',
 								handler : function() {
-									add();
+								//	add();
+									
+									var editRow=undefined;
+			                		var datagrid_container=$("#dgTax");
+			                		if (editRow != undefined) {
+			                            $(datagrid_container).datagrid('endEdit', editRow);
+			                        }
+			                        if (editRow == undefined) {
+			                            $(datagrid_container).datagrid('insertRow', {
+			                                index: 0,
+			                                row: {
+			                                	checked:true,
+			                                	isUsed:'是'}
+			                            });
+			                           
+			                        //    getEditIndex();
+			                            $(datagrid_container).datagrid('selectRow',0);
+			                           $(datagrid_container).datagrid('beginEdit', 0);
+			                            editRow = 0;
+			                        }
+									
+			                        
+									
+									
 								}
-							}, '-', {
+							}/* , '-', {
 								text : '编辑',
 								iconCls : 'icon-edit',
 								handler : function() {
-									edit();
+								//	edit();	var datagrid_container=$("#dgTax");							
+								var row = $(datagrid_container).datagrid('getSelected');								
+								var rowIndex = $(datagrid_container).datagrid('getRowIndex',row);			
+								$(datagrid_container).datagrid('beginEdit', rowIndex);
+								
+								
 								}
-							}, '-', {
+							} */, '-', {
+								text : '保存',
+								iconCls : 'icon-save',
+								handler : function() {
+									saveNewRow();
+								}
+							}
+				/* 			, '-', {
 								text : '删除',
 								iconCls : 'icon-remove',
 								handler : function() {
 									removeit();
 								}
-							}, '-' ],
+							}, '-'  */
+							],
 							onLoadSuccess : function() {
 								$('#dgTax').datagrid('clearSelections')
 							},
@@ -203,6 +280,12 @@
 								if (row) {
 									loadSaveFormData(row);
 								}
+							},
+							onClickRow: function(index,field,value){
+								$(this).datagrid('beginEdit', index);
+								var ed = $(this).datagrid('getEditor', {index:index,field:field});
+								$(ed.target).focus();
+							
 							}
 						});
 		//设置分页控件	
@@ -236,6 +319,46 @@
 		/* appuseruuid:row.appuseruuid */
 		});
 	}
+	
+	function getEditIndex(){
+		
+	$('#dgTax').datagrid({
+			
+			onClickCell: function(index,field,value){
+				$(this).datagrid('beginEdit', index);
+				var ed = $(this).datagrid('getEditor', {index:index,field:field});
+				$(ed.target).focus();
+			}
+		});
+	}
+	
+	
+	function saveNewRow(){
+		
+   		$('#dgTax').datagrid('acceptChanges');
+		var	getData = $('#dgTax').datagrid('getSelections');
+		var data =   JSON.stringify(getData);
+	$.messager.confirm("提示","确认提交？",function(result){
+		if (result){
+			$.ajax({
+				url : "${vat}/taxCategory/saveTaxCategory.do",
+				type : "POST",
+				data : "param="+data, //不能直接写成 {id:"123",code:"tomcat"}  
+				dataType : "json",
+				cache : false,
+				success : function(result) {
+					$.messager.alert('<spring:message code="system.alert"/>','保存成功');
+					loadAll();
+					
+				}
+			});
+		}
+	});
+		
+	}
+	
+	
+	
 	function find(pageNumber, pageSize) {
 	
 		$('#searchAll').form('load', {
@@ -266,6 +389,7 @@
 	}
 	function loadAll() {
 		//alert(2);
+		
 		$("#dgTax").datagrid("loading");
 		$('#searchAll').form('submit', {
 			url : '${vat}/taxCategory/getTaxCategorys.do',
@@ -276,6 +400,7 @@
 				var result = $.parseJSON(result);
 				$("#dgTax").datagrid('loadData', result);
 				$("#dgTax").datagrid("loaded");
+				$('#dgTax').datagrid('acceptChanges');
 			}
 		});
 	}

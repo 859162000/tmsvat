@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.dao.impl.BaseDao;
+import com.deloitte.tms.pl.security.utils.LittleUtils;
 import com.deloitte.tms.vat.purchinvoice.dao.TmsDrvatInvoiceTrxHDao;
 import com.deloitte.tms.vat.purchinvoice.model.TmsDrvatInvoiceTrxH;
 import com.deloitte.tms.vat.purchinvoice.model.TmsDrvatInvoiceTrxL;
@@ -110,7 +111,7 @@ public class TmsDrvatInvoiceTrxHDaoImpl extends BaseDao<TmsDrvatInvoiceTrxH> imp
 		
 		//todo: from query for exist must have 2 fields exist
 		//query.append(" from TmsDrvatInvoiceTrxL where 1=1 and flag!=1 ");
-		query.append(" from ").append( TmsDrvatInvoiceTrxL.class.getName() ).append( " where  flag!='0' ");
+		query.append(" from ").append( TmsDrvatInvoiceTrxL.class.getName() ).append( " where  flag=").append(LittleUtils.one);
 		
 		params.remove("pageIndex");
 		params.remove("pageSize");
@@ -242,6 +243,55 @@ public class TmsDrvatInvoiceTrxHDaoImpl extends BaseDao<TmsDrvatInvoiceTrxH> imp
 		buildTmsDrvatInvoiceTrxLQuery4Date(query,  params);
 		return findBy(query, params);
 		
+	}
+	@Override
+	public void removeTrxL(String ids) {
+		// TODO Auto-generated method stub
+
+		
+		try{
+			
+		if(LittleUtils.strEmpty(ids)){
+			return;
+		}else{
+			StringBuffer sb = new StringBuffer();
+			
+			sb.append(" update ").append(TmsDrvatInvoiceTrxL.class.getName());
+			sb.append( "  set flag = ").append(LittleUtils.zero);
+			sb.append("  where id in ( ");
+			sb.append( ":ids" );
+			sb.append(" ) "); 
+			
+			HashMap<String, String> m = new HashMap<String, String>();
+			
+			m.put("ids", ids);
+			
+			this.executeHqlProduce(sb.toString(), m);
+			
+		}
+	}catch(Exception e){
+		e.printStackTrace();
+	}
+		
+	
+	}
+	
+	
+	@Override
+	public List findExistsRecords (Map<String, String> params){
+		
+		if(params==null || params.size()<2){
+			return null;
+		}
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select id from ").append( TmsDrvatInvoiceTrxL.class.getName()).append(" where ");
+		
+		sb.append(" flag=").append(LittleUtils.one);
+		
+		sb.append(" and invoiceCode=:invoiceCode and invoiceNumber=:invoiceNumber ");
+		
+		return findBy(sb, params);		
 	}
 	
 }

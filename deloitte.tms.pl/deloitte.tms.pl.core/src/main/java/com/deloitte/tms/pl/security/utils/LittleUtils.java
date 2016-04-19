@@ -20,7 +20,7 @@ public class LittleUtils {
 	
 	public static boolean strEmpty(String str){
 		
-		if(str==null || ""==str.trim()){
+		if(str==null || ""==str.trim()  || "null".equalsIgnoreCase(str)  ){
 			return true;
 		}else {
 			return false;

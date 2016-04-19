@@ -45,10 +45,17 @@ public class InvoiceSendLDaoImpl extends BaseDao<InvoiceSendL> implements Invoic
 	private void buildInvoiceSendLQuery(StringBuffer query,Map values,Map params) {
 		query.append(" from InvoiceSendL where 1=1 ");
 		Object value=params.get("status");
+		//	invoiceHIdsMap.put("invoiceHId", clientId);
 		if(value!=null)
 		{
 			query.append(" and status=:status");
 			values.put("status", value);
+		}
+		value=params.get("invoiceHId");
+		if(value!=null)
+		{
+			query.append(" and invoiceDeliveryHId=:invoiceDeliveryHId");
+			values.put("invoiceDeliveryHId", value);
 		}
 	}
 }

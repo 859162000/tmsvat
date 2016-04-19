@@ -18,6 +18,8 @@ import com.deloitte.tms.vat.base.enums.CrvatTaxPoolStatuEnums;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxPool;
 import com.deloitte.tms.vat.salesinvoice.model.TempTmsCrvatInvoiceReqL;
 import com.deloitte.tms.vat.salesinvoice.dao.InvoiceTrxPoolDao;
+import com.deloitte.tms.pl.core.commons.utils.PageUtils;
+
 /**
  * Home object for domain model class InvoiceTrxPool.
  * @see com.deloitte.tms.vat.salesinvoice.model
@@ -80,11 +82,134 @@ public class InvoiceTrxPoolDaoImpl extends BaseDao<InvoiceTrxPool> implements In
 //		return pageBy(query, values, pageIndex, pageSize);
 		
 		
-		
-		
-		
 	}
 	
+	@Override  
+	public DaoPage findInvoiceTrxPoolByParams4Query(Map params, Integer pageIndex,Integer pageSize)
+	{
+		StringBuffer query=new StringBuffer();
+		Map<String,Object> values=new HashMap<String,Object>();
+		//System.out.println("*********************************test in InvoiceTrxPoolDaoImpl -- findInvoiceTrxPoolByParams2");
+		buildInvoiceTrxPoolQuery4Query(query, values, params);
+		
+		int pageIndex2 = PageUtils.getPageNumber(params);
+		int pageSize2 = PageUtils.getPageSize(params);
+		return pageBy(query, values, pageIndex2, pageSize2);
+	}
+	
+	public void buildInvoiceTrxPoolQuery4Query(StringBuffer query, Map<String,Object> values, Map params) {
+	
+		//System.out.println("*********************************test in InvoiceTrxPoolDaoImpl -- buildInvoiceTrxPoolQuery2");
+		
+		Object value = params.get("selectOption");
+		System.out.println("================selectOption=============="+value);
+		
+		if("1".equals(value) || "2".equals(value) || "3".equals(value)){
+			Object selectValue; 
+			if("1".equals(value)){
+				selectValue = params.get("selectValue");
+				if(AssertHelper.notEmpty(selectValue))
+				{
+					//System.out.println("================selectValue======custRegistrationNumber======="+selectValue);
+					query.append("select itp from InvoiceTrxPool itp, Customer cust where itp.customerId=cust.id and cust.custRegistrationNumber=:custRegistrationNumber ");
+				    values.put("custRegistrationNumber", selectValue);
+				}
+			}
+	        
+			if("2".equals(value)){
+				selectValue = params.get("selectValue");
+				if(AssertHelper.notEmpty(selectValue))
+				{
+					//System.out.println("================selectValue=====gsnRegistrationNumber========"+selectValue);
+					query.append("select itp from InvoiceTrxPool itp, Customer cust where itp.customerId=cust.id and cust.gsnRegistrationNumber=:gsnRegistrationNumber ");
+				    values.put("gsnRegistrationNumber", selectValue);
+				}
+			}
+			
+			if("3".equals(value)){
+				selectValue = params.get("selectValue");
+				if(AssertHelper.notEmpty(selectValue))
+				{
+					//System.out.println("================selectValue=======customerNumber======"+selectValue);
+					query.append("select itp from InvoiceTrxPool itp, Customer cust where itp.customerId=cust.id and cust.customerNumber=:customerNumber ");
+				    values.put("customerNumber", selectValue);
+				}
+			}
+		}else{
+			query.append(" from InvoiceTrxPool itp where 1=1 ");
+		}
+		
+		value=params.get("status");
+		if(AssertHelper.notEmpty(value))
+		{
+		query.append(" and itp.status=:status");
+		values.put("status", value);
+		}
+		
+		value = params.get("source");
+		if(AssertHelper.notEmpty(value))
+		{
+		query.append(" and itp.sourceCode=:sourcecode");
+		values.put("sourcecode", value);
+		}
+		
+		value = params.get("trxNumber");
+		if(AssertHelper.notEmpty(value))
+		{
+		query.append(" and itp.trxNumber=:trxNumber");
+		values.put("trxNumber", value);
+		}
+		
+		value = params.get("batchNum");
+		if(AssertHelper.notEmpty(value))
+		{
+		query.append(" and itp.trxBatchNum=:trxBatchNum");
+		values.put("trxBatchNum", value);
+		}
+		
+		value = params.get("custRegistrationNumber");
+		if(AssertHelper.notEmpty(value))
+		{
+		query.append(" and itp.custRegistrationNumber=:custRegistrationNumber");
+		values.put("custRegistrationNumber", value);
+		}
+		
+		value = params.get("trsEndDate");
+		if(AssertHelper.notEmpty(value))
+		{
+		query.append(" and itp.trxDate<=:trsEndDate");
+		values.put("trsEndDate", DateUtils.parseTime((String)value,"yyyy-MM-dd"));
+		}
+		
+		value = params.get("trsStartDate");
+		if(AssertHelper.notEmpty(value))
+		{
+		query.append(" and itp.trxDate>=:trsStartDate");
+		values.put("trsStartDate", DateUtils.parseTime((String)value,"yyyy-MM-dd"));
+		}
+		
+		value = params.get("customerId");
+		if(AssertHelper.notEmpty(value))
+		{
+		query.append(" and itp.customerId=:customerId");
+		values.put("customerId", value);
+		}
+		
+		value = params.get("taxTrxTypeId");
+		if(AssertHelper.notEmpty(value))
+		{
+		query.append(" and itp.taxTrxTypeId=:taxTrxTypeId");
+		values.put("taxTrxTypeId", value);
+		}
+		
+		value = params.get("legalEntityId");
+		if(AssertHelper.notEmpty(value))
+		{
+		query.append(" and itp.legalEntityId =:legalEntityId");
+		values.put("legalEntityId", value);
+		}
+	}
+		
 	@SuppressWarnings("unchecked")
 	public List<InvoiceTrxPool> findInvoiceTrxPoolByParams(Map<String,Object> params)
 	{

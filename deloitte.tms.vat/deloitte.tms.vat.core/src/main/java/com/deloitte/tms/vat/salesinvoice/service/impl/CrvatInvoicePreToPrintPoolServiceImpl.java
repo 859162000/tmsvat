@@ -155,7 +155,7 @@ public class CrvatInvoicePreToPrintPoolServiceImpl extends BaseService
 						invoicePrintPoolD.setId(IdGenerator.getUUID());
 						invoicePrintPoolD.setInvoicePrtPoolLId(invoicePrintPoolL.getId());
 						invoicePrintPoolD.setCrvatInvoicePreLId(tmsCrvatInvoicePreL.getId());
-						invoicePrintPoolD.setAcctdAmountCr(tmsCrvatInvoicePreL.getAcctdAmountCr());
+						//invoicePrintPoolD.setAcctdAmountCr(tmsCrvatInvoicePreL.getAcctdAmountCr());
 						invoicePrintPoolD.setCrvatTrxPoolId(tmsCrvatInvoicePreL.getCrvatTrxPoolId());
 						invoicePrintPoolD.setEndDate(tmsCrvatInvoicePreL.getEndDate());
 						invoicePrintPoolD.setInventoryItemDescripton(tmsCrvatInvoicePreL.getInventoryItemDescripton());
@@ -167,7 +167,7 @@ public class CrvatInvoicePreToPrintPoolServiceImpl extends BaseService
 						invoicePrintPoolD.setStartDate(tmsCrvatInvoicePreL.getStartDate());
 						invoicePrintPoolD.setUomCode(tmsCrvatInvoicePreL.getUomCode());
 						invoicePrintPoolD.setUomCodeDescripton(tmsCrvatInvoicePreL.getUomCodeDescripton());
-						invoicePrintPoolD.setVatAmount(tmsCrvatInvoicePreL.getVatAmount());
+						//invoicePrintPoolD.setVatAmount(tmsCrvatInvoicePreL.getVatAmount());
 						invoicePrintPoolD.setInvoiceTrxPoolId(tmsCrvatInvoicePreL.getCrvatTrxPoolId());
 						if(tmsCrvatInvoicePreL.getInventoryItemQty()!=null){
 							qty = qty + tmsCrvatInvoicePreL.getInventoryItemQty();
@@ -198,9 +198,9 @@ public class CrvatInvoicePreToPrintPoolServiceImpl extends BaseService
 					invoicePrintPoolL.setInventoryItemModels(inventorymode);
 					invoicePrintPoolL.setInventoryItemId(inventoryId);
 					vatAmoun = vatAmoun.setScale(2, RoundingMode.HALF_UP);
-					invoicePrintPoolL.setVatAmount(vatAmoun);
+					//invoicePrintPoolL.setVatAmount(vatAmoun);
 					accAmount = accAmount.setScale(2, RoundingMode.HALF_UP);
-					invoicePrintPoolL.setAcctdAmountCR(accAmount);
+					//invoicePrintPoolL.setAcctdAmountCR(accAmount);
 					amountBigDecimal= amountBigDecimal.setScale(2, RoundingMode.HALF_UP);
 					invoicePrintPoolL.setInvoiceAmount(amountBigDecimal);
 					invoicePrintPoolL.setPriceOfUnit(priceOfUnit);
@@ -294,12 +294,14 @@ public class CrvatInvoicePreToPrintPoolServiceImpl extends BaseService
 				for(InvoicePrintPoolD invoicePrintPoolD:invoicePrintPoolL.getPoolDs()){
 					InvoiceTrxPool invoiceTrxPool = (InvoiceTrxPool) invoicePreHDao.get(InvoiceTrxPool.class, invoicePrintPoolD.getCrvatTrxPoolId());
 					invoiceTrxPool.setStatus(CrvatTaxPoolStatuEnums.INVOICE_TOBE_PRINTED.getValue());
+					if(AssertHelper.notEmpty(invoiceTrxPool.getTaxRate())){
+						invoicePrintPoolL.setTaxRate(new BigDecimal(invoiceTrxPool.getTaxRate()).setScale(6, RoundingMode.HALF_UP));
+						invoicePrintPoolD.setTaxRate(new BigDecimal(invoiceTrxPool.getTaxRate()).setScale(6, RoundingMode.HALF_UP));
+					}
 					invoicePreHDao.update(invoiceTrxPool);
 					invoicePreHDao.save(invoicePrintPoolD);
 					//新增发票打印池行表税率设置
-					if(AssertHelper.notEmpty(invoiceTrxPool.getTaxRate())){
-						invoicePrintPoolL.setTaxRate(new BigDecimal(invoiceTrxPool.getTaxRate()).setScale(6, RoundingMode.HALF_UP));
-					}
+					
 					
 				}	
 				
@@ -317,14 +319,15 @@ public class CrvatInvoicePreToPrintPoolServiceImpl extends BaseService
 			BigDecimal limitAmout = BigDecimal.valueOf(limit);
 			BigDecimal totalAmount = invoicePrintPoolH.getTotalAmount();
 			int size = invoicePrintPoolH.getInvoicePrintPoolLs().size();
-			if(size<8&&totalAmount.compareTo(limitAmout)<=0){
+			int sizelimit = 150;
+			if(size<sizelimit&&totalAmount.compareTo(limitAmout)<=0){
 				invoicePreHDao.save(invoicePrintPoolH);
 				for(InvoicePrintPoolL invoicePrintPoolL:invoicePrintPoolH.getInvoicePrintPoolLs()){					
 					invoicePreHDao.save(invoicePrintPoolL);
 				}
 				
 			}
-			if(size<8&&totalAmount.compareTo(limitAmout)>0){             
+			if(size<sizelimit&&totalAmount.compareTo(limitAmout)>0){             
 				List<InvoicePrintPoolL> list2 = (List<InvoicePrintPoolL>) invoicePrintPoolH.getInvoicePrintPoolLs();				
 				//计算同一销售方根据发票限额拆分的发票数量。				
 				long a = totalAmount.longValue();
@@ -440,7 +443,7 @@ public class CrvatInvoicePreToPrintPoolServiceImpl extends BaseService
 					
 				}				
 			}
-			if(size>8){
+			if(size>sizelimit){
 			   List<InvoicePrintPoolH> poolHs = handleSizeLarge8(invoicePrintPoolH);				
 			   saveBachInvoicePrintPoolH(poolHs);
 			}
@@ -451,8 +454,9 @@ public class CrvatInvoicePreToPrintPoolServiceImpl extends BaseService
 	private List<InvoicePrintPoolH> handleSizeLarge8(InvoicePrintPoolH invoicePrintPoolH){			
 		//根据总条数按照每页8条拆分
 		int size = invoicePrintPoolH.getInvoicePrintPoolLs().size();
-		int c = size/8;
-		int b = size%8;
+		int sizelimit = 150;
+		int c = size/sizelimit;
+		int b = size%sizelimit;
 		int p = 0;
 		if(b>0){
 			p=c+1;				

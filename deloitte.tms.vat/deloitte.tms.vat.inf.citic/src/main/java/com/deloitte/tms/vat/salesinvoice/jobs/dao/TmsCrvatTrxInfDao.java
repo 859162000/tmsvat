@@ -40,5 +40,7 @@ public interface TmsCrvatTrxInfDao extends IDao<TmsCrvatTrxInf> {
 
 	public List<TmsCrvatTrxInf> findTmsCrvatTrxInf(String ready, int pageIndex,
 			int pageSize);
+
+	public int findTmsCrvatTrxInfNum(String ready);
 	
 }

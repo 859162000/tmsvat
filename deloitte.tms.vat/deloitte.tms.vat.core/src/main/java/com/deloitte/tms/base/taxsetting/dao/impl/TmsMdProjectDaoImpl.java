@@ -46,7 +46,7 @@ public class TmsMdProjectDaoImpl extends BaseDao<TmsMdProject> implements TmsMdP
 	public void removeTmsMdProjects(String projectId) {
 		StringBuffer query=new StringBuffer();
 		Map values=new HashMap<String, Object>();
-		query.append("delete from TmsMdProject where id =:projectId ");
+		query.append("update TmsMdProject set DELETED_FLAG = 0 where id =:contractId");
 		values.put("projectId", projectId);
 		executeHqlProduce(query.toString(), values);
 	}

@@ -109,13 +109,14 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 			invoiceReqL.setLegalEntityCode(pool.getLegalEntityCode());
 			invoiceReqL.setLegalEntityName(pool.getLegalEntityName());
 			invoiceReqL.setCrvatTrxPoolId(pool.getId());
+			invoiceReqL.setOrgId(pool.getOrgId());//行信息的OrgID取交易池的orgId;
 			invoiceReqL.setTaxTrxTypeId(pool.getTaxTrxTypeId());
 			invoiceReqL.setInventoryItemId(pool.getInventoryItemId());
 			invoiceReqL.setInventoryItemDescripton(pool.getInventoryItemDescripton());
 			invoiceReqL.setInventoryItemModels(pool.getInventoryItmeModels());
 			invoiceReqL.setInventoryItemNumber(pool.getInventoryItemNumber());
 			invoiceReqL.setInventoryItemQty(pool.getInventoryItemQty());
-			
+			invoiceReqL.setOrgId(pool.getOrgId());
 			if(!AssertHelper.isOrNotEmpty_assert(pool.getExchangeRate())){
 				pool.setExchangeRate(BigDecimal.ZERO);
 			}
@@ -313,7 +314,7 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 				entity.setId(IdGenerator.getUUID());
 				entity.setCrvatInvoiceReqHId(invoiceReqH.getId());
 				entity.setStatus(map.get("status").toString());
-				entity.setOrgId(map.get("orgId").toString());
+				//entity.setOrgId(map.get("orgId").toString());//注释掉行信息设置orgID的代码
 				invoiceReqLs.add(entity);
 			}
 			invoiceReqH.setInvoiceReqLs(invoiceReqLs);
@@ -355,17 +356,34 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 	public InvoiceTrxPoolInParam convertInvoiceTrxPoolToInParam(
 			InvoiceTrxPool initiation) {
 		//InvoiceTrxPoolInParam inparam=convertInvoiceTrxPoolToInParam(initiation);
+		//InvoiceTrxPoolInParam inparam=convertInvoiceTrxPoolToInParam(initiation);
 		InvoiceTrxPoolInParam inparam=new InvoiceTrxPoolInParam();
-		inparam.setId(initiation.getId());
+		inparam.setTempId(initiation.getTempId());
 		inparam.setTaxRate(null!=initiation.getTaxRate()?initiation.getTaxRate():0.00);
 		inparam.setTrxAffirmId(initiation.getTrxAffirmId());
+		inparam.setTrxBatchNum(initiation.getTrxBatchNum());
 		inparam.setTrxNumber(initiation.getTrxNumber());
-		InvoiceReqLInParam amountInParam=getAmout(initiation.getId(),initiation);
+		inparam.setSourceCode(initiation.getSourceCode());
+		inparam.setCustRegistrationCode(initiation.getCustRegistrationCode());
+		inparam.setCustRegistrationNumber(initiation.getCustRegistrationNumber());
+		inparam.setCustBankAccountNum(initiation.getCustBankAccountNum());
+		inparam.setCustBankBranchName(initiation.getCustBankBranchName());
+		inparam.setTaxRate(initiation.getTaxRate());
+		inparam.setTaxBaseName(initiation.getTaxBaseName());
+		inparam.setTaxSettingMethod(initiation.getTaxSettingMethod());
+		inparam.setInvoiceCategoryName(DictionaryCacheUtils.getCodeName("VAT_INVOICE_RULE", initiation.getInvoiceCategory()));
+		inparam.setLegalEntityName(initiation.getLegalEntityName());
+		inparam.setRegistrationNumber(initiation.getRegistrationNumber());
+		/*InvoiceReqLInParam amountInParam=getAmout(initiation.getId(),initiation);
 		inparam.setUsedAmount(amountInParam.getUsedAmount());
-		inparam.setUserfulAmount(amountInParam.getUserfulAmount());
+		inparam.setUserfulAmount(amountInParam.getUserfulAmount());*/
+		if(AssertHelper.isOrNotEmpty_assert(initiation.getCustomerId())){
+			Customer customer = (Customer) get(Customer.class, initiation.getCustomerId());
+			inparam.setCustomerNumber(customer.getCustomerNumber());
+			inparam.setCustomerName(customer.getCustomerName());
+		}
 		inparam.setCrvatTrxPoolId(initiation.getId());
-		inparam.setTrxDate(initiation.getTrxDate());
-		inparam.setInvoiceAmount(null!=inparam.getCurrencyAmountCr()?inparam.getCurrencyAmountCr():BigDecimal.valueOf(0.00).multiply(null!=inparam.getExchangeRate()?inparam.getExchangeRate():BigDecimal.valueOf(0.00)));
+		inparam.setInvoiceAmount(null!=initiation.getCurrencyAmount()?initiation.getCurrencyAmount():BigDecimal.valueOf(0.00).multiply(null!=initiation.getExchangeRate()?initiation.getExchangeRate():BigDecimal.valueOf(0.00)));
 		if(AssertHelper.isOrNotEmpty_assert(initiation.getOrgId())){
 			BizOrgNode node=OrgCacheUtils.getNodeByOrgId(initiation.getOrgId());
 			if(null!=node){
@@ -380,7 +398,7 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 			inparam.setStatus(valueName);
 		}
 		if(AssertHelper.isOrNotEmpty_assert(initiation.getTaxTrxTypeId())){
-			TmsMdTaxTrxType trxType=(TmsMdTaxTrxType) invoiceReqLService.get(TmsMdTaxTrxType.class, initiation.getTaxTrxTypeId());
+			TmsMdTaxTrxType trxType=(TmsMdTaxTrxType)get(TmsMdTaxTrxType.class, initiation.getTaxTrxTypeId());
 			if(null!=trxType){
 				inparam.setTaxTrxTypeCode(trxType.getTaxTrxTypeCode());
 				inparam.setTaxTrxTypeName(trxType.getTaxTrxTypeName());
@@ -389,6 +407,7 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 		if(AssertHelper.isOrNotEmpty_assert(initiation.getInventoryItemId())){
 			TmsMdInventoryItems items = (TmsMdInventoryItems) this.get(TmsMdInventoryItems.class, initiation.getInventoryItemId());
 			if(null!=items){
+				inparam.setInventoryItemNumber(initiation.getInventoryItemNumber());
 				inparam.setInventoryItemDescripton(items.getInventoryItemDescripton());
 			}
 		}
@@ -412,6 +431,7 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 	public InvoiceTrxPool findInvoiceTrxPoolByParams(Map<String, Object> map) throws Exception{
 		InvoiceTrxPool pool= invoiceReqHDao.findWithOutCustomer(map);
 		if(AssertHelper.isOrNotEmpty_assert(pool.getId())){
+			
 			return pool;
 		}else {
 			throw new Exception("没有找到交易纪录");
@@ -434,6 +454,8 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 			customer.setIsInvoiceProviding("");//是否开具发票
 			//String flag=DictionaryCacheUtils.getCodeValue("BASE_IS_ENABLED", "Yes");
 			customer.setEnabledFlag("1");
+			String sequece = FlowHelper.getNextFlowNo("CUSTOMERNO");
+			customer.setCustomerNumber(sequece);
 			customer.setCustRegistrationCode(map.get("custRegistrationCode").toString());
 			customer.setCustRegistrationAddress(map.get("custRegistrationAddress").toString());
 			customer.setCustRegistrationNumber(map.get("custRegistrationNumber").toString());
@@ -444,6 +466,7 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 			customer.setCustRegistrationAddress(map.get("custRegistrationAddress").toString());
 			customer.setIsInvoiceProviding(VatIsIssueInvoiceEnums.VAT_IS_ISSUE_INVOICEY.getValue());
 			customer.setIsAppointInvoice(VatIsAppointIssuInvoiceEnums.VAT_IS_APPOINT_ISSU_INVOICEN.getValue());
+			customerService.save(customer);
 			customerId=customer.getId();
 		}else{
 			customerId=entity.getId();
@@ -453,6 +476,7 @@ public class CiticInvoiceReqHServiceImpl extends BaseService implements CiticInv
 		invoiceTrxPoolDao.deleteTempCrvatInvoiceReqLByReqHid(id);
 		InvoiceReqH invoiceReqH = new InvoiceReqH();
 		invoiceReqH.setId(IdGenerator.getUUID());
+		invoiceReqH.setOrgId(map.get("orgId").toString());
 		invoiceReqH.setCustomerId(customerId);
 		invoiceReqH.setCustRegistrationNumber(map.get("custRegistrationNumber").toString());
 		String sequece = FlowHelper.getNextFlowNo("INVOICEREQ");

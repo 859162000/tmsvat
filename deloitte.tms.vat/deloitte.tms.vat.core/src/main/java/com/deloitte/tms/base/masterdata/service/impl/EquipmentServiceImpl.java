@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import net.sf.json.JSONObject;
+
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
@@ -85,6 +87,14 @@ public class EquipmentServiceImpl extends BaseService implements EquipmentServic
 	
 	public TmsMdEquipmentInParam convertEquipmentToInParam(TmsMdEquipment model){
 		TmsMdEquipmentInParam inparam=new TmsMdEquipmentInParam();
+		if(null==model.getParentEquipmentId()){
+			inparam.setParentEquipmentName("");
+		}else{
+			TmsMdEquipment parent = (TmsMdEquipment) this.get(TmsMdEquipment.class, model.getParentEquipmentId());
+			if(null!=parent){
+				inparam.setParentEquipmentName(parent.getEquipmentName());
+			}
+		}
 		ReflectUtils.copyProperties(model, inparam);
 		return inparam;
 	}
@@ -141,14 +151,29 @@ public class EquipmentServiceImpl extends BaseService implements EquipmentServic
 		return entity;
 	}
 	@Override
-	public void deleteEquipment(String id) {/*
-		
+	public JSONObject deleteEquipment(String id) {
+		JSONObject result = new JSONObject();
+		String msg;
 		if(LittleUtils.strEmpty(id)){
-			return;
+			msg = "请选择要删除的记录！";
+			result.put("success", false);
+			result.put("msg", msg);
+			return result;
 		}
 		TmsMdEquipment equipment = (TmsMdEquipment) equipmentDao.get(TmsMdEquipment.class, id);
-		Hibernate.initialize(equipment.getTmsMdEquipments());
-		equipmentDao.removeAll(equipment.getTmsMdEquipments());
+		//判断是否有子节点
+		List<TmsMdEquipment> sonEquips = equipmentDao.loadSonEquipments(equipment.getId());
+		if(sonEquips!=null && sonEquips.size()>0){
+			msg = "该服务器下含有终端，不可删除！";
+			result.put("success", false);
+			result.put("msg", msg);
+			return result;
+		}
+		
 		equipmentDao.remove(equipment);
-	*/}
+		msg = "删除成功！";
+		result.put("success", true);
+		result.put("msg", msg);
+		return result;
+	}
 }

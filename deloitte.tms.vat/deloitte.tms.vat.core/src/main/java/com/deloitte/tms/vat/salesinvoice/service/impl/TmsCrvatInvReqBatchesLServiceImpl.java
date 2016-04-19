@@ -11,8 +11,10 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
+import com.deloitte.tms.base.masterdata.model.BaseOrg;
 import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.base.taxsetting.model.TmsMdInventoryItems;
+import com.deloitte.tms.base.taxsetting.model.TmsMdTrxAffirmSetting;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.BatchUtils;
@@ -104,6 +106,8 @@ public class TmsCrvatInvReqBatchesLServiceImpl extends BaseService implements Tm
 		{
 			Customer customer =model.getCustomer();//customer.getCustDepositBankNumber()
 			inparam.setCustomerType(customer.getCustomerType());
+			inparam.setCustLegalEntityType(customer.getCustLegalEntityType());//custLegalEntityType纳税人身份
+			//inparam.setin
 			inparam.setCustomerName(customer.getCustomerName());//类型
 			inparam.setCustomerNumber(customer.getCustomerNumber());//编号
 			inparam.setContactPhone(customer.getContactPhone());//电话
@@ -118,8 +122,10 @@ public class TmsCrvatInvReqBatchesLServiceImpl extends BaseService implements Tm
 		{
 			TmsCrvatInvReqBatchesH tmsCrvatInvReqBatchesH =model.getTmsCrvatInvReqBatchesH();
 			inparam.setLegalEntityId(tmsCrvatInvReqBatchesH.getLegalEntityId());//纳税人实体ID
-			inparam.setCrvatInvoiceReqNumber(tmsCrvatInvReqBatchesH.getCrvatInvoiceReqNumber());//申请单编号
-			
+			inparam.setCrvatInvoiceReqNumber(tmsCrvatInvReqBatchesH.getCrvatInvoiceReqNumber());//申请单编号//crvatInvoiceReqNumber
+			inparam.setApprovalBy(tmsCrvatInvReqBatchesH.getApprovalBy());	
+			//最后审批人 == 复核人
+			inparam.setCreatedBy(tmsCrvatInvReqBatchesH.getCreatedBy());//收款人 ==创建人
 		}
 		
 		if(model.getTmsMdInventoryItems()!=null)
@@ -128,6 +134,17 @@ public class TmsCrvatInvReqBatchesLServiceImpl extends BaseService implements Tm
 			inparam.setInventoryItemId(tmsMdInventoryItems.getId());//商品及服务ID
 			inparam.setInventoryItemNumber(tmsMdInventoryItems.getInventoryItemNumber());//商品编号
 			inparam.setInventoryItemDescripton(tmsMdInventoryItems.getInventoryItemDescripton());//商品服务名称
+		}
+		if(model.getBaseOrg()!=null)
+		{
+			BaseOrg org=model.getBaseOrg();
+			inparam.setOrgName(org.getOrgName());//组织相关数据
+			inparam.setOrgCode(org.getOrgCode());
+		}
+		if(model.getTmsMdTrxAffirmSetting()!=null)
+		{
+			TmsMdTrxAffirmSetting tmsMdTrxAffirmSetting =model.getTmsMdTrxAffirmSetting();//涉税交易类型
+			inparam.setInvoiceCategories(tmsMdTrxAffirmSetting.getInvoiceCategories());//
 		}
 		return inparam;
 	}

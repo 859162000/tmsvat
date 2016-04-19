@@ -48,7 +48,7 @@ public class TmsMdCurrencyRate extends BaseEntity {
 
     @Column(name="CURRENCY_RATE")
 	@ModelProperty(comment="汇率")
-	private String  currencyRate;
+	private Double  currencyRate;
 
 
 	@Column(name="EXCHANGE_DATE")
@@ -108,11 +108,11 @@ public class TmsMdCurrencyRate extends BaseEntity {
 	public void setTargetCurrencyCode(String targetCurrencyCode) {
 	    this.targetCurrencyCode = targetCurrencyCode;
 	}
-	public String getCurrencyRate() {
+	public Double getCurrencyRate() {
 	    return this.currencyRate;
 	}
 	
-	public void setCurrencyRate(String currencyRate) {
+	public void setCurrencyRate(Double currencyRate) {
 	    this.currencyRate = currencyRate;
 	}
 	public Date getExchangeDate() {

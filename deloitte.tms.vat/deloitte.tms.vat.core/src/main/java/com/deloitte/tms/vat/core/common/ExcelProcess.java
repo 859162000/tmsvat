@@ -48,7 +48,7 @@ public class ExcelProcess {
 	  excelHeaderFields.add("验证日期");
 	  excelHeaderFields.add("发票代号");
 	  excelHeaderFields.add("发票票号");
-	  excelHeaderFields.add("纳税人识别号");
+	  excelHeaderFields.add("销方纳税人识别号");
 	  excelHeaderFields.add("开票日期");
 	//含税金额 改成 净额  excelHeaderFields.add("含税金额");
 	 // excelHeaderFields.add("净额");
@@ -56,11 +56,14 @@ public class ExcelProcess {
 	  excelHeaderFields.add("含税金额"); //attribute6
 	  
 	  excelHeaderFields.add("税金");
-	  excelHeaderFields.add("纳税人名称");
+	  
+	  
+	  excelHeaderFields.add("销方纳税人名称");
 	  excelHeaderFields.add("公司代码");
 	  excelHeaderFields.add("发票验证人");
-	 // excelHeaderFields.add("发票状态");   / 不是导入的
-	 // excelHeaderFields.add("认证失败原因");   / 不是导入的
+	  excelHeaderFields.add("发票认证状态");   // 不是导入的 --> 20160419变成是导入初始值了PF
+	  
+	 // excelHeaderFields.add("认证失败原因");   // 不是导入的
 	  
 	  //-----------------------------
 	  
@@ -76,11 +79,15 @@ public class ExcelProcess {
 		 
 		 excelHeaderFieldsByDb.add("attribute6");//含税金额 attribute6
 		 
-		 excelHeaderFieldsByDb.add("vatAmount"); //税金
+		 //excelHeaderFieldsByDb.add("vatAmount"); //税金
+		 
+		 excelHeaderFieldsByDb.add("attribute7"); //税金
+		 
 		 excelHeaderFieldsByDb.add("venderName"); //纳税人名称
 		 excelHeaderFieldsByDb.add("attribute3"); //公司代码
 		 excelHeaderFieldsByDb.add("attribute4"); //发票验证人
-		 //excelHeaderFieldsByDb.add("invoiceAuthenticationStatus");
+		 
+		 excelHeaderFieldsByDb.add("invoiceAuthenticationStatus");
 			
 		 /**
 			 *  static {
@@ -95,7 +102,7 @@ public class ExcelProcess {
 		  excelHeaderFields.add("纳税人名称");         venderName
 		  excelHeaderFields.add("公司代码");             attribute3
 		  excelHeaderFields.add("发票验证人");           attribute4  
-		  excelHeaderFields.add("发票状态");           invoiceAuthenticationStatus  / 不是导入的
+		  excelHeaderFields.add("发票状态");           invoiceAuthenticationStatus  / 不是导入的 ->变成导入初始值
 		 // list.add("认证失败原因");                  attribute5 / 不是导入的
 	  }
 			 */
@@ -106,10 +113,10 @@ public class ExcelProcess {
   
   
   
-  public void excelReader(String path){
+  public void excelReader(InputStream content){
     try {
-      InputStream inp = new FileInputStream(path);
-      importWorkbook = WorkbookFactory.create(inp);      
+//      InputStream inp = new FileInputStream(path);
+      importWorkbook = WorkbookFactory.create(content);      
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (InvalidFormatException e) {
@@ -466,14 +473,14 @@ public class ExcelProcess {
 	       return "";
   }
   
-  public void importExcelInit(String importExcelName){
+  public void importExcelInit(InputStream content){
 	  
-	  if(AssertHelper.empty(importExcelName)){
+	  if(AssertHelper.empty(content)){
 		  System.out.println("importExcel get null importExcelName");
 		  return;
 	  }
 	  
-	  this.excelReader(importExcelName);
+	  this.excelReader(content);
 	  this.getAllData(sheetIndexDefault);
 	  
 	  

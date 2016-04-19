@@ -76,7 +76,7 @@
 						
 						
 						<td><spring:message code="TmsMdCurrencyRate.exchangeDate" />：</td>
-						<td><input id="exchangeDateInDialog" name="exchangeDate" style="width: 150px;" class="easyui-textbox" type="text"></td>
+						<td><input id="exchangeDateInDialog" class="easyui-datebox" type="text" style="width: 90;" name="exchangeDate" value="" ></input></td>
 					
 					</tr>                              
 					<tr>
@@ -323,7 +323,7 @@ $(document).ready(
 	}
 	function TmsMdCurrencyRateEditSave() {
 		
-		alert($("#currencyRateInDialog").textbox("getValue"));
+		//alert($("#currencyRateInDialog").textbox("getValue"));
 		
 		$.messager.confirm("<spring:message code='client.datacommit.formsave.confirm.title'/>","<spring:message code='client.datacommit.formsave.confirm.text'/>",
 		function(result) {

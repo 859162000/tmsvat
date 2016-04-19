@@ -15,7 +15,12 @@ import org.springframework.stereotype.Component;
 
 import com.deloitte.tms.base.cache.model.BizOrgNode;
 import com.deloitte.tms.base.cache.utils.OrgCacheUtils;
+import com.deloitte.tms.base.masterdata.model.Customer;
+import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
 import com.deloitte.tms.base.masterdata.model.TmsMdTaxTrxType;
+import com.deloitte.tms.base.taxsetting.model.Items;
+import com.deloitte.tms.base.taxsetting.model.TmsMdInventoryItems;
+import com.deloitte.tms.pl.cache.utils.DictionaryCacheUtils;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.BatchUtils;
@@ -28,10 +33,12 @@ import com.deloitte.tms.vat.salesinvoice.dao.InvoiceReqLDao;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqL;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqLInParam;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxPool;
+import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxPoolInParam;
 import com.deloitte.tms.vat.salesinvoice.service.InvoiceReqHService;
 import com.deloitte.tms.vat.salesinvoice.service.InvoiceReqLService;
 import com.deloitte.tms.vat.salesinvoice.service.InvoiceSyncProvider;
 import com.deloitte.tms.vat.salesinvoice.service.InvoiceTrxPoolService;
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 /**
  * Home object for domain model class InvoiceReqL.
  * @see com.deloitte.tms.vat.salesinvoice.model
@@ -60,7 +67,8 @@ public class InvoiceReqLServiceImpl extends BaseService implements InvoiceReqLSe
 			params=new HashMap();
 		}			
 		DaoPage daoPage= invoiceReqLDao.findInvoiceReqLByParams(params, pageIndex, pageSize);
-		daoPage.setResult(convertInvoiceReqLToInParam((List<InvoiceReqL>) daoPage.getResult()));
+		daoPage.setResult(convertInvoiceReqLToPoolInParam((List<InvoiceReqL>) daoPage.getResult()));
+		//daoPage.setResult(convertInvoiceReqLToInParam((List<InvoiceReqL>) daoPage.getResult()));
 		return daoPage;
 	}
 	@Override
@@ -102,6 +110,16 @@ public class InvoiceReqLServiceImpl extends BaseService implements InvoiceReqLSe
 		}
 		
 	}
+	private List<InvoiceTrxPoolInParam> convertInvoiceReqLToPoolInParam(List<InvoiceReqL> models){
+		List<InvoiceTrxPool> result = new ArrayList<InvoiceTrxPool>();
+		for(InvoiceReqL initiation:models){
+			InvoiceTrxPool invoiceTrxPool = (InvoiceTrxPool) get(InvoiceTrxPool.class, initiation.getCrvatTrxPoolId());
+			invoiceTrxPool.setLid(initiation.getId());
+			result.add(invoiceTrxPool);
+		}
+		List<InvoiceTrxPoolInParam> inParams = convertInvoiceTrxPoolToInParam(result);
+		return inParams;
+	}
 	private List<InvoiceReqLInParam> convertInvoiceReqLToInParam(List<InvoiceReqL> models){
 		List<InvoiceReqLInParam> result=new ArrayList<InvoiceReqLInParam>();
 		for(InvoiceReqL initiation:models){
@@ -118,13 +136,14 @@ public class InvoiceReqLServiceImpl extends BaseService implements InvoiceReqLSe
 		InvoiceTrxPool pool;
 		if(AssertHelper.isOrNotEmpty_assert(model.getOrgId())){
 			//orgName=invoiceReqHService.findOrgNameByOrgCode(model.getOperationOrgCode());
-			BizOrgNode node=OrgCacheUtils.getNodeByOrgId(model.getOrgId());
+			BizOrgNode node=OrgCacheUtils.getNodeByOrgId(model.getOrgId().trim());
 			//BizOrgNode node=OrgCacheUtils.getNodeByOrgCode(model.getOrgId());
 			if(null!=node){
 				inparam.setOrgName(node.getName());
 				inparam.setOrgCode(node.getCode());
 			}
-		}if(AssertHelper.isOrNotEmpty_assert(model.getCrvatTrxPoolId())){
+		}
+		if(AssertHelper.isOrNotEmpty_assert(model.getCrvatTrxPoolId())){
 			pool=(InvoiceTrxPool) invoiceTrxPoolService.get(InvoiceTrxPool.class, model.getCrvatTrxPoolId());
 			inparam.setTaxRate(null!=pool.getTaxRate()?pool.getTaxRate().toString():"0");
 			inparam.setTrxNumber(pool.getTrxNumber());
@@ -307,5 +326,160 @@ public class InvoiceReqLServiceImpl extends BaseService implements InvoiceReqLSe
 			entity.setStatus(name);
 			invoiceTrxPoolService.update(entity);
 		}
+	}
+	
+	
+	private List<InvoiceTrxPoolInParam> convertInvoiceTrxPoolToInParam(List<InvoiceTrxPool> models){
+		List<InvoiceTrxPoolInParam> result=new ArrayList<InvoiceTrxPoolInParam>();
+		result=convertInvoiceTrxPoolToInParam2(models);
+		return result;
+	}
+
+	private List<InvoiceTrxPoolInParam> convertInvoiceTrxPoolToInParam2(List<InvoiceTrxPool>models){
+		List<InvoiceTrxPoolInParam> result=new ArrayList<InvoiceTrxPoolInParam>();
+		for(InvoiceTrxPool initiation:models){
+			InvoiceTrxPoolInParam inparam=convertInvoiceTrxPoolToInParam(initiation);
+			//InvoiceTrxPoolInParam inparam=new InvoiceTrxPoolInParam();
+			inparam.setLid(initiation.getLid());
+			inparam.setTaxRate(null!=initiation.getTaxRate()?initiation.getTaxRate():0.00);
+			inparam.setTrxAffirmId(initiation.getTrxAffirmId());
+			inparam.setTrxBatchNum(initiation.getTrxBatchNum());
+			inparam.setTrxNumber(initiation.getTrxNumber());
+			inparam.setSourceCode(initiation.getSourceCode());
+			inparam.setCustRegistrationCode(initiation.getCustRegistrationCode());
+			inparam.setCustRegistrationNumber(initiation.getCustRegistrationNumber());
+			inparam.setCustBankAccountNum(initiation.getCustBankAccountNum());
+			inparam.setCustBankBranchName(initiation.getCustBankBranchName());
+			inparam.setTaxRate(initiation.getTaxRate());
+			inparam.setTaxBaseName(initiation.getTaxBaseName());
+			inparam.setTaxSettingMethod(initiation.getTaxSettingMethod());
+			inparam.setInvoiceCategoryName(DictionaryCacheUtils.getCodeName("VAT_INVOICE_RULE", initiation.getInvoiceCategory()));
+			inparam.setLegalEntityName(initiation.getLegalEntityName());
+			inparam.setRegistrationNumber(initiation.getRegistrationNumber());
+			/*InvoiceReqLInParam amountInParam=getAmout(initiation.getId(),initiation);
+			inparam.setUsedAmount(amountInParam.getUsedAmount());
+			inparam.setUserfulAmount(amountInParam.getUserfulAmount());*/
+			if(AssertHelper.isOrNotEmpty_assert(initiation.getCustomerId())){
+				Customer customer = (Customer) get(Customer.class,initiation.getCustomerId());
+				inparam.setCustomerNumber(customer.getCustomerNumber());
+				inparam.setCustomerName(customer.getCustomerName());
+			}
+			inparam.setCrvatTrxPoolId(initiation.getId());
+			inparam.setInvoiceAmount(initiation.getExchangeAmount());
+			//inparam.setInvoiceAmount(null!=inparam.getCurrencyAmount()?inparam.getCurrencyAmount():BigDecimal.valueOf(0.00).multiply(null!=inparam.getExchangeRate()?inparam.getExchangeRate():BigDecimal.valueOf(0.00)));
+			if(AssertHelper.isOrNotEmpty_assert(initiation.getOrgId())){
+				BizOrgNode node=OrgCacheUtils.getNodeByOrgId(initiation.getOrgId());
+				if(null!=node){
+					inparam.setOrgName(node.getName());
+					inparam.setOrgCode(node.getCode());	
+				}
+			}
+			// TO DO
+			String codeValue = initiation.getStatus();
+			if(AssertHelper.isOrNotEmpty_assert(codeValue)){
+				String valueName = DictionaryCacheUtils.getCodeName("VAT_CR_INVOICE_TRX_ITEM_STATUS", codeValue); 
+				inparam.setStatus(valueName);
+			}
+			if(AssertHelper.isOrNotEmpty_assert(initiation.getTaxTrxTypeId())){
+				TmsMdTaxTrxType trxType=(TmsMdTaxTrxType)get(TmsMdTaxTrxType.class, initiation.getTaxTrxTypeId());
+				if(null!=trxType){
+					inparam.setTaxTrxTypeCode(trxType.getTaxTrxTypeCode());
+					inparam.setTaxTrxTypeName(trxType.getTaxTrxTypeName());
+				}
+			}
+			if(AssertHelper.isOrNotEmpty_assert(initiation.getInventoryItemId())){
+				TmsMdInventoryItems items = (TmsMdInventoryItems) this.get(TmsMdInventoryItems.class, initiation.getInventoryItemId());
+				if(null!=items){
+					inparam.setInventoryItemNumber(initiation.getInventoryItemNumber());
+					inparam.setInventoryItemDescripton(items.getInventoryItemDescripton());
+				}
+			}
+			if(AssertHelper.isOrNotEmpty_assert(initiation.getLegalEntityId())){
+				TmsMdLegalEntity entity=(TmsMdLegalEntity) this.get(TmsMdLegalEntity.class, initiation.getLegalEntityId());
+				if(null!=entity){
+					inparam.setLegalEntityCode(entity.getLegalEntityCode());
+					inparam.setLegalEntityName(entity.getLegalEntityName());
+				}
+			}
+			result.add(inparam);
+		}
+		return result;
+		
+	}
+	public InvoiceTrxPoolInParam convertInvoiceTrxPoolToInParam(InvoiceTrxPool model){
+		InvoiceTrxPoolInParam inparam=new InvoiceTrxPoolInParam();
+		ReflectUtils.copyProperties(model, inparam);
+		inparam.setProductName(model.getInventoryItemDescripton());
+		inparam.setProductNum(model.getInventoryItemNumber());
+		String value = model.getTaxBaseCode();
+		String text = DictionaryCacheUtils.getCodeName("VAT_TAX_CAL_BASE", value);
+		inparam.setTaxBaseName(text);
+		
+		value = model.getInvoiceCategory();
+	    text = DictionaryCacheUtils.getCodeName("VAT_INVOICE_RULE", value);
+		inparam.setInvoiceCategoryName(text);
+		
+		value = model.getInvoiceType();
+	    text = DictionaryCacheUtils.getCodeName("VAT_BIZ_SCOPE_TYPE", value);
+		inparam.setInvoiceTypeName(text);
+		
+		value = model.getTaxSettingMethod();
+	    text = DictionaryCacheUtils.getCodeName("BASE_TAX_METHOD", value);
+		inparam.setTaxSettingMethodName(text);
+		
+		value = model.getSourceCode();
+	    text = DictionaryCacheUtils.getCodeName("VAT_TRX_ITEM_DATA_SOURCE", value);
+		inparam.setSourceCodeName(text);
+		
+		String status = model.getStatus();
+		String statusStr = DictionaryCacheUtils.getCodeName("VAT_CR_INVOICE_TRX_ITEM_STATUS", status);
+		inparam.setStrStatus(statusStr);
+		//BizOrgNode bizOrgNode = OrgCacheUtils.getNodeByOrgId(model.getOrgId());
+		/*LegalEntityNode legalEntityNode = LegalEntityCacheUtils.getLegalNodeByLegalId(model.getLegalEntityId());
+		if(legalEntityNode!=null){
+			inparam.setOrgName(legalEntityNode.getCode());
+		}*/
+		TmsMdLegalEntity tmsMdLegalEntity = model.getTmsMdLegalEntity();
+		if(tmsMdLegalEntity!=null){
+			inparam.setOrgName(tmsMdLegalEntity.getLegalEntityCode());
+		}
+		TmsMdTaxTrxType tmsMdTaxTrxType = model.getTmsMdTaxTrxType();
+		if(tmsMdTaxTrxType!=null){
+			inparam.setTaxTrxTypeName(tmsMdTaxTrxType.getTaxTrxTypeName());
+			inparam.setTaxTrxTypeCode(tmsMdTaxTrxType.getTaxTrxTypeCode());
+		}
+		Customer customer = model.getCustomer();
+		if(customer!=null){
+			inparam.setCustomerName(customer.getCustomerName());
+			inparam.setCustomerNumber(customer.getCustomerNumber());
+			inparam.setCustomerRegisTrationNum(customer.getCustRegistrationNumber());
+			String customerType = DictionaryCacheUtils.getCodeName("VAT_CUSTOMER_DISC_OPTION", customer.getCustomerType());
+			inparam.setCustomerNumbType(customerType);;
+		}
+		Items taxItems = model.getTaxItems();
+		if(taxItems!=null){
+			inparam.setTaxItem(taxItems.getItemName());
+		}
+		BigDecimal origAmount = model.getOriginalCurrencyAmount();
+		if(origAmount!=null){
+			String origAmountStr = String.valueOf(origAmount);
+			inparam.setOrigAmount(origAmountStr);
+		}
+		
+		String origCurrency = DictionaryCacheUtils.getCodeName("BASE_CURRENCY_TYPE", model.getOriginalCurrencyCode());
+		inparam.setOrigCurrent(origCurrency);
+		BigDecimal currentAmount = model.getCurrencyAmount();
+		if(currentAmount!=null){
+			String currentAmountString = String.valueOf(currentAmount);
+			inparam.setCurrentAmount(currentAmountString);
+		}
+		String currency = DictionaryCacheUtils.getCodeName("BASE_CURRENCY_TYPE", model.getCurrencyCode());
+		inparam.setCurrent(currency);
+		BigDecimal exchangeAmount = model.getExchangeAmount();
+		if(exchangeAmount!=null){
+			String exchangeAmountString = String.valueOf(exchangeAmount);
+			inparam.setTotalAmount(exchangeAmountString);
+		}
+		return inparam;
 	}
 }

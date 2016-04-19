@@ -47,15 +47,10 @@
             								<input:systemStatusOption parentCode="VAT_CR_INVOICE_STATUS"/>
 									</input:select>
 				    			</td>
-				    			<td align='right'>申请日期:</td>
-				    			<td>
-				    				<input class="easyui-datebox" style='width:120px' value=" " name="sBeginDate" data-options="formatter:myformatter,parser:myparser" />&nbsp;至&nbsp;
-				    				<input class="easyui-datebox"  style='width:120px'  value=" " name="sEndDate" data-options="formatter:myformatter,parser:myparser" />
-				    			</td> 
-				    		</tr>
-				    		<tr>
 				    			<td align='right'>购方客户：</td>
           						<td><input id="invoiceTrxPool_searchform_customerName_input" class="easyui-textbox" style="width: 120px" name="customerId" /></td>
+				    		</tr>
+				    		<tr>
 				    			<td align="right">申请单编号:</td>
 				    			<td>
 				    				<input class="easyui-textbox" style='width:120px'  name="invoiceReqNumber"  />
@@ -68,10 +63,6 @@
 				    			<td>
 				    				<input class="easyui-textbox" style='width:120px'  name="invoiceCode"  />
 				    			</td>
-				    			
-				    			
-				    		</tr> 
-				    		<tr >
 				    			<td style="padding-left:20px">打印终端编号:</td>
 				    			<td>
 									<%-- <input  class="easyui-combobox" name="equipmentCode" style="width:120px" 
@@ -82,6 +73,9 @@
                                                               panelHeight:'auto'"> --%>
                                      <input class="easyui-textbox" style="width:120px"/>
 				    			</td>
+				    			
+				    		</tr> 
+				    		<tr >
 				    			<td align="right">申请机构:</td>
 				    			<td>
 				    				<%-- <input:select easyuiStyle="width:120px;" id="printPoolHManageInit_searchform_appOrgCode" name="appOrgCode" value="$printPoolHManageInit_searchform_appOrgCode" easyuiClass="easyui-combobox" >
@@ -215,6 +209,9 @@
 	   <div id="printPoolHManageInit_printSubmit_dlg" class="easyui-dialog"
 			 closed="true" width="800" height="500"
 			buttons="#printPoolHManageInit_printSubmit_dlg-buttons" modal="true">
+			<div style="width: 100%;" border="false" >
+				<p style="color:red;font-size:14px;padding:0 20px">现在显示的为将要打印的发票代码、发票号码，请认真核对装入打印机中的纸质发票代码、号码是否与之一致；如一致，可执行打印操作；如不一致，请予以更换。相关明细如下。</p>
+			</div>
 				<form id="printPoolHManageInit_printSubmit_editform" class="easyui-form" method="post" data-options="novalidate:true" commandsName="billBookManageForm">
 					<!-- <table >
 		    		<tr>
@@ -227,7 +224,7 @@
 		    </form>
 		    <div style=" height: 100%;" border="false" >
 				<table class="easyui-datagrid" id="printPoolHManageInit_printSubmit_dataGrid"
-					toolbar="" border="false" title="待打印发票列表"style="width: 100%; height: 100%"
+					toolbar="" border="false" title="待打印发票列表" style="width: 100%; height: 100%"
 					data-options="					
 						autoRowHeight:true,
 						pagination:false,
@@ -310,7 +307,7 @@
 			checkbox:false,
 			collapsible:false,//可折叠  
 			fitColumns: false,//自动调整各列，用了这个属性，下面各列的宽度值就只是一个比例。
-			nowrap: false,
+			nowrap: true,
 			iconCls: 'icon icon-list',
 			pagination:false, //显示分页 
 			rownumbers:true, //显示行号
@@ -383,16 +380,15 @@
 			singleSelect:false, //多选
 			collapsible:false,//可折叠  
 			fitColumns: false,//自动调整各列，用了这个属性，下面各列的宽度值就只是一个比例。
-			nowrap: false,
+			nowrap: true,
 			iconCls: 'icon icon-list',
 			pagination:true, //显示分页 
 			rownumbers:true, //显示行号
 			idField:'id',//主键字段
 			columns:[[	{field:'checkFlag',checkbox:true,width:80,align:'center'},
-			        	{field:'invoiceReqTypeName',title:"来源",width:80,align:'center'},
-	 					{field:'invoiceReqNumber',title:"开票申请单号",width:150,align:'center'},
-	 					{field:'invoicePreNumber',title:"开票准备单号",width:150,align:'center'},
-	 					{field:'orgName',title:"申请组织",width:80,align:'center'},
+			        	{field:'attribute2',title:"来源",width:80,align:'center'},
+	 					{field:'attribute1',title:"开票申请单号",width:150,align:'center'},
+	 					{field:'attribute5',title:"申请组织",width:80,align:'center'},
 	 					{field:'invoicePrintStatusName',title:"发票状态",width:80,align:'center'},
 	 					{field:'legalEntityName',title:"销方单位名称",width:100,align:'center'},
 	 					//{field:'invoicePrintStatusName',title:"发票状态",width:100,align:'center'},
@@ -403,9 +399,21 @@
 	   					{field:'custRegistrationCode',title:"购方证件类型",width:100,align:'center'}, 
 	   					{field:'custRegistrationNumber',title:"购方证件号码",width:100,align:'center'},
 	   					{field:'invoiceCategoryName',title:"发票类型",width:100,align:'center'},
-	   					{field:'acctdAmountCR',title:"金额",width:100,halign:'center',align:'right'},
-	   					{field:'vatAmount',title:"税额",width:100,halign:'center',align:'right'},
-	   					{field:'invoiceAmount',title:"合计金额",width:100,halign:'center',align:'right'},
+	   					{field:'acctdAmountCR',title:"金额",width:100,halign:'center',align:'right',formatter:function(value,rec){
+	   						if (typeof(value)!="undefined"&&value!=0&&value!=null){
+								return value.toFixed(2);
+							}
+  						}},
+	   					{field:'vatAmount',title:"税额",width:100,halign:'center',align:'right',formatter:function(value,rec){
+	   						if (typeof(value)!="undefined"&&value!=0&&value!=null){
+								return value.toFixed(2);
+							}
+  						}},
+	   					{field:'invoiceAmount',title:"合计金额",width:100,halign:'center',align:'right',formatter:function(value,rec){
+	   						if (typeof(value)!="undefined"&&value!=0&&value!=null){
+								return value.toFixed(2);
+							}
+  						}},
 	 					{field:'equipmentCode',title:"打印终端编号",align:'center',width:100,editor: {
 	 						type: 'combogrid', options: { required: false } 
 	 						} 
@@ -424,12 +432,7 @@
                 	handler:function(){  
                 		printPoolHManageInit_printSubmit();  
                 			}  
-            		},'-',{text:"批量打印",  
-                    	iconCls:'icon-print',
-                    	handler:function(){  
-                    		printPoolHManageInit_printSubmit_confirm_new();  
-                    			}  
-                		},'-',{text:"发票详情",  
+            		},'-',{text:"发票详情",  
                         	iconCls:'icon-search',
                         	handler:function(){  
                         		printPoolHManageInit_view();  
@@ -555,36 +558,38 @@
 				singleSelect:false, //多选
 				collapsible:false,//可折叠  
 				fitColumns: false,//自动调整各列，用了这个属性，下面各列的宽度值就只是一个比例。
-				nowrap: false,
+				nowrap: true,
 				iconCls: 'icon icon-list',
 				pagination:false, //显示分页 
 				rownumbers:true, //显示行号
 				idField:'id',//主键字段
 				frozenColumns:[[
 				{field:'id',hidden:true,width:80,align:'center'},
-				{field:'ck',checkbox:true,width:80,align:'center'}
+				 {field:'ck',checkbox:true,hidden:true,width:80,align:'center'} 
                 ]],
                 columns:[[
          					{field:'checkFlag',checkbox:true,width:80,align:'center'},
-				        	{field:'invoiceReqTypeName',title:"来源",width:80,align:'center'},
 		 					{field:'invoiceReqNumber',title:"开票申请单号",width:150,align:'center'},
-		 					{field:'invoicePreNumber',title:"开票准备单号",width:150,align:'center'},
-		 					{field:'orgName',title:"申请组织",width:80,align:'center'},
-		 					{field:'invoicePrintStatusName',title:"发票状态",width:80,align:'center'},
 		 					{field:'legalEntityName',title:"销方单位名称",width:100,align:'center'},
-		 					//{field:'invoicePrintStatusName',title:"发票状态",width:100,align:'center'},
 		 					{field:'invoiceCode',title:"发票代码",width:100,align:'center'},
 		   					{field:'invoiceNumber',title:"发票号码",width:100,align:'center'},
-		   					{field:'customerNumber',title:"购方客户编码",width:100,align:'center'},
 		   					{field:'customerName',title:"购方单位名称",width:100,align:'center'},
-		   					{field:'custRegistrationCode',title:"购方证件类型",width:100,align:'center'}, 
-		   					{field:'custRegistrationNumber',title:"购方证件号码",width:100,align:'center'},
 		   					{field:'invoiceCategoryName',title:"发票类型",width:100,align:'center'},
-		   					{field:'acctdAmountCR',title:"金额",width:100,halign:'center',align:'right'},
-		   					{field:'vatAmount',title:"税额",width:100,halign:'center',align:'right'},
-		   					{field:'invoiceAmount',title:"合计金额",width:100,halign:'center',align:'right'},
-		 					{field:'equipmentCode',title:"打印终端编号",align:'center',width:100},
-		 					{field:'equipmentName',title:"打印终端名称",width:100,align:'center'},
+		   					{field:'acctdAmountCR',title:"金额",width:100,halign:'center',align:'right',formatter:function(value,rec){
+		   						if (typeof(value)!="undefined"&&value!=0&&value!=null){
+									return value.toFixed(2);
+								}
+	  						}},
+		   					{field:'vatAmount',title:"税额",width:100,halign:'center',align:'right',formatter:function(value,rec){
+		   						if (typeof(value)!="undefined"&&value!=0&&value!=null){
+									return value.toFixed(2);
+								}
+	  						}},
+		   					{field:'invoiceAmount',title:"合计金额",width:100,halign:'center',align:'right',formatter:function(value,rec){
+		   						if (typeof(value)!="undefined"&&value!=0&&value!=null){
+									return value.toFixed(2);
+								}
+	  						}},
 		   					{field:'invoicePrintBy',title:"发票开具人",width:100,align:'center'},
 		   					{field:'invoicePrintDate',title:"发票开具日期",width:120,align:'center',formatter:function(value,rec){
 		   						if (typeof(value)!="undefined"&&value!=0&&value!=null){
@@ -679,9 +684,9 @@
 		                    else  
 		                    	urlString += "&id="+item.id;  
 		                });
-					//alert("urlString:"+urlString)
+					
 		        	if(urlString!=''){
-		        		$.messager.progress({title:'Please waiting',
+		        		$.messager.progress({title:'请耐心等待！！',
 		 					msg:'数据加载中'});
 		        		$.ajax({  
 		        	        url: "${vat}/invoicePrintPoolH_cz/loadInvoicePrintPoolHSubmitList.do",  
@@ -785,11 +790,8 @@
     	        cache: false,  
     	        success: function(result){
     	        	if(result.status=='0'){
-    	        		$("#printPoolHManageInit_poolDDetail_dlg").dialog('open').dialog('setTitle',
-    	        		"明细查看");
+    	        		$("#printPoolHManageInit_poolDDetail_dlg").dialog('open').dialog('setTitle',"明细查看");
     	        		$("#printPoolHManageInit_poolDDetail_dataGrid").datagrid('loadData',result.data.invoicePrintPoolDList);
-    	        		//$("#printPoolHManageInit_details_searchform").form('load',result.data);
-    	        		//$('#printPoolHManageInit_details_dataGrid').datagrid('loadData',result.data.invoicePrintPoolLInParamList);
     	        	}else{
     	        		//$.messager.alert('<spring:message code="system.alert"/>','<spring:message code="system.delete.fail.text"/>');
     	        	}
@@ -797,129 +799,57 @@
     	    });
     }
     
-	function printPoolHManageInit_printSubmit_confirm_new(){
-    	var row_list=$('#printPoolHManageInit_dataGrid').datagrid('getChecked');
-    	
-    	//alert("打印数量A:"+row_list.length);
-    	
-    	if(row_list==''||row_list=='undefined'){
-    		if(row_list.length<1){  
-                $.messager.alert('提示',"请选择你要打印的发票");  
-                return false;  
-            }
-    	}
-    	//批量打印判断
-    	var invoiceCode="";
-    	var check_value="";
-    	var urlString="";
-    	$.each(row_list,function(index,item){
- 			if(item.invoicePrintStatus!='20'){
- 				check_value=check_value+index;
- 			}else{
- 				if(invoiceCode==""){
- 	 				invoiceCode=item.invoiceCode;
- 	 			}else{
- 	 				invoiceCode=invoiceCode+","+item.invoiceCode;
- 	 			}
- 				if(urlString==''){
-             	   urlString += "id="+item.id;  
-                }else {
-             	   urlString += "&id="+item.id;
-                }
- 			}
-		});
-    	if(check_value!=''){
-    		$.messager.alert('提示',"存在待开具发票，不能进行批量打印",'info');
-    	}else{
-    		$.messager.confirm("提示","即将打印的发票代码为："+invoiceCode+'请确认纸质发票是否放置！',function(result){
-    			if(result){
-    				$.ajax({  
-    			        url: "${vat}/invoicePrintPoolH_cz/loadInvoicePrintPoolHPrintSubmit.do",  
-    			        type: "POST",  
-    			        async: true,  
-    			        data: urlString, //不能直接写成 {id:"123",code:"tomcat"}  
-    			        dataType: "json",  
-    			        cache: false,  
-    			        success: function(result){
-    			        	if(result.status=='0'){
-    			        		//$.messager.alert('提示','发送税控系统成功操作成功');
-    			        		$('#printPoolHManageInit_printSubmit_dlg').dialog('close');
-    			        		printPoolHManageInit_Search();
-    			        	}else{
-    			        		$.messager.alert('<spring:message code="system.alert"/>',result.erroMessage);
-    			        	}
-    			        	printPoolHManageInit_Search();
-	        	        	printPoolHManageInit_clearForm();
-    			        } 
-    			    });
-    			}
-    		});
-    	}
-    		
-    }
+
     function printPoolHManageInit_printSubmit_confirm(){
     	var row_list=$('#printPoolHManageInit_printSubmit_dataGrid').datagrid('getChecked');
     	
-    	//alert("打印数量B:"+row_list.length);
-    	
     	if(row_list==''||row_list=='undefined'){
     		if(row_list.length<1){  
                 $.messager.alert('提示',"请选择你要打印的发票");  
                 return false;  
             }
     	}
+    	
     	//批量打印判断
     	var invoiceCode="";
-    	var check_value="";
     	var urlString="";
     	$.each(row_list,function(index,item){
-    		//alert("invoicePrintStatus="+item.invoicePrintStatus);
- 			if(item.invoicePrintStatus!='20'){
- 				check_value=check_value+index;
+			if(invoiceCode==""){
+ 				invoiceCode=item.invoiceCode;
  			}else{
- 				if(invoiceCode==""){
- 	 				invoiceCode=item.invoiceCode;
- 	 			}else{
- 	 				invoiceCode=invoiceCode+","+item.invoiceCode;
- 	 			}
- 				if(urlString==''){
- 					urlString += "id="+item.id;
- 				}else {
- 					urlString += "&id="+item.id;
- 				} 
+ 				invoiceCode=invoiceCode+","+item.invoiceCode;
  			}
+			if(urlString==''){
+				urlString += "id="+item.id;
+			}else {
+				urlString += "&id="+item.id;
+			} 
 		});
     	
-    	//alert("invoiceCode="+invoiceCode+"urlString="+urlString);
     	
-    	if(check_value!=''){
-    		$.messager.alert('提示',"存在待开具发票，不能进行批量打印",'info');
-    		return false;
-    	}else{
-    		$.messager.confirm("提示","即将打印的发票代码为："+invoiceCode+'请确认纸质发票是否放置！',function(result){
-    			if(result){
-    				$('#printPoolHManageInit_printSubmit_print_buttons').linkbutton("disable");
-    				$.ajax({  
-    			        url: "${vat}/invoicePrintPoolH_cz/loadInvoicePrintPoolHPrintSubmit.do",  
-    			        type: "POST",  
-    			        async: true,  
-    			        data: urlString, //不能直接写成 {id:"123",code:"tomcat"}  
-    			        dataType: "json",  
-    			        cache: false,  
-    			        success: function(result){
-    			        	if(result.status=='0'){
-    			        		$.messager.alert('提示','发票打印成功');
-    			        		$('#printPoolHManageInit_printSubmit_dlg').dialog('close');
-    			        		printPoolHManageInit_Search();
-    			        		//$('#printPoolHManageInit_details_dataGrid').datagrid('loadData',result.data);
-    			        	}else{
-    			        		$.messager.alert('<spring:message code="system.alert"/>',result.erroMessage);
-    			        	}
-    			        } 
-    			    });
-    			}
-    		});
-    	}
+   		$.messager.confirm("提示","即将打印的发票代码为："+invoiceCode+"，请确认纸质发票是否放置！",function(result){
+   			if(result){
+   				$('#printPoolHManageInit_printSubmit_print_buttons').linkbutton("disable");
+   				$.ajax({  
+   			        url: "${vat}/invoicePrintPoolH_cz/loadInvoicePrintPoolHPrintSubmit.do",  
+   			        type: "POST",  
+   			        async: true,  
+   			        data: urlString, //不能直接写成 {id:"123",code:"tomcat"}  
+   			        dataType: "json",  
+   			        cache: false,  
+   			        success: function(result){
+   			        	if(result.status=='0'){
+   			        		$.messager.alert('提示','发票打印成功');
+   			        		$('#printPoolHManageInit_printSubmit_dlg').dialog('close');
+   			        		printPoolHManageInit_Search();
+   			        		//$('#printPoolHManageInit_details_dataGrid').datagrid('loadData',result.data);
+   			        	}else{
+   			        		$.messager.alert('<spring:message code="system.alert"/>',result.erroMessage);
+   			        	}
+   			        } 
+   			    });
+   			}
+   		});
     		
     }
     

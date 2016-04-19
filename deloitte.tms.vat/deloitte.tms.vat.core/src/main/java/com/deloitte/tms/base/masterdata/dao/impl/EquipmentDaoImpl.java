@@ -150,4 +150,11 @@ public class EquipmentDaoImpl extends BaseDao<TmsMdEquipment> implements Equipme
 		values.put("Id", id);
 		executeHqlProduce(query.toString(), values);
 	}
+
+	@Override
+	public List<TmsMdEquipment> loadSonEquipments(String parentEquipmentId) {
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("parentEquipmentId", parentEquipmentId);
+		return find(" from TmsMdEquipment where 1=1 and  flag = 1 and parentEquipmentId=:parentEquipmentId", params);		
+	}
 }

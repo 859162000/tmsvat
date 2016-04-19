@@ -20,7 +20,6 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -122,27 +121,30 @@ public class EquipmentController extends BaseController{
 	
 	@RequestMapping(value = "equipmentN/getDictionary")    
     public void getDictionaryEntitiesByParentCode(HttpServletResponse response){
-		
-		try{
-          
-          List<Map<String, Object>> reList = new ArrayList<Map<String,Object>>();
-                            
-          HashMap<String, Object> map = new HashMap<String, Object>();
-          
-               map.put("value", 1);
-               map.put("text", "打印终端");
-               reList.add(map);
-               
-               map.put("value", 2);
-               map.put("text", "打印服务器");
-               reList.add(map);
-                    
-          JSONArray jsonArray = JSONArray.fromObject(reList);
-          retJsonArray(response, jsonArray);
-		}catch(Exception e){
-			e.printStackTrace();			
+		try {
+			Collection<DictionaryEntity> results = dictionaryService.loadDictionaryEntities("BASE_PRINT_TYPE");
+            List<Map<String, String>> reList = new ArrayList<Map<String,String>>();
+            for(DictionaryEntity dictionaryEntity:results){
+                 Map<String,String> map = new HashMap<String,String>();                             
+                 map.put("value", dictionaryEntity.getCode());
+                 map.put("text", dictionaryEntity.getName());
+                 reList.add(map);
+            }
+			/*HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("value", 1);
+			map.put("text", "打印终端");
+			reList.add(map);
+			HashMap<String, Object> map2 = new HashMap<String, Object>();
+			map2.put("value", 2);
+			map2.put("text", "打印服务器");
+			reList.add(map2);*/
+
+			JSONArray jsonArray = JSONArray.fromObject(reList);
+			retJsonArray(response, jsonArray);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
+
     }
 	
 /*
@@ -253,55 +255,44 @@ public class EquipmentController extends BaseController{
 	@RequestMapping("equipmentN/saveEquipment.do")
 	public void saveEquipment(@ModelAttribute("tmsMdEquipment") TmsMdEquipmentInParam tmsMdEquipment,
 			HttpServletResponse response){
-
-		//TmsMdEquipment tmsMdEquipment=new TmsMdEquipment(map);
-		
-		
 		try{
-		TmsMdEquipment entity = null;
-		if (AssertHelper.empty(tmsMdEquipment.getEnabledFlag()) || tmsMdEquipment.getEnabledFlag().equals("是")) {
-			tmsMdEquipment.setEnabledFlag("Yes");
+			TmsMdEquipment entity = null;
+			if (AssertHelper.empty(tmsMdEquipment.getEnabledFlag()) || tmsMdEquipment.getEnabledFlag().equals("是")) {
+				tmsMdEquipment.setEnabledFlag("Yes");
+			}
+			if (AssertHelper.empty(tmsMdEquipment.getId())) {
+				entity=equipmentService.convertEquipmentInParamToEntity(tmsMdEquipment);
+				equipmentService.save(entity);
+			}else{
+				entity=(TmsMdEquipment) equipmentService.get(TmsMdEquipment.class, tmsMdEquipment.getId());
+				if(!AssertHelper.empty(tmsMdEquipment.getEquipmentCode())){
+					entity.setEquipmentCode(tmsMdEquipment.getEquipmentCode());
+				}
+				if(!AssertHelper.empty(tmsMdEquipment.getEquipmentName())){
+					entity.setEquipmentName(tmsMdEquipment.getEquipmentName());
+				}
+				if(!AssertHelper.empty(tmsMdEquipment.getEquipmentIp())){
+					entity.setEquipmentIp(tmsMdEquipment.getEquipmentIp());
+				}
+				if(!AssertHelper.empty(tmsMdEquipment.getEquipmentManager())){
+					entity.setEquipmentManager(tmsMdEquipment.getEquipmentManager());
+				}
+				if(!AssertHelper.empty(tmsMdEquipment.getEnabledFlag())){
+					entity.setEnabledFlag(tmsMdEquipment.getEnabledFlag());
+				}
+				if(!AssertHelper.empty(tmsMdEquipment.getParentEquipmentId())){
+					entity.setParentEquipmentId(tmsMdEquipment.getParentEquipmentId());
+				}
+				equipmentService.update(entity);
+			}
+			tmsMdEquipment.setId(entity.getId());
+			this.returnOk(response, "保存成功");
+		
+		}catch(Exception x){
+			x.printStackTrace();
+			this.returnFail(response, "保存异常");
 		}
-
-		if (AssertHelper.empty(tmsMdEquipment.getId())) {
-			entity=equipmentService.convertEquipmentInParamToEntity(tmsMdEquipment);
-			//entity=tmsMdEquipment;
-			equipmentService.save(entity);
-		}else{
-			entity=(TmsMdEquipment) equipmentService.get(TmsMdEquipment.class, tmsMdEquipment.getId());
-			if(!AssertHelper.empty(tmsMdEquipment.getEquipmentCode())){
-				entity.setEquipmentCode(tmsMdEquipment.getEquipmentCode());
-			}
-			if(!AssertHelper.empty(tmsMdEquipment.getEquipmentName())){
-				entity.setEquipmentName(tmsMdEquipment.getEquipmentName());
-			}
-			if(!AssertHelper.empty(tmsMdEquipment.getEquipmentIp())){
-				entity.setEquipmentIp(tmsMdEquipment.getEquipmentIp());
-			}
-			if(!AssertHelper.empty(tmsMdEquipment.getEquipmentManager())){
-				entity.setEquipmentManager(tmsMdEquipment.getEquipmentManager());
-			}
-			if(!AssertHelper.empty(tmsMdEquipment.getEnabledFlag())){
-				entity.setEnabledFlag(tmsMdEquipment.getEnabledFlag());
-			}
-			if(!AssertHelper.empty(tmsMdEquipment.getParentEquipmentId())){
-				entity.setParentEquipmentId(tmsMdEquipment.getParentEquipmentId());
-			}
-			equipmentService.update(entity);
-		}
-		
-		tmsMdEquipment.setId(entity.getId());
-		
-		this.returnOk(response, "保存成功");
-		//return equipmentForm;
-		
-		
-	}catch(Exception x){
-		x.printStackTrace();
-		this.returnFail(response, "保存异常");
-	}
 		return;
-		//return equipmentForm;
 	}
 	
 	@RequestMapping(value = "equipmentN/getEquipmentById")
@@ -309,10 +300,11 @@ public class EquipmentController extends BaseController{
 			HttpServletResponse response) throws IOException {
 		TmsMdEquipment entity = (TmsMdEquipment) equipmentService.get(
 				TmsMdEquipment.class, id);
+		TmsMdEquipmentInParam inparam = equipmentService.convertEquipmentToInParam(entity);
 		JsonConfig jsonConfig = new JsonConfig();
 		jsonConfig.registerJsonValueProcessor(Date.class,
 				new JsonDateValueProcessor("yyyy-MM-dd"));
-		JSONObject jsonObject = JSONObject.fromObject(entity, jsonConfig);
+		JSONObject jsonObject = JSONObject.fromObject(inparam, jsonConfig);
 		retJson(response, jsonObject);
 	}
 	
@@ -320,16 +312,12 @@ public class EquipmentController extends BaseController{
 	public void deleteEquipment(@RequestParam("id") String id,
 			HttpServletResponse response) {
 		JSONObject result = new JSONObject();
-		try{
-		
-		equipmentService.deleteEquipment(id);
-		String successMsg = "删除成功！";
-		result.put("success", true);
-		result.put("msg", successMsg);
-		retJson(response, result);
-		}catch(Exception x){
+		try {
+			result = equipmentService.deleteEquipment(id);
+			retJson(response, result);
+		} catch (Exception x) {
 			x.printStackTrace();
-			String successMsg = "删除成功！";
+			String successMsg = "删除失败！";
 			result.put("success", false);
 			result.put("msg", successMsg);
 		}

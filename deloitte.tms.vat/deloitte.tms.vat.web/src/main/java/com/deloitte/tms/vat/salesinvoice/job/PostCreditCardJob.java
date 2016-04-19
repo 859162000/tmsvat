@@ -20,14 +20,17 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import com.deloitte.tms.base.masterdata.dao.CustomerDao;
 import com.deloitte.tms.base.masterdata.model.Customer;
+import com.deloitte.tms.pl.core.commons.exception.BusinessException;
 import com.deloitte.tms.pl.job.task.JobTest;
 import com.deloitte.tms.vat.salesinvoice.common.StringPool;
 import com.deloitte.tms.vat.salesinvoice.fileutils.HttpUtilHelper;
@@ -47,6 +50,8 @@ import com.deloitte.tms.vat.salesinvoice.jobs.socket.XmlUtils;
 @Component("postCreditCardJob")
 public class PostCreditCardJob implements Job, JobTest {
 
+	private final Logger log = Logger.getLogger(PreTrxFileInfJob.class);
+	
 	@Value("${ling2.xmlPath}")
 	String xmlPath;
 
@@ -65,21 +70,18 @@ public class PostCreditCardJob implements Job, JobTest {
 	@Override
 	public void execute() {
 
-		Map<String, Object> map = new HashMap<String, Object>();
-		
-		map.put("interfaceTrxFlag", StringPool.READY);
-		map.put("startDate", new Date());// 处理生效日期为当天的
-		map.put("sourceCustomerCode", StringPool.XACP);
-		
-		List<TmsMdCustomersInf> listTmsMdCustomersInf = tmsMdCustomersInfService.findTmsMdCustomersInf(map);
+		List<TmsMdCustomersInf> listTmsMdCustomersInf = getValidData();
+
 		List<String> customerIds = new ArrayList<String>();
-		
+
 		for (TmsMdCustomersInf list : listTmsMdCustomersInf) {
 			customerIds.add(list.getCustomerId());
 		}
 
 		String returnMsg = HttpUtilHelper.http(httpPostInfo, genParams(customerIds));
-		System.out.println(returnMsg);
+		
+		log.info(returnMsg);
+		
 		List<Customer> listCustomer = XmlUtils.extractXACPXmlToEntity(returnMsg, xmlPath);
 
 		customerDao.saveAll(listCustomer);
@@ -87,7 +89,32 @@ public class PostCreditCardJob implements Job, JobTest {
 	}
 
 	/**
+	 * 〈一句话功能简述〉 功能详细描述
+	 * 
+	 * @return
+	 * @see [相关类/方法]（可选）
+	 * @since [产品/模块版本] （可选）
+	 */
+
+	private List<TmsMdCustomersInf> getValidData() {
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("interfaceTrxFlag", StringPool.READY);
+		map.put("startDate", new Date());// 处理生效日期为当天的
+		map.put("sourceCustomerCode", StringPool.XACP);
+
+		List<TmsMdCustomersInf> listTmsMdCustomersInf = tmsMdCustomersInfService.findTmsMdCustomersInf(map);
+		
+		if(CollectionUtils.isEmpty(listTmsMdCustomersInf)) {
+			throw new BusinessException("没有合适的数据!");
+		}
+		return listTmsMdCustomersInf;
+
+	}
+
+	/**
 	 * 生成customer_id
+	 * 
 	 * @param customerIds
 	 * @see [相关类/方法]（可选）
 	 * @since [产品/模块版本] （可选）

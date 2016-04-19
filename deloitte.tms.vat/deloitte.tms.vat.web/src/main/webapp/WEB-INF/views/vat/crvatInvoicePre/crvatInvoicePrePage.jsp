@@ -50,6 +50,21 @@
 												">
 								    </td>
 								    
+								    
+								    <td><spring:message code="invoiceprint.level" />：</td>
+									<td><input id="invoice_print_newSearch_level"
+										class="easyui-combobox" name="reqInvoiceRange"
+										style="width: 120px" editable="false"
+										data-options="
+										 url:'invoiceReqH/getLeveldictionary.do',
+		                                 method:'get',
+		                                 valueField:'value',
+		                                 textField:'text',
+		                                 panelHeight:'auto'
+		                                 ">
+									</td>
+								
+								
 								    <td><spring:message code="invoiceprint.validType"/>:</td>
 									<td>
 									   <div>
@@ -63,25 +78,25 @@
 										class="easyui-textbox" style="width: 120px" name="customerId" disabled="true"/>
 									</td>
 									
-									<td>购方单位名称:</td>
-									<td><input id="clientinfo" class="easyui-textbox"
-										type="text" style="width: 120px;" name="customerName" disabled="true"></input></td>
 								</tr>
 								
 								<tr>
+								    <td>购方单位名称:</td>
+									<td><input id="clientinfo" class="easyui-textbox"
+										type="text" style="width: 120px;" name="customerName" disabled="true"></input></td>
 								    <td><spring:message code="client.bank" />：</td>
 									<td><select id="invoice_print_newSearch_bank" name="bankname" class="easyui-textbox" readonly="true" style="width: 120px;" disabled="true"></td>
 									<td><spring:message code="client.bankNum" />：</td>
 									<td><input id="invoice_print_newSearch_bankNum" name="bankAccount" class="easyui-textbox" readonly="true" style="width: 120px;" disabled="true"></td>
 									
 									<td>联系电话：</td>
-									<td><input id="invoice_print_newSearch_bankNum" name="bankAccount" class="easyui-textbox" readonly="true" style="width: 120px;" disabled="true"></td>
+									<td><input id="invoice_print_newSearch_bankNum" name="contactPhone" class="easyui-textbox" readonly="true" style="width: 120px;" disabled="true"></td>
 								
-								    <td><spring:message code="address" />：</td>
-								    <td><input id="invoice_print_newSearch_address" name="address" class="easyui-textbox" readonly="true" style="width: 120px;" disabled="true"></td>
 								</tr>	
 														
 								<tr>
+								    <td><spring:message code="address" />：</td>
+								    <td><input id="invoice_print_newSearch_address" name="address" class="easyui-textbox" readonly="true" style="width: 120px;" disabled="true"></td>
 								    <td><spring:message code="crvatInvoicePre.totalamount" />:</td>
 									<td><input id="time" class="easyui-textbox"style="width: 120px;"
 										name="totalamount" disabled="true"/></input></td>
@@ -283,16 +298,11 @@ $(function(){
 			{ field:'requestDate', title:'<spring:message code="invoiceprint.search.applyTime"/>',width:100,align:'center'},
 			{ field:'requestPerson', title:'<spring:message code="invoiceprint.applicant"/>',width:100,align:'center'},			
 			{ field:'approvalBy', title:'受理人',width:100,align:'center'},
-			{ field:'approveDate', title:'受理日期',width:100,align:'center'},			
+			{ field:'approveDate', title:'受理日期',width:100,align:'center'},
 			{ field:'invoiceAmount', title:'<spring:message code="invoiceprint.amountAll"/>',width:100,align:'right',
 				 formatter: function(value,row,index){
-						return fmoney(value,3);
+						return fmoney(value,2);
 					 }	
-			},
-			{ field:'acctdAmountCr', title:'<spring:message code="invoiceprint.amount"/>',width:100,align:'right',
-				formatter: function(value,row,index){
-					return fmoney(value,3);
-				 }	
 			},
 		]],
 	   toolbar:[{  
@@ -337,11 +347,15 @@ $(function(){
 			{ field:'taxTrxTypeName', title:'<spring:message code="invoiceprint.taxType"/>',width:100,align:'center'}, 
 			{ field:'taxTrxTypeCode', title:'<spring:message code="invoiceprint.taxCode"/>',width:100,align:'center'},
 			{ field:'trxDate', title:'<spring:message code="invoiceTrxPool.trxDate"/>',width:100,align:'center'},				
-			{ field:'invoiceAmount', title:'<spring:message code="invoiceprint.amountAll"/>',width:100,align:'center'},
+			{ field:'invoiceAmount', title:'<spring:message code="invoiceprint.amountAll"/>',width:100,align:'right'},
 			{ field:'taxTrxTypeName', title:'<spring:message code="taxItemsmaintain.itemInfo"/>',width:100,align:'center'},
-			{ field:'taxRate', title:'<spring:message code="taxRate"/>',width:100,align:'center'},
-			{ field:'invoiceAmount', title:'<spring:message code="invoiceprint.canAmount"/>',width:100,align:'center'},
-			{ field:'acctdAmountCr', title:'<spring:message code="invoiceprint.billingAmount"/>',width:100,align:'center'},
+			{ field:'taxRateStr', title:'<spring:message code="taxRate"/>',width:100,align:'center'},
+			{ field:'invoiceAmount', title:'<spring:message code="invoiceprint.canAmount"/>',width:100,align:'right',
+				 formatter: function(value,row,index){
+						return fmoney(value,2);
+					 }	
+			},
+			{ field:'vatAmountStr', title:'<spring:message code="invoiceprint.tax"/>',width:100,align:'center'},
 			{ field:'legalEntityName', title:'<spring:message code="crvatInvoicePre.legalentityName"/>',width:150,align:'center'},
 			{ field:'registrationNumber', title:'<spring:message code="crvatInvoicePre.legalentityNum"/>',width:100,align:'center'},
 		]],
@@ -464,6 +478,7 @@ $(function(){
 	function detail(){		
 		var row = $('#dg').datagrid('getSelected');		
 		if(row!=null){
+			$("#invoice_print_newSearch_level").combobox({disabled:true}); 
 			$("#layoutid").layout('expand', 'east');
 		}else{
 			$.messager.alert('<spring:message code="system.alert"/>','<spring:message code="noselectrecord"/>');
@@ -486,22 +501,25 @@ $(function(){
 				$('#revertbtn').linkbutton('disable');
 			}	 	
 			$('#prehform').form('load',{
-				invoiceReqNum:row.invoiceReqNum,
-				operationOrgCode:row.requestOrg,
-				acceptorg:row.acceptOrg,
+				invoiceReqNum:row.invoiceReqNum, 
+				operationOrgCode:row.requestOrg, 
+				acceptorg:row.acceptOrg, 
 				buyidentitytype:row.custRegistrationCodeStr,
 				buyidentitynum:row.custRegistrationNumber,
-				bankname:row.bankName,
-				bankAccount:row.bankAccount,
 				contactName:row.contactName,
-				address:row.address,
 				cratInvoicePreNum:row.crvatInvoicePreNumber,
 				createdate:row.invoicePreDate,
-				submitdate:row.strSubmitDate,
+				submitdate:row.requestDate,
 				status:row.approvalStatus,
 				totalamount:row.invoiceAmount,
 				retainamount:row.acctdAmountCr,
-				preHid:row.id
+				preHid:row.id,
+				customerId:row.customerNumber,
+				customerName:row.customerName,
+				bankname:row.bankName,
+				bankAccount:row.bankAccount,
+				address:row.address,
+				contactPhone:row.contactPhone
 			});
 			$('#prehformstatus').combobox('setValues',row.approvalStatus); 
 			var id = row.id;	

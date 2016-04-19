@@ -70,4 +70,9 @@ public class TmsMdContractServiceImpl extends BaseService implements
 		tmsMdContractDao.removeTmsMdContractById(contractId);
 	}
 
+	@Override
+	public TmsMdContract getContractByNumber(String contractNumber) {
+		return tmsMdContractDao.getContractByNumber(contractNumber);
+	}
+
 }

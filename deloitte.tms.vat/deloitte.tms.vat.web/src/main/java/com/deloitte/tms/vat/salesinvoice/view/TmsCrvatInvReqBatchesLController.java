@@ -28,6 +28,9 @@ import com.deloitte.tms.base.cache.model.PrinterTerminalNode;
 import com.deloitte.tms.base.cache.utils.PrintOrgCacheUtils;
 import com.deloitte.tms.base.masterdata.model.TmsMdEquipment;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
+import com.deloitte.tms.base.masterdata.model.TmsMdLegalInvoice;
+import com.deloitte.tms.base.masterdata.model.TmsMdLegalInvoiceInParam;
+import com.deloitte.tms.base.masterdata.service.TmsMdLegalInvoiceService;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.reflect.ReflectUtils;
@@ -65,6 +68,8 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 
 	@Resource
 	InvoiceSpecialContractBathDao invoiceSpecialContractBathDaoImpl;
+	@Resource
+	TmsMdLegalInvoiceService tmsMdLegalInvoiceService;
 
 	@RequestMapping(value = "/initTmsCrvatInvReqBatchesL", method = RequestMethod.GET)
 	public String initTmsCrvatInvReqBatchesL() throws Exception {
@@ -98,20 +103,23 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 		inParam.setId(entity.getId());
 	}
 
-	@ResponseBody
-	@RequestMapping(value = "/batchSaveTmsCrvatInvReqBatchesLToPrintPool", method = RequestMethod.POST)
+	//@ResponseBody
+	//@RequestMapping(value = "/batchSaveTmsCrvatInvReqBatchesLToPrintPool", method = RequestMethod.POST)
 	// @RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
-	public void batchSaveTmsCrvatInvReqBatchesLToPrintPool(@RequestParam("id") String clientKeys,HttpServletResponse response) throws Exception {
-		for(String clientId:clientKeys.split(",")){//根据ID拆分批量审批
+	public void batchSaveTmsCrvatInvReqBatchesLToPrintPool(String clientId)
+			throws Exception {
+		//for (String clientId : clientKeys.split(",")) {// 根据ID拆分批量审批
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("crvatInvReqBatchesHId", clientId);//根据特殊批量开票申请ID 查询 行数据
-		//	params.put("status", "30");//30 代表已经提交 50 代表已经审批
+			params.put("crvatInvReqBatchesHId", clientId);// 根据特殊批量开票申请ID 查询 行数据
+			// params.put("status", "30");//30 代表已经提交 50 代表已经审批
 			List<TmsCrvatInvReqBatchesLInParam> tmsCrvatInvReqBatchesL = new ArrayList<TmsCrvatInvReqBatchesLInParam>();
-		
+
 			tmsCrvatInvReqBatchesL = tmsCrvatInvReqBatchesLService
 					.findTmsCrvatInvReqBatchesLByParams(params);
-//			List<InvoicePrintPoolH> invoicePrintPoolHlist = new ArrayList<InvoicePrintPoolH>();
-//			List<InvoicePrintPoolL> invoicePrintPoolLs = new ArrayList<InvoicePrintPoolL>();
+			// List<InvoicePrintPoolH> invoicePrintPoolHlist = new
+			// ArrayList<InvoicePrintPoolH>();
+			// List<InvoicePrintPoolL> invoicePrintPoolLs = new
+			// ArrayList<InvoicePrintPoolL>();
 			Iterator iterator = tmsCrvatInvReqBatchesL.listIterator();
 			InvoicePrintPoolH tnvoicePrintPoolHTemp = new InvoicePrintPoolH();
 			InvoicePrintPoolL invoicePrintPoolLTemp = new InvoicePrintPoolL();
@@ -119,49 +127,93 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 			while (iterator.hasNext()) {
 				TmsCrvatInvReqBatchesLInParam temps = (TmsCrvatInvReqBatchesLInParam) iterator
 						.next();
-				BigDecimal totalAmount =temps.getInvoiceAmount();// 金额
-				long loopTimes = function(totalAmount);
+				if("false".equals(temps.getAttribute4()))
+				{
+					continue;
+				}
+				BigDecimal totalAmount = temps.getInvoiceAmount();// 金额
+				String legalEntityID = temps.getLegalEntityId();
+				Map<String, Object> legalEntityInvoiceMap = new HashMap<String, Object>();
+				legalEntityInvoiceMap.put("legalEntityId", legalEntityID);// legalEntityId
+				List<TmsMdLegalInvoiceInParam> tmsMdLegalInvoiceList = (List<TmsMdLegalInvoiceInParam>) tmsMdLegalInvoiceService
+						.findTmsMdLegalInvoiceByParams(legalEntityInvoiceMap);
+				TmsMdLegalInvoice tmsMdLegalInvoiceTemp = new TmsMdLegalInvoice();//发票限额
+				Long limitAmountLong = 9999999l;
+				if (tmsMdLegalInvoiceList != null) {
+					tmsMdLegalInvoiceTemp = tmsMdLegalInvoiceList.get(0);
+					limitAmountLong = tmsMdLegalInvoiceTemp
+							.getInvoiceLimitAmountValue();// 纳税实体对应的发票限额
+				}
+				long loopTimes = function(totalAmount, limitAmountLong);
 				if (loopTimes == 0) {
 					String invoiceReqNumber = temps.getCrvatInvoiceReqNumber();// 申请单编号
-					tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);//约定 attribute 1 是申请单号
+					tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);// 约定
+																			// attribute
+																			// 1
+																			// 是申请单号
+					tnvoicePrintPoolHTemp.setAttribute2("SP");//数据来源 特殊开票
 					String orgId = temps.getOrgId();// 组织编号
+					tnvoicePrintPoolHTemp.setAttribute3(orgId);//组织ID
+					tnvoicePrintPoolHTemp.setAttribute4(temps.getOrgCode());//组织编号
+					tnvoicePrintPoolHTemp.setAttribute5(temps.getOrgName());//组织名称
+					tnvoicePrintPoolHTemp.setPayee(temps.getCreatedBy());//收款人 ==创建人
+					tnvoicePrintPoolHTemp.setChecker(temps.getApprovalBy());//最后审批人 == 复核人
 					TmsMdEquipment tmsMdEquipment = invoiceSpecialContractServiceImpli
 							.getTmsMdEquipment(temps.getLegalEntityId());// 查询终端信息
-					//销售方信息
-					TmsMdLegalEntity tmsMdLegalEntity = (TmsMdLegalEntity) invoiceSpecialContractServiceImpli.findById(TmsMdLegalEntity.class, temps.getLegalEntityId());
-					tnvoicePrintPoolHTemp.setLegalEntityCode(tmsMdLegalEntity.getLegalEntityCode());//销方纳税人编码
-					tnvoicePrintPoolHTemp.setLegalEntityName(tmsMdLegalEntity.getLegalEntityName());//销方纳税名称
-					tnvoicePrintPoolHTemp.setLegalEntityId(tmsMdLegalEntity.getId());//销方纳税人ID
-					tnvoicePrintPoolHTemp.setBankAccountNum(tmsMdLegalEntity.getBankAccountNum());//销方开户银行账号
-					tnvoicePrintPoolHTemp.setBankBranchName(tmsMdLegalEntity.getBankBranchName());//销方开户银行
-					tnvoicePrintPoolHTemp.setRegistrationContactPhone(tmsMdLegalEntity.getRegistrationContactPhone());//销方地址联系电话
-					tnvoicePrintPoolHTemp.setRegistrationContactAddress(tmsMdLegalEntity.getRegistrationContactAddress());//销方地址
+					// 销售方信息
+					TmsMdLegalEntity tmsMdLegalEntity = (TmsMdLegalEntity) invoiceSpecialContractServiceImpli
+							.findById(TmsMdLegalEntity.class,
+									temps.getLegalEntityId());
+					tnvoicePrintPoolHTemp.setLegalEntityCode(tmsMdLegalEntity
+							.getLegalEntityCode());// 销方纳税人编码
+					tnvoicePrintPoolHTemp.setLegalEntityName(tmsMdLegalEntity
+							.getLegalEntityName());// 销方纳税名称
+					tnvoicePrintPoolHTemp.setLegalEntityId(tmsMdLegalEntity
+							.getId());// 销方纳税人ID
+					tnvoicePrintPoolHTemp.setBankAccountNum(tmsMdLegalEntity
+							.getBankAccountNum());// 销方开户银行账号
+					tnvoicePrintPoolHTemp.setBankBranchName(tmsMdLegalEntity
+							.getBankBranchName());// 销方开户银行
+					tnvoicePrintPoolHTemp
+							.setRegistrationContactPhone(tmsMdLegalEntity
+									.getRegistrationContactPhone());// 销方地址联系电话
+					tnvoicePrintPoolHTemp
+							.setRegistrationContactAddress(tmsMdLegalEntity
+									.getRegistrationContactAddress());// 销方地址
 					// 终端名称
 					tnvoicePrintPoolHTemp.setEquipmentName(tmsMdEquipment
 							.getEquipmentName());
 					// 终端ID
-					tnvoicePrintPoolHTemp.setEquipmentId(tmsMdEquipment.getId());
+					tnvoicePrintPoolHTemp
+							.setEquipmentId(tmsMdEquipment.getId());
 					tnvoicePrintPoolHTemp.setEquipmentCode(tmsMdEquipment
 							.getEquipmentCode());
 					String customerName = temps.getCustomerName();// 客户信息
 					tnvoicePrintPoolHTemp.setCustomerName(customerName);//
 					tnvoicePrintPoolHTemp.setCustomerId(temps.getCustomerId());
-					tnvoicePrintPoolHTemp.setCustRegistrationAddress(temps.getCustRegistrationAddress());//地址
+					tnvoicePrintPoolHTemp.setCustRegistrationAddress(temps
+							.getCustRegistrationAddress());// 地址
 					String customerNumber = temps.getCustomerNumber();// 客户编号
 					tnvoicePrintPoolHTemp.setCustomerNumber(customerNumber);
-					tnvoicePrintPoolHTemp.setCustContactPhone(temps.getContactPhone());//购方电话
-					tnvoicePrintPoolHTemp.setCustDepositBankName(temps.getCustDepositBankName());//开户行
-					tnvoicePrintPoolHTemp.setCustDepositBankNumber(temps.getCustDepositBankNumber());//开户行编号
-					//6222208111014503024
-					if(temps.getCustDepositBankAccountNum()!=null)
-					{
-					tnvoicePrintPoolHTemp.setCustDepositBankAccountNum(temps.getCustDepositBankAccountNum());//银行账号
+					tnvoicePrintPoolHTemp.setCustContactPhone(temps
+							.getContactPhone());// 购方电话
+					tnvoicePrintPoolHTemp.setCustDepositBankName(temps
+							.getCustDepositBankName());// 开户行
+					tnvoicePrintPoolHTemp.setCustDepositBankNumber(temps
+							.getCustDepositBankNumber());// 开户行编号
+					// 6222208111014503024
+					if (temps.getCustDepositBankAccountNum() != null) {
+						tnvoicePrintPoolHTemp
+								.setCustDepositBankAccountNum(temps
+										.getCustDepositBankAccountNum());// 银行账号
+					} else {
+						tnvoicePrintPoolHTemp
+								.setCustDepositBankAccountNum("6222208111014503024");
 					}
-					else {
-						tnvoicePrintPoolHTemp.setCustDepositBankAccountNum("6222208111014503024");
-					}
-					tnvoicePrintPoolHTemp.setCustRegistrationNumber(temps.getCustRegistrationNumber());//证件编号
-					tnvoicePrintPoolHTemp.setCustContactName(temps.getContactName());//购方联系人
+					tnvoicePrintPoolHTemp.setCustRegistrationNumber(temps
+							.getCustRegistrationNumber());// 证件编号
+					tnvoicePrintPoolHTemp.setCustContactName(temps
+							.getContactName());// 购方联系人
 					String uuId = IdGenerator.getUUID();
 					tnvoicePrintPoolHTemp.setInvoicePrintStatus("10");// 待打印
 					tnvoicePrintPoolHTemp.setId(uuId);// ID uuid
@@ -169,7 +221,8 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 							.getCurrentOrgId());// 发票打印需要ID不可以为空
 					tnvoicePrintPoolHTemp.setTotalAmount(totalAmount);
 					tnvoicePrintPoolHTemp.setArchiveBaseDate(new Date());
-					tnvoicePrintPoolHTemp.setBizOrgCode(tmsMdLegalEntity.getBizOrgCode());
+					tnvoicePrintPoolHTemp.setBizOrgCode(tmsMdLegalEntity
+							.getBizOrgCode());
 					tnvoicePrintPoolHTemp.setInvoicePrintBy(ContextUtils
 							.getCurrentUserName());// 发票开具人
 					tnvoicePrintPoolHTemp.setCreatedBy(ContextUtils
@@ -179,35 +232,60 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 							.getCurrentUserName());
 					tnvoicePrintPoolHTemp.setModifiedDate(new Date());
 					tnvoicePrintPoolHTemp.setVersionId(0);//
-					tnvoicePrintPoolHTemp.setInvoicePrintDate(new Date());
-					if ("2".equals(temps.getCustomerType())) {
-						tnvoicePrintPoolHTemp.setInvoiceCategory("2");// 一般纳税人
+					//tnvoicePrintPoolHTemp.setInvoicePrintDate(new Date());
+					if ("1".equals(temps.getCustLegalEntityType())&&("3".equals(temps.getInvoiceCategories()))) {
+						tnvoicePrintPoolHTemp.setInvoiceCategory("2");// 专票逻辑纳税人身份是一般纳税人 而且涉税交易类型是专票
 					} else {
-						tnvoicePrintPoolHTemp.setInvoiceCategory("1");// 小规模纳税人
+						tnvoicePrintPoolHTemp.setInvoiceCategory("1");// 普票
 					}
 					// ((TmsCrvatInvReqBatchesLInParam)temps).getCustomerType()="";
 					tnvoicePrintPoolHTemp.setInvoiceCategory("1");
-				//	invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
+					// invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
 					tmsCrvatInvReqBatchesLService.save(tnvoicePrintPoolHTemp);
 					invoicePrintPoolLTemp.setId(IdGenerator.getUUID());
-					invoicePrintPoolLTemp.setIsTax(temps.getIsTax());//是否含税
+					invoicePrintPoolLTemp.setIsTax(temps.getIsTax());// 是否含税
+
 					invoicePrintPoolLTemp.setInvoicePrtPoolHId(uuId);// H ID
-					invoicePrintPoolLTemp.setInvoiceAmount(totalAmount);// 发票打印池行数据和头数据一对一
+					invoicePrintPoolLTemp.setInvoiceAmount(totalAmount);// 发票金额
+																		// 发票打印池行数据和头数据一对一
 					BigDecimal taxRate = new BigDecimal(temps.getTaxRate());// 税率
-					invoicePrintPoolLTemp.setTaxRate(taxRate);// 税额
-					Double vatAmountDouble  =taxRate.doubleValue()*totalAmount.doubleValue();
-					BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
-					invoicePrintPoolLTemp.setVatAmount(vatAmount);//税额
+					invoicePrintPoolLTemp.setTaxRate(taxRate);// 税率
+					// Double vatAmountDouble
+					// =taxRate.doubleValue()*totalAmount.doubleValue();
+					// BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+					// invoicePrintPoolLTemp.setVatAmount(vatAmount);//税额
+
+					if ("1".equals(temps.getIsTax())) {
+						double tempAmount = totalAmount.doubleValue() / 1.06;
+						tempAmount = tempAmount * taxRate.doubleValue();
+						BigDecimal vatAmount = new BigDecimal(tempAmount);
+						invoicePrintPoolLTemp.setVatAmount(vatAmount);// 税额
+						BigDecimal acctdAmountCR = new BigDecimal(
+								totalAmount.doubleValue()
+										- vatAmount.doubleValue());
+						invoicePrintPoolLTemp.setAcctdAmountCR(acctdAmountCR);//净额
+						// 含税 金额等于 金额减去 税额
+					} else {
+						// 不含税 金额等于金额
+						invoicePrintPoolLTemp.setAcctdAmountCR(totalAmount);//净额
+						 Double vatAmountDouble
+						 =taxRate.doubleValue()*totalAmount.doubleValue();
+						 BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+						 invoicePrintPoolLTemp.setVatAmount(vatAmount);//税额
+					}
 					String bizOrgCode = temps.getBizOrgCode();//
-					//invoicePrintPoolLTemp.setBizOrgCode(bizOrgCode);
+					// invoicePrintPoolLTemp.setBizOrgCode(bizOrgCode);
 					String inventoryNumber = temps.getInventoryItemNumber();
-					invoicePrintPoolLTemp.setInventoryItemNumber(inventoryNumber);// 商品及服务编码
+					invoicePrintPoolLTemp
+							.setInventoryItemNumber(inventoryNumber);// 商品及服务编码
 					invoicePrintPoolLTemp.setInventoryItemDescripton(temps
-							.getInventoryItemDescripton());//商品及服务名称
-					invoicePrintPoolLTemp.setInventoryItemId(temps.getInventoryItemId());//商品及服务ID
+							.getInventoryItemDescripton());// 商品及服务名称
+					invoicePrintPoolLTemp.setInventoryItemId(temps
+							.getInventoryItemId());// 商品及服务ID
 					invoicePrintPoolLTemp.setArchiveBaseDate(new Date());
 					invoicePrintPoolLTemp.setPriceOfUnit(totalAmount);// 单价
-					invoicePrintPoolLTemp.setBizOrgCode(tmsMdLegalEntity.getBizOrgCode());
+					invoicePrintPoolLTemp.setBizOrgCode(tmsMdLegalEntity
+							.getBizOrgCode());
 					invoicePrintPoolLTemp.setInventoryItemQty(1);// 商品数量默认是1
 					invoicePrintPoolLTemp.setCreatedBy(ContextUtils
 							.getCurrentUserName());
@@ -216,26 +294,53 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 							.getCurrentUserName());
 					invoicePrintPoolLTemp.setModifiedDate(new Date());
 					invoicePrintPoolLTemp.setVersionId(0);// crvatInvReqBatchesLId
-					invoicePrintPoolLTemp.setCrvatInvReqBatchesLId(temps.getId());
-					//invoicePrintPoolLs.add(invoicePrintPoolLTemp);
+					invoicePrintPoolLTemp.setCrvatInvReqBatchesLId(temps
+							.getId());
+					// invoicePrintPoolLs.add(invoicePrintPoolLTemp);
 					tmsCrvatInvReqBatchesLService.save(invoicePrintPoolLTemp);
 				} else {
 					for (int i = 0; i < loopTimes; i++) {
 
 						// int
-						BigDecimal tempBigDecimal = new BigDecimal(9999999);
-						String invoiceReqNumber = temps.getCrvatInvoiceReqNumber();// 申请单编号
+						BigDecimal tempBigDecimal = new BigDecimal(
+								limitAmountLong);
+						String invoiceReqNumber = temps
+								.getCrvatInvoiceReqNumber();// 申请单编号
 						String orgId = temps.getOrgId();// 组织编号
-						//销售方信息
-						tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);//约定 attribute 1 是申请单号
-						TmsMdLegalEntity tmsMdLegalEntity = (TmsMdLegalEntity) invoiceSpecialContractServiceImpli.findById(TmsMdLegalEntity.class, temps.getLegalEntityId());
-						tnvoicePrintPoolHTemp.setLegalEntityCode(tmsMdLegalEntity.getLegalEntityCode());//销方纳税人编码
-						tnvoicePrintPoolHTemp.setLegalEntityName(tmsMdLegalEntity.getLegalEntityName());//销方纳税名称
-						tnvoicePrintPoolHTemp.setLegalEntityId(tmsMdLegalEntity.getId());//销方纳税人ID
-						tnvoicePrintPoolHTemp.setBankAccountNum(tmsMdLegalEntity.getBankAccountNum());//销方开户银行账号
-						tnvoicePrintPoolHTemp.setBankBranchName(tmsMdLegalEntity.getBankBranchName());//销方开户银行
-						tnvoicePrintPoolHTemp.setRegistrationContactPhone(tmsMdLegalEntity.getRegistrationContactPhone());//销方地址联系电话
-						tnvoicePrintPoolHTemp.setRegistrationContactAddress(tmsMdLegalEntity.getRegistrationContactAddress());//销方地址
+						tnvoicePrintPoolHTemp.setAttribute3(orgId);//组织ID
+						tnvoicePrintPoolHTemp.setAttribute4(temps.getOrgCode());//组织编号
+						tnvoicePrintPoolHTemp.setAttribute5(temps.getOrgName());//组织名称
+						// 销售方信息
+						tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);// 约定
+																				// attribute
+																				// 1
+																				// 是申请单号
+						tnvoicePrintPoolHTemp.setAttribute2("SP");//数据来源 特殊开票
+						tnvoicePrintPoolHTemp.setPayee(temps.getCreatedBy());//收款人 ==创建人
+						tnvoicePrintPoolHTemp.setChecker(temps.getApprovalBy());//最后审批人 == 复核人
+						TmsMdLegalEntity tmsMdLegalEntity = (TmsMdLegalEntity) invoiceSpecialContractServiceImpli
+								.findById(TmsMdLegalEntity.class,
+										temps.getLegalEntityId());
+						tnvoicePrintPoolHTemp
+								.setLegalEntityCode(tmsMdLegalEntity
+										.getLegalEntityCode());// 销方纳税人编码
+						tnvoicePrintPoolHTemp
+								.setLegalEntityName(tmsMdLegalEntity
+										.getLegalEntityName());// 销方纳税名称
+						tnvoicePrintPoolHTemp.setLegalEntityId(tmsMdLegalEntity
+								.getId());// 销方纳税人ID
+						tnvoicePrintPoolHTemp
+								.setBankAccountNum(tmsMdLegalEntity
+										.getBankAccountNum());// 销方开户银行账号
+						tnvoicePrintPoolHTemp
+								.setBankBranchName(tmsMdLegalEntity
+										.getBankBranchName());// 销方开户银行
+						tnvoicePrintPoolHTemp
+								.setRegistrationContactPhone(tmsMdLegalEntity
+										.getRegistrationContactPhone());// 销方地址联系电话
+						tnvoicePrintPoolHTemp
+								.setRegistrationContactAddress(tmsMdLegalEntity
+										.getRegistrationContactAddress());// 销方地址
 						TmsMdEquipment tmsMdEquipment = invoiceSpecialContractServiceImpli
 								.getTmsMdEquipment(((TmsCrvatInvReqBatchesLInParam) temps)
 										.getLegalEntityId());// 查询终端信息
@@ -243,43 +348,53 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 						tnvoicePrintPoolHTemp.setEquipmentName(tmsMdEquipment
 								.getEquipmentName());
 						// 终端ID
-						tnvoicePrintPoolHTemp
-								.setEquipmentId(tmsMdEquipment.getId());
+						tnvoicePrintPoolHTemp.setEquipmentId(tmsMdEquipment
+								.getId());
 						tnvoicePrintPoolHTemp.setEquipmentCode(tmsMdEquipment
 								.getEquipmentCode());
 						String customerName = temps.getCustomerName();// 客户名称
 						tnvoicePrintPoolHTemp.setCustomerName(customerName);//
-						tnvoicePrintPoolHTemp.setCustomerId(temps.getCustomerId());
+						tnvoicePrintPoolHTemp.setCustomerId(temps
+								.getCustomerId());
 						String customerNumber = temps.getCustomerNumber();// 客户编号
-						tnvoicePrintPoolHTemp.setCustRegistrationAddress(temps.getCustRegistrationAddress());//地址
-						tnvoicePrintPoolHTemp.setCustContactPhone(temps.getContactPhone());//电话
+						tnvoicePrintPoolHTemp.setCustRegistrationAddress(temps
+								.getCustRegistrationAddress());// 地址
+						tnvoicePrintPoolHTemp.setCustContactPhone(temps
+								.getContactPhone());// 电话
 						tnvoicePrintPoolHTemp.setCustomerNumber(customerNumber);
-						tnvoicePrintPoolHTemp.setCustDepositBankName(temps.getCustDepositBankName());//开户行
-						tnvoicePrintPoolHTemp.setCustDepositBankNumber(temps.getCustDepositBankNumber());//开户行编号
-						//6222208111014503024
-						if(temps.getCustDepositBankAccountNum()!=null)
-						{
-						tnvoicePrintPoolHTemp.setCustDepositBankAccountNum(temps.getCustDepositBankAccountNum());//银行账号
+						tnvoicePrintPoolHTemp.setCustDepositBankName(temps
+								.getCustDepositBankName());// 开户行
+						tnvoicePrintPoolHTemp.setCustDepositBankNumber(temps
+								.getCustDepositBankNumber());// 开户行编号
+						// 6222208111014503024
+						if (temps.getCustDepositBankAccountNum() != null) {
+							tnvoicePrintPoolHTemp
+									.setCustDepositBankAccountNum(temps
+											.getCustDepositBankAccountNum());// 银行账号
+						} else {
+							tnvoicePrintPoolHTemp
+									.setCustDepositBankAccountNum("6222208111014503024");
 						}
-						else {
-							tnvoicePrintPoolHTemp.setCustDepositBankAccountNum("6222208111014503024");
-						}
-						tnvoicePrintPoolHTemp.setCustRegistrationNumber(temps.getCustRegistrationNumber());//证件编号
-						tnvoicePrintPoolHTemp.setCustContactName(temps.getContactName());//联系人
+						tnvoicePrintPoolHTemp.setCustRegistrationNumber(temps
+								.getCustRegistrationNumber());// 证件编号
+						tnvoicePrintPoolHTemp.setCustContactName(temps
+								.getContactName());// 联系人
 						String uuId = IdGenerator.getUUID();
 						tnvoicePrintPoolHTemp.setInvoicePrintStatus("10");// 待打印
 						tnvoicePrintPoolHTemp.setId(uuId);// ID uuid
-						tnvoicePrintPoolHTemp.setInvoicePrintDate(new Date());// 发票打印日期
-						if ("1".equals(temps.getCustomerType())) {
-							tnvoicePrintPoolHTemp.setInvoiceCategory("1");// 一般纳税人
+						//tnvoicePrintPoolHTemp.setInvoicePrintDate(new Date());// 发票打印日期
+						if ("1".equals(temps.getCustLegalEntityType())&&("3".equals(temps.getInvoiceCategories()))) {
+							tnvoicePrintPoolHTemp.setInvoiceCategory("2");// 专票逻辑纳税人身份是一般纳税人 而且涉税交易类型是专票
 						} else {
-							tnvoicePrintPoolHTemp.setInvoiceCategory("2");// 小规模纳税人
+							tnvoicePrintPoolHTemp.setInvoiceCategory("1");// 普票
 						}
-						tnvoicePrintPoolHTemp.setCrvatInvoicePreHId(ContextUtils
-								.getCurrentOrgId());// 发票打印需要参数
+						tnvoicePrintPoolHTemp
+								.setCrvatInvoicePreHId(ContextUtils
+										.getCurrentOrgId());// 发票打印需要参数
 						tnvoicePrintPoolHTemp.setTotalAmount(tempBigDecimal);
 						tnvoicePrintPoolHTemp.setArchiveBaseDate(new Date());
-						tnvoicePrintPoolHTemp.setBizOrgCode(tmsMdLegalEntity.getBizOrgCode());
+						tnvoicePrintPoolHTemp.setBizOrgCode(tmsMdLegalEntity
+								.getBizOrgCode());
 						tnvoicePrintPoolHTemp.setCreatedBy(ContextUtils
 								.getCurrentUserName());
 						tnvoicePrintPoolHTemp.setCreateDate(new Date());
@@ -287,20 +402,40 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 								.getCurrentUserName());
 						tnvoicePrintPoolHTemp.setModifiedDate(new Date());
 						tnvoicePrintPoolHTemp.setVersionId(0);
-						tmsCrvatInvReqBatchesLService.save(tnvoicePrintPoolHTemp);
-						//invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
+						tmsCrvatInvReqBatchesLService
+								.save(tnvoicePrintPoolHTemp);
+						// invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
 						invoicePrintPoolLTemp.setId(IdGenerator.getUUID());
-						invoicePrintPoolLTemp.setIsTax(temps.getIsTax());//是否含税
+						invoicePrintPoolLTemp.setIsTax(temps.getIsTax());// 是否含税
 						invoicePrintPoolLTemp.setInvoicePrtPoolHId(uuId);// H ID
 						invoicePrintPoolLTemp.setInvoiceAmount(tempBigDecimal);// 发票打印池行数据和头数据一对一
 						BigDecimal taxRate = new BigDecimal(temps.getTaxRate());// 税率
-						invoicePrintPoolLTemp.setTaxRate(taxRate);// 税额
-						Double vatAmountDouble  =taxRate.doubleValue()*tempBigDecimal.doubleValue();
-						BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
-						invoicePrintPoolLTemp.setVatAmount(vatAmount);//税额
-						//invoicePrintPoolLTemp.setVatAmount(tempBigDecimal);
+						invoicePrintPoolLTemp.setTaxRate(taxRate);// 税率
+//						Double vatAmountDouble = taxRate.doubleValue()
+//								* tempBigDecimal.doubleValue();
+//						BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+//						invoicePrintPoolLTemp.setVatAmount(vatAmount);// 税额
+						if ("1".equals(temps.getIsTax())) {
+							double tempAmount = tempBigDecimal.doubleValue() / 1.06;
+							tempAmount = tempAmount * taxRate.doubleValue();
+							BigDecimal vatAmount = new BigDecimal(tempAmount);
+							invoicePrintPoolLTemp.setVatAmount(vatAmount);// 税额
+							BigDecimal acctdAmountCR = new BigDecimal(
+									tempBigDecimal.doubleValue()
+											- vatAmount.doubleValue());
+							invoicePrintPoolLTemp.setAcctdAmountCR(acctdAmountCR);//净额
+							// 含税 净额等于 金额减去 税额
+						} else {
+							// 不含税 净额等于金额 
+							invoicePrintPoolLTemp.setAcctdAmountCR(tempBigDecimal);//净额
+							 Double vatAmountDouble
+							 =taxRate.doubleValue()*tempBigDecimal.doubleValue();
+							 BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+							 invoicePrintPoolLTemp.setVatAmount(vatAmount);//税额
+						}
+						// invoicePrintPoolLTemp.setVatAmount(tempBigDecimal);
 						String bizOrgCode = temps.getBizOrgCode();//
-						//invoicePrintPoolLTemp.setBizOrgCode(bizOrgCode);
+						// invoicePrintPoolLTemp.setBizOrgCode(bizOrgCode);
 
 						String inventoryNumber = temps.getInventoryItemNumber();
 						invoicePrintPoolLTemp
@@ -308,9 +443,11 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 						invoicePrintPoolLTemp.setInventoryItemQty(1);// 商品数量默认是1
 						invoicePrintPoolLTemp.setInventoryItemDescripton(temps
 								.getInventoryItemDescripton());
-						invoicePrintPoolLTemp.setInventoryItemId(temps.getInventoryItemId());//商品及服务ID
+						invoicePrintPoolLTemp.setInventoryItemId(temps
+								.getInventoryItemId());// 商品及服务ID
 						invoicePrintPoolLTemp.setArchiveBaseDate(new Date());
-						invoicePrintPoolLTemp.setBizOrgCode(tmsMdLegalEntity.getBizOrgCode());
+						invoicePrintPoolLTemp.setBizOrgCode(tmsMdLegalEntity
+								.getBizOrgCode());
 						invoicePrintPoolLTemp.setPriceOfUnit(tempBigDecimal);// 单价
 						invoicePrintPoolLTemp.setCreatedBy(ContextUtils
 								.getCurrentUserName());
@@ -324,24 +461,52 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 						// BigDecimal taxRate
 						invoicePrintPoolLTemp.setCrvatInvReqBatchesLId(temps
 								.getId());
-						tmsCrvatInvReqBatchesLService.save(invoicePrintPoolLTemp);
-					//	invoicePrintPoolLs.add(invoicePrintPoolLTemp);
+						tmsCrvatInvReqBatchesLService
+								.save(invoicePrintPoolLTemp);
+						// invoicePrintPoolLs.add(invoicePrintPoolLTemp);
 					}
-					if ((totalAmount.doubleValue() - 9999999 * loopTimes) > 0) {
+					if ((totalAmount.doubleValue() - limitAmountLong
+							* loopTimes) > 0) {
 						BigDecimal tempBigDecimal = new BigDecimal(
-								totalAmount.doubleValue() - 9999999 * loopTimes);
-						String invoiceReqNumber = temps.getCrvatInvoiceReqNumber();// 申请单编号
-						tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);//约定 attribute 1 是申请单号
+								totalAmount.doubleValue() - limitAmountLong
+										* loopTimes);
+						String invoiceReqNumber = temps
+								.getCrvatInvoiceReqNumber();// 申请单编号
+						tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);// 约定
+																				// attribute
+																				// 1
+																				// 是申请单号
+						tnvoicePrintPoolHTemp.setAttribute2("SP");//数据来源 特殊开票
+						tnvoicePrintPoolHTemp.setPayee(temps.getCreatedBy());//收款人 ==创建人
+						tnvoicePrintPoolHTemp.setChecker(temps.getApprovalBy());//最后审批人 == 复核人
 						String orgId = temps.getOrgId();// 组织编号
-						//销售方信息
-						TmsMdLegalEntity tmsMdLegalEntity = (TmsMdLegalEntity) invoiceSpecialContractServiceImpli.findById(TmsMdLegalEntity.class, temps.getLegalEntityId());
-						tnvoicePrintPoolHTemp.setLegalEntityCode(tmsMdLegalEntity.getLegalEntityCode());//销方纳税人编码
-						tnvoicePrintPoolHTemp.setLegalEntityName(tmsMdLegalEntity.getLegalEntityName());//销方纳税名称
-						tnvoicePrintPoolHTemp.setLegalEntityId(tmsMdLegalEntity.getId());//销方纳税人ID
-						tnvoicePrintPoolHTemp.setBankAccountNum(tmsMdLegalEntity.getBankAccountNum());//销方开户银行账号
-						tnvoicePrintPoolHTemp.setBankBranchName(tmsMdLegalEntity.getBankBranchName());//销方开户银行
-						tnvoicePrintPoolHTemp.setRegistrationContactPhone(tmsMdLegalEntity.getRegistrationContactPhone());//销方地址联系电话
-						tnvoicePrintPoolHTemp.setRegistrationContactAddress(tmsMdLegalEntity.getRegistrationContactAddress());//销方地址
+						tnvoicePrintPoolHTemp.setAttribute3(orgId);//组织ID
+						tnvoicePrintPoolHTemp.setAttribute4(temps.getOrgCode());//组织编号
+						tnvoicePrintPoolHTemp.setAttribute5(temps.getOrgName());//组织名称
+						// 销售方信息
+						TmsMdLegalEntity tmsMdLegalEntity = (TmsMdLegalEntity) invoiceSpecialContractServiceImpli
+								.findById(TmsMdLegalEntity.class,
+										temps.getLegalEntityId());
+						tnvoicePrintPoolHTemp
+								.setLegalEntityCode(tmsMdLegalEntity
+										.getLegalEntityCode());// 销方纳税人编码
+						tnvoicePrintPoolHTemp
+								.setLegalEntityName(tmsMdLegalEntity
+										.getLegalEntityName());// 销方纳税名称
+						tnvoicePrintPoolHTemp.setLegalEntityId(tmsMdLegalEntity
+								.getId());// 销方纳税人ID
+						tnvoicePrintPoolHTemp
+								.setBankAccountNum(tmsMdLegalEntity
+										.getBankAccountNum());// 销方开户银行账号
+						tnvoicePrintPoolHTemp
+								.setBankBranchName(tmsMdLegalEntity
+										.getBankBranchName());// 销方开户银行
+						tnvoicePrintPoolHTemp
+								.setRegistrationContactPhone(tmsMdLegalEntity
+										.getRegistrationContactPhone());// 销方地址联系电话
+						tnvoicePrintPoolHTemp
+								.setRegistrationContactAddress(tmsMdLegalEntity
+										.getRegistrationContactAddress());// 销方地址
 						TmsMdEquipment tmsMdEquipment = invoiceSpecialContractServiceImpli
 								.getTmsMdEquipment(((TmsCrvatInvReqBatchesLInParam) temps)
 										.getLegalEntityId());// 查询终端信息
@@ -349,43 +514,53 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 						tnvoicePrintPoolHTemp.setEquipmentName(tmsMdEquipment
 								.getEquipmentName());
 						// 终端ID
-						tnvoicePrintPoolHTemp
-								.setEquipmentId(tmsMdEquipment.getId());
+						tnvoicePrintPoolHTemp.setEquipmentId(tmsMdEquipment
+								.getId());
 						tnvoicePrintPoolHTemp.setEquipmentCode(tmsMdEquipment
 								.getEquipmentCode());
 						String customerName = temps.getCustomerName();// 客户名称
 						tnvoicePrintPoolHTemp.setCustomerName(customerName);//
-						tnvoicePrintPoolHTemp.setCustomerId(temps.getCustomerId());
+						tnvoicePrintPoolHTemp.setCustomerId(temps
+								.getCustomerId());
 						String customerNumber = temps.getCustomerNumber();// 客户编号
 						tnvoicePrintPoolHTemp.setCustomerNumber(customerNumber);
-						tnvoicePrintPoolHTemp.setCustRegistrationAddress(temps.getCustRegistrationAddress());//地址
-						tnvoicePrintPoolHTemp.setCustContactPhone(temps.getContactPhone());//电话
-						tnvoicePrintPoolHTemp.setCustDepositBankName(temps.getCustDepositBankName());//开户行
-						tnvoicePrintPoolHTemp.setCustDepositBankNumber(temps.getCustDepositBankNumber());//开户行编号
-						//6222208111014503024
-						if(temps.getCustDepositBankAccountNum()!=null)
-						{
-						tnvoicePrintPoolHTemp.setCustDepositBankAccountNum(temps.getCustDepositBankAccountNum());//银行账号
+						tnvoicePrintPoolHTemp.setCustRegistrationAddress(temps
+								.getCustRegistrationAddress());// 地址
+						tnvoicePrintPoolHTemp.setCustContactPhone(temps
+								.getContactPhone());// 电话
+						tnvoicePrintPoolHTemp.setCustDepositBankName(temps
+								.getCustDepositBankName());// 开户行
+						tnvoicePrintPoolHTemp.setCustDepositBankNumber(temps
+								.getCustDepositBankNumber());// 开户行编号
+						// 6222208111014503024
+						if (temps.getCustDepositBankAccountNum() != null) {
+							tnvoicePrintPoolHTemp
+									.setCustDepositBankAccountNum(temps
+											.getCustDepositBankAccountNum());// 银行账号
+						} else {
+							tnvoicePrintPoolHTemp
+									.setCustDepositBankAccountNum("6222208111014503024");
 						}
-						else {
-							tnvoicePrintPoolHTemp.setCustDepositBankAccountNum("6222208111014503024");
-						}
-						tnvoicePrintPoolHTemp.setCustRegistrationNumber(temps.getCustRegistrationNumber());//证件编号
-						tnvoicePrintPoolHTemp.setCustContactName(temps.getContactName());//联系人
+						tnvoicePrintPoolHTemp.setCustRegistrationNumber(temps
+								.getCustRegistrationNumber());// 证件编号
+						tnvoicePrintPoolHTemp.setCustContactName(temps
+								.getContactName());// 联系人
 						String uuId = IdGenerator.getUUID();
 						tnvoicePrintPoolHTemp.setInvoicePrintStatus("10");// 待打印
-						tnvoicePrintPoolHTemp.setInvoicePrintDate(new Date());// 发票打印日期
+					//	tnvoicePrintPoolHTemp.setInvoicePrintDate(new Date());// 发票打印日期
 						tnvoicePrintPoolHTemp.setId(uuId);// ID uuid
-						tnvoicePrintPoolHTemp.setCrvatInvoicePreHId(ContextUtils
-								.getCurrentOrgId());// 发票打印需要参数
-						if ("1".equals(temps.getCustomerType())) {
-							tnvoicePrintPoolHTemp.setInvoiceCategory("1");// 一般纳税人
+						tnvoicePrintPoolHTemp
+								.setCrvatInvoicePreHId(ContextUtils
+										.getCurrentOrgId());// 发票打印需要参数
+						if ("1".equals(temps.getCustLegalEntityType())&&("3".equals(temps.getInvoiceCategories()))) {
+							tnvoicePrintPoolHTemp.setInvoiceCategory("2");// 专票逻辑纳税人身份是一般纳税人 而且涉税交易类型是专票
 						} else {
-							tnvoicePrintPoolHTemp.setInvoiceCategory("2");// 小规模纳税人
+							tnvoicePrintPoolHTemp.setInvoiceCategory("1");// 普票
 						}
 						tnvoicePrintPoolHTemp.setTotalAmount(tempBigDecimal);
 						tnvoicePrintPoolHTemp.setArchiveBaseDate(new Date());
-						tnvoicePrintPoolHTemp.setBizOrgCode(tmsMdLegalEntity.getBizOrgCode());
+						tnvoicePrintPoolHTemp.setBizOrgCode(tmsMdLegalEntity
+								.getBizOrgCode());
 						tnvoicePrintPoolHTemp.setInvoicePrintBy(ContextUtils
 								.getCurrentUserName());// 发票开具人
 						tnvoicePrintPoolHTemp.setCreatedBy(ContextUtils
@@ -395,65 +570,90 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 								.getCurrentUserName());
 						tnvoicePrintPoolHTemp.setModifiedDate(new Date());
 						tnvoicePrintPoolHTemp.setVersionId(0);
-						tmsCrvatInvReqBatchesLService.save(tnvoicePrintPoolHTemp);
-					//	invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
+						tmsCrvatInvReqBatchesLService
+								.save(tnvoicePrintPoolHTemp);
+						// invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
 						invoicePrintPoolLTemp.setId(IdGenerator.getUUID());
-						invoicePrintPoolLTemp.setIsTax(temps.getIsTax());//是否含税
+						invoicePrintPoolLTemp.setIsTax(temps.getIsTax());// 是否含税
 						invoicePrintPoolLTemp.setPriceOfUnit(tempBigDecimal);// 单价
 						invoicePrintPoolLTemp.setInvoicePrtPoolHId(uuId);// H ID
 						invoicePrintPoolLTemp.setInvoiceAmount(tempBigDecimal);// 发票打印池行数据和头数据一对一
 						BigDecimal taxRate = new BigDecimal(temps.getTaxRate());// 税率
 						invoicePrintPoolLTemp.setTaxRate(taxRate);// 税额
-						Double vatAmountDouble  =taxRate.doubleValue()*tempBigDecimal.doubleValue();
-						BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
-						invoicePrintPoolLTemp.setVatAmount(vatAmount);//税额
-						//invoicePrintPoolLTemp.setVatAmount(totalAmount);
+//						Double vatAmountDouble = taxRate.doubleValue()
+//								* tempBigDecimal.doubleValue();
+//						BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+//						invoicePrintPoolLTemp.setVatAmount(vatAmount);// 税额
+						if ("1".equals(temps.getIsTax())) {
+							double tempAmount = tempBigDecimal.doubleValue() / 1.06;
+							tempAmount = tempAmount * taxRate.doubleValue();
+							BigDecimal vatAmount = new BigDecimal(tempAmount);
+							invoicePrintPoolLTemp.setVatAmount(vatAmount);// 税额
+							BigDecimal acctdAmountCR = new BigDecimal(
+									tempBigDecimal.doubleValue()
+											- vatAmount.doubleValue());
+							invoicePrintPoolLTemp.setAcctdAmountCR(acctdAmountCR);//净额
+							// 含税 金额等于 金额减去 税额
+						} else {
+							// 不含税 金额等于金额
+							invoicePrintPoolLTemp.setAcctdAmountCR(tempBigDecimal);//净额
+							 Double vatAmountDouble
+							 =taxRate.doubleValue()*tempBigDecimal.doubleValue();
+							 BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+							 invoicePrintPoolLTemp.setVatAmount(vatAmount);//税额
+						}
+						// invoicePrintPoolLTemp.setVatAmount(totalAmount);
 						String bizOrgCode = temps.getBizOrgCode();//
-					//	invoicePrintPoolLTemp.setBizOrgCode(bizOrgCode);
+						// invoicePrintPoolLTemp.setBizOrgCode(bizOrgCode);
 						String inventoryNumber = temps.getInventoryItemNumber();
 						invoicePrintPoolLTemp
 								.setInventoryItemNumber(inventoryNumber);// 商品及服务编码
 						invoicePrintPoolLTemp.setInventoryItemQty(1);// 商品数量默认是1
 						invoicePrintPoolLTemp.setInventoryItemDescripton(temps
 								.getInventoryItemDescripton());
-						invoicePrintPoolLTemp.setInventoryItemId(temps.getInventoryItemId());//商品及服务ID
+						invoicePrintPoolLTemp.setInventoryItemId(temps
+								.getInventoryItemId());// 商品及服务ID
 						invoicePrintPoolLTemp.setArchiveBaseDate(new Date());
-						invoicePrintPoolLTemp.setBizOrgCode(tmsMdLegalEntity.getBizOrgCode());
+						invoicePrintPoolLTemp.setBizOrgCode(tmsMdLegalEntity
+								.getBizOrgCode());
 						invoicePrintPoolLTemp.setCreatedBy(ContextUtils
 								.getCurrentUserName());
 						invoicePrintPoolLTemp.setCreateDate(new Date());
-					
+
 						invoicePrintPoolLTemp.setModifiedBy(ContextUtils
 								.getCurrentUserName());
 						invoicePrintPoolLTemp.setModifiedDate(new Date());
 						invoicePrintPoolLTemp.setVersionId(0);// crvatInvReqBatchesLId
 						invoicePrintPoolLTemp.setCrvatInvReqBatchesLId(temps
 								.getId());
-						tmsCrvatInvReqBatchesLService.save(invoicePrintPoolLTemp);
-					//	invoicePrintPoolLs.add(invoicePrintPoolLTemp);
+						tmsCrvatInvReqBatchesLService
+								.save(invoicePrintPoolLTemp);
+						// invoicePrintPoolLs.add(invoicePrintPoolLTemp);
 					}
 				}
-			
+
 			}
-			if(tmsCrvatInvReqBatchesL.size()>0)
-			{
-				tmsCrvatInvReqBatchesHNeedToUpdate=(TmsCrvatInvReqBatchesH) tmsCrvatInvReqBatchesLService.findById(TmsCrvatInvReqBatchesH.class, tmsCrvatInvReqBatchesL.get(0).getCrvatInvReqBatchesHId());
-				tmsCrvatInvReqBatchesHNeedToUpdate.setStatus("50");//已经拆分完成的数据更新
-				tmsCrvatInvReqBatchesLService.update(tmsCrvatInvReqBatchesHNeedToUpdate);
+			if (tmsCrvatInvReqBatchesL.size() > 0) {
+				tmsCrvatInvReqBatchesHNeedToUpdate = (TmsCrvatInvReqBatchesH) tmsCrvatInvReqBatchesLService
+						.findById(TmsCrvatInvReqBatchesH.class,
+								tmsCrvatInvReqBatchesL.get(0)
+										.getCrvatInvReqBatchesHId());
+				tmsCrvatInvReqBatchesHNeedToUpdate.setStatus("50");// 已经拆分完成的数据更新
+				tmsCrvatInvReqBatchesLService
+						.update(tmsCrvatInvReqBatchesHNeedToUpdate);
 			}
-		}
-		
-	
-		JSONObject object = new JSONObject();
-		object.put("result", "true");
-		object.put("success", "true");
-		retJson(response, object);
-		
-//		tmsCrvatInvReqBatchesLService.saveAll(invoicePrintPoolHlist);
-//		tmsCrvatInvReqBatchesLService.saveAll(invoicePrintPoolLs);
+		//}
+
+//		JSONObject object = new JSONObject();
+//		object.put("result", "true");
+//		object.put("success", "true");
+//		retJson(response, object);
+
+		// tmsCrvatInvReqBatchesLService.saveAll(invoicePrintPoolHlist);
+		// tmsCrvatInvReqBatchesLService.saveAll(invoicePrintPoolLs);
 	}
 
-	public long function(BigDecimal bigDecimal) {
+	public long function(BigDecimal bigDecimal, long limitAmountLong) {
 
 		BigDecimal comBigDecimal = new BigDecimal(9999999);
 		// List<Integer> bigDecimalList =new Arrayist<Integer>();
@@ -463,8 +663,555 @@ public class TmsCrvatInvReqBatchesLController extends BaseController {
 			return 0;
 		} else {
 			bigDecimalIntValue = bigDecimal.longValue();
-			return bigDecimalIntValue / 9999999;
+			return bigDecimalIntValue / limitAmountLong;
 		}
+	}
+	
+	public void batchSaveTmsCrvatInvReqBatchesLToPrintPoolByAcount(String clientId)
+			throws Exception {
+		//for (String clientId : clientKeys.split(",")) {// 根据ID拆分批量审批
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("crvatInvReqBatchesHId", clientId);// 根据特殊批量开票申请ID 查询 行数据
+			// params.put("status", "30");//30 代表已经提交 50 代表已经审批
+			List<TmsCrvatInvReqBatchesLInParam> tmsCrvatInvReqBatchesL = new ArrayList<TmsCrvatInvReqBatchesLInParam>();
+
+			tmsCrvatInvReqBatchesL = tmsCrvatInvReqBatchesLService
+					.findTmsCrvatInvReqBatchesLByParams(params);
+			// List<InvoicePrintPoolH> invoicePrintPoolHlist = new
+			// ArrayList<InvoicePrintPoolH>();
+			// List<InvoicePrintPoolL> invoicePrintPoolLs = new
+			// ArrayList<InvoicePrintPoolL>();
+			Iterator iterator = tmsCrvatInvReqBatchesL.listIterator();
+			InvoicePrintPoolH tnvoicePrintPoolHTemp = new InvoicePrintPoolH();
+			InvoicePrintPoolL invoicePrintPoolLTemp = new InvoicePrintPoolL();
+			TmsCrvatInvReqBatchesH tmsCrvatInvReqBatchesHNeedToUpdate = new TmsCrvatInvReqBatchesH();
+			while (iterator.hasNext()) {
+				TmsCrvatInvReqBatchesLInParam temps = (TmsCrvatInvReqBatchesLInParam) iterator
+						.next();
+				if("false".equals(temps.getAttribute4()))
+				{
+					continue;
+				}
+				BigDecimal totalAmount = temps.getInvoiceAmount();// 金额
+				String legalEntityID = temps.getLegalEntityId();
+				Map<String, Object> legalEntityInvoiceMap = new HashMap<String, Object>();
+				legalEntityInvoiceMap.put("legalEntityId", legalEntityID);// legalEntityId
+				List<TmsMdLegalInvoiceInParam> tmsMdLegalInvoiceList = (List<TmsMdLegalInvoiceInParam>) tmsMdLegalInvoiceService
+						.findTmsMdLegalInvoiceByParams(legalEntityInvoiceMap);
+				TmsMdLegalInvoice tmsMdLegalInvoiceTemp = new TmsMdLegalInvoice();//发票限额
+				Long limitAmountLong = 9999999l;
+				if (tmsMdLegalInvoiceList != null) {
+					tmsMdLegalInvoiceTemp = tmsMdLegalInvoiceList.get(0);
+					limitAmountLong = tmsMdLegalInvoiceTemp
+							.getInvoiceLimitAmountValue();// 纳税实体对应的发票限额
+				}
+				long loopTimes = function(totalAmount, limitAmountLong);
+				if (loopTimes == 0) {
+					String invoiceReqNumber = temps.getCrvatInvoiceReqNumber();// 申请单编号
+					tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);// 约定
+																			// attribute
+																			// 1
+																			// 是申请单号
+					tnvoicePrintPoolHTemp.setAttribute2("SP");//数据来源 特殊开票
+					String orgId = temps.getOrgId();// 组织编号
+					tnvoicePrintPoolHTemp.setAttribute3(orgId);//组织ID
+					tnvoicePrintPoolHTemp.setAttribute4(temps.getOrgCode());//组织编号
+					tnvoicePrintPoolHTemp.setAttribute5(temps.getOrgName());//组织名称
+					tnvoicePrintPoolHTemp.setPayee(temps.getCreatedBy());//收款人 ==创建人
+					tnvoicePrintPoolHTemp.setChecker(temps.getApprovalBy());//最后审批人 == 复核人
+					TmsMdEquipment tmsMdEquipment = invoiceSpecialContractServiceImpli
+							.getTmsMdEquipment(temps.getLegalEntityId());// 查询终端信息
+					// 销售方信息
+					TmsMdLegalEntity tmsMdLegalEntity = (TmsMdLegalEntity) invoiceSpecialContractServiceImpli
+							.findById(TmsMdLegalEntity.class,
+									temps.getLegalEntityId());
+					tnvoicePrintPoolHTemp.setLegalEntityCode(tmsMdLegalEntity
+							.getLegalEntityCode());// 销方纳税人编码
+					tnvoicePrintPoolHTemp.setLegalEntityName(tmsMdLegalEntity
+							.getLegalEntityName());// 销方纳税名称
+					tnvoicePrintPoolHTemp.setLegalEntityId(tmsMdLegalEntity
+							.getId());// 销方纳税人ID
+					tnvoicePrintPoolHTemp.setBankAccountNum(tmsMdLegalEntity
+							.getBankAccountNum());// 销方开户银行账号
+					tnvoicePrintPoolHTemp.setBankBranchName(tmsMdLegalEntity
+							.getBankBranchName());// 销方开户银行
+					tnvoicePrintPoolHTemp
+							.setRegistrationContactPhone(tmsMdLegalEntity
+									.getRegistrationContactPhone());// 销方地址联系电话
+					tnvoicePrintPoolHTemp
+							.setRegistrationContactAddress(tmsMdLegalEntity
+									.getRegistrationContactAddress());// 销方地址
+					// 终端名称
+					tnvoicePrintPoolHTemp.setEquipmentName(tmsMdEquipment
+							.getEquipmentName());
+					// 终端ID
+					tnvoicePrintPoolHTemp
+							.setEquipmentId(tmsMdEquipment.getId());
+					tnvoicePrintPoolHTemp.setEquipmentCode(tmsMdEquipment
+							.getEquipmentCode());
+					String customerName = temps.getCustomerName();// 客户信息
+					tnvoicePrintPoolHTemp.setCustomerName(customerName);//
+					tnvoicePrintPoolHTemp.setCustomerId(temps.getCustomerId());
+					tnvoicePrintPoolHTemp.setCustRegistrationAddress(temps
+							.getCustRegistrationAddress());// 地址
+					String customerNumber = temps.getCustomerNumber();// 客户编号
+					tnvoicePrintPoolHTemp.setCustomerNumber(customerNumber);
+					tnvoicePrintPoolHTemp.setCustContactPhone(temps
+							.getContactPhone());// 购方电话
+					tnvoicePrintPoolHTemp.setCustDepositBankName(temps
+							.getCustDepositBankName());// 开户行
+					tnvoicePrintPoolHTemp.setCustDepositBankNumber(temps
+							.getCustDepositBankNumber());// 开户行编号
+					// 6222208111014503024
+					if (temps.getCustDepositBankAccountNum() != null) {
+						tnvoicePrintPoolHTemp
+								.setCustDepositBankAccountNum(temps
+										.getCustDepositBankAccountNum());// 银行账号
+					} else {
+						tnvoicePrintPoolHTemp
+								.setCustDepositBankAccountNum("6222208111014503024");
+					}
+					tnvoicePrintPoolHTemp.setCustRegistrationNumber(temps
+							.getCustRegistrationNumber());// 证件编号
+					tnvoicePrintPoolHTemp.setCustContactName(temps
+							.getContactName());// 购方联系人
+					String uuId = IdGenerator.getUUID();
+					tnvoicePrintPoolHTemp.setInvoicePrintStatus("10");// 待打印
+					tnvoicePrintPoolHTemp.setId(uuId);// ID uuid
+					tnvoicePrintPoolHTemp.setCrvatInvoicePreHId(ContextUtils
+							.getCurrentOrgId());// 发票打印需要ID不可以为空
+					tnvoicePrintPoolHTemp.setTotalAmount(totalAmount);
+					tnvoicePrintPoolHTemp.setArchiveBaseDate(new Date());
+					tnvoicePrintPoolHTemp.setBizOrgCode(tmsMdLegalEntity
+							.getBizOrgCode());
+					tnvoicePrintPoolHTemp.setInvoicePrintBy(ContextUtils
+							.getCurrentUserName());// 发票开具人
+					tnvoicePrintPoolHTemp.setCreatedBy(ContextUtils
+							.getCurrentUserName());
+					tnvoicePrintPoolHTemp.setCreateDate(new Date());
+					tnvoicePrintPoolHTemp.setModifiedBy(ContextUtils
+							.getCurrentUserName());
+					tnvoicePrintPoolHTemp.setModifiedDate(new Date());
+					tnvoicePrintPoolHTemp.setVersionId(0);//
+					//tnvoicePrintPoolHTemp.setInvoicePrintDate(new Date());
+					if ("1".equals(temps.getCustLegalEntityType())&&("3".equals(temps.getInvoiceCategories()))) {
+						tnvoicePrintPoolHTemp.setInvoiceCategory("2");// 专票逻辑纳税人身份是一般纳税人 而且涉税交易类型是专票
+					} else {
+						tnvoicePrintPoolHTemp.setInvoiceCategory("1");// 普票
+					}
+					// ((TmsCrvatInvReqBatchesLInParam)temps).getCustomerType()="";
+					tnvoicePrintPoolHTemp.setInvoiceCategory("1");
+					// invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
+					tmsCrvatInvReqBatchesLService.save(tnvoicePrintPoolHTemp);
+					invoicePrintPoolLTemp.setId(IdGenerator.getUUID());
+					invoicePrintPoolLTemp.setIsTax(temps.getIsTax());// 是否含税
+
+					invoicePrintPoolLTemp.setInvoicePrtPoolHId(uuId);// H ID
+					invoicePrintPoolLTemp.setInvoiceAmount(totalAmount);// 发票金额
+																		// 发票打印池行数据和头数据一对一
+					BigDecimal taxRate = new BigDecimal(temps.getTaxRate());// 税率
+					invoicePrintPoolLTemp.setTaxRate(taxRate);// 税率
+					// Double vatAmountDouble
+					// =taxRate.doubleValue()*totalAmount.doubleValue();
+					// BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+					// invoicePrintPoolLTemp.setVatAmount(vatAmount);//税额
+
+					if ("1".equals(temps.getIsTax())) {
+						double tempAmount = totalAmount.doubleValue() / 1.06;
+						tempAmount = tempAmount * taxRate.doubleValue();
+						BigDecimal vatAmount = new BigDecimal(tempAmount);
+						invoicePrintPoolLTemp.setVatAmount(vatAmount);// 税额
+						BigDecimal acctdAmountCR = new BigDecimal(
+								totalAmount.doubleValue()
+										- vatAmount.doubleValue());
+						invoicePrintPoolLTemp.setAcctdAmountCR(acctdAmountCR);//净额
+						// 含税 金额等于 金额减去 税额
+					} else {
+						// 不含税 金额等于金额
+						invoicePrintPoolLTemp.setAcctdAmountCR(totalAmount);//净额
+						 Double vatAmountDouble
+						 =taxRate.doubleValue()*totalAmount.doubleValue();
+						 BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+						 invoicePrintPoolLTemp.setVatAmount(vatAmount);//税额
+					}
+					String bizOrgCode = temps.getBizOrgCode();//
+					// invoicePrintPoolLTemp.setBizOrgCode(bizOrgCode);
+					String inventoryNumber = temps.getInventoryItemNumber();
+					invoicePrintPoolLTemp
+							.setInventoryItemNumber(inventoryNumber);// 商品及服务编码
+					invoicePrintPoolLTemp.setInventoryItemDescripton(temps
+							.getInventoryItemDescripton());// 商品及服务名称
+					invoicePrintPoolLTemp.setInventoryItemId(temps
+							.getInventoryItemId());// 商品及服务ID
+					invoicePrintPoolLTemp.setArchiveBaseDate(new Date());
+					invoicePrintPoolLTemp.setPriceOfUnit(totalAmount);// 单价
+					invoicePrintPoolLTemp.setBizOrgCode(tmsMdLegalEntity
+							.getBizOrgCode());
+					invoicePrintPoolLTemp.setInventoryItemQty(1);// 商品数量默认是1
+					invoicePrintPoolLTemp.setCreatedBy(ContextUtils
+							.getCurrentUserName());
+					invoicePrintPoolLTemp.setCreateDate(new Date());
+					invoicePrintPoolLTemp.setModifiedBy(ContextUtils
+							.getCurrentUserName());
+					invoicePrintPoolLTemp.setModifiedDate(new Date());
+					invoicePrintPoolLTemp.setVersionId(0);// crvatInvReqBatchesLId
+					invoicePrintPoolLTemp.setCrvatInvReqBatchesLId(temps
+							.getId());
+					// invoicePrintPoolLs.add(invoicePrintPoolLTemp);
+					tmsCrvatInvReqBatchesLService.save(invoicePrintPoolLTemp);
+				} else {
+					for (int i = 0; i < loopTimes; i++) {
+
+						// int
+						BigDecimal tempBigDecimal = new BigDecimal(
+								limitAmountLong);
+						String invoiceReqNumber = temps
+								.getCrvatInvoiceReqNumber();// 申请单编号
+						String orgId = temps.getOrgId();// 组织编号
+						tnvoicePrintPoolHTemp.setAttribute3(orgId);//组织ID
+						tnvoicePrintPoolHTemp.setAttribute4(temps.getOrgCode());//组织编号
+						tnvoicePrintPoolHTemp.setAttribute5(temps.getOrgName());//组织名称
+						// 销售方信息
+						tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);// 约定
+																				// attribute
+																				// 1
+																				// 是申请单号
+						tnvoicePrintPoolHTemp.setAttribute2("SP");//数据来源 特殊开票
+						tnvoicePrintPoolHTemp.setPayee(temps.getCreatedBy());//收款人 ==创建人
+						tnvoicePrintPoolHTemp.setChecker(temps.getApprovalBy());//最后审批人 == 复核人
+						TmsMdLegalEntity tmsMdLegalEntity = (TmsMdLegalEntity) invoiceSpecialContractServiceImpli
+								.findById(TmsMdLegalEntity.class,
+										temps.getLegalEntityId());
+						tnvoicePrintPoolHTemp
+								.setLegalEntityCode(tmsMdLegalEntity
+										.getLegalEntityCode());// 销方纳税人编码
+						tnvoicePrintPoolHTemp
+								.setLegalEntityName(tmsMdLegalEntity
+										.getLegalEntityName());// 销方纳税名称
+						tnvoicePrintPoolHTemp.setLegalEntityId(tmsMdLegalEntity
+								.getId());// 销方纳税人ID
+						tnvoicePrintPoolHTemp
+								.setBankAccountNum(tmsMdLegalEntity
+										.getBankAccountNum());// 销方开户银行账号
+						tnvoicePrintPoolHTemp
+								.setBankBranchName(tmsMdLegalEntity
+										.getBankBranchName());// 销方开户银行
+						tnvoicePrintPoolHTemp
+								.setRegistrationContactPhone(tmsMdLegalEntity
+										.getRegistrationContactPhone());// 销方地址联系电话
+						tnvoicePrintPoolHTemp
+								.setRegistrationContactAddress(tmsMdLegalEntity
+										.getRegistrationContactAddress());// 销方地址
+						TmsMdEquipment tmsMdEquipment = invoiceSpecialContractServiceImpli
+								.getTmsMdEquipment(((TmsCrvatInvReqBatchesLInParam) temps)
+										.getLegalEntityId());// 查询终端信息
+						// 终端名称
+						tnvoicePrintPoolHTemp.setEquipmentName(tmsMdEquipment
+								.getEquipmentName());
+						// 终端ID
+						tnvoicePrintPoolHTemp.setEquipmentId(tmsMdEquipment
+								.getId());
+						tnvoicePrintPoolHTemp.setEquipmentCode(tmsMdEquipment
+								.getEquipmentCode());
+						String customerName = temps.getCustomerName();// 客户名称
+						tnvoicePrintPoolHTemp.setCustomerName(customerName);//
+						tnvoicePrintPoolHTemp.setCustomerId(temps
+								.getCustomerId());
+						String customerNumber = temps.getCustomerNumber();// 客户编号
+						tnvoicePrintPoolHTemp.setCustRegistrationAddress(temps
+								.getCustRegistrationAddress());// 地址
+						tnvoicePrintPoolHTemp.setCustContactPhone(temps
+								.getContactPhone());// 电话
+						tnvoicePrintPoolHTemp.setCustomerNumber(customerNumber);
+						tnvoicePrintPoolHTemp.setCustDepositBankName(temps
+								.getCustDepositBankName());// 开户行
+						tnvoicePrintPoolHTemp.setCustDepositBankNumber(temps
+								.getCustDepositBankNumber());// 开户行编号
+						// 6222208111014503024
+						if (temps.getCustDepositBankAccountNum() != null) {
+							tnvoicePrintPoolHTemp
+									.setCustDepositBankAccountNum(temps
+											.getCustDepositBankAccountNum());// 银行账号
+						} else {
+							tnvoicePrintPoolHTemp
+									.setCustDepositBankAccountNum("6222208111014503024");
+						}
+						tnvoicePrintPoolHTemp.setCustRegistrationNumber(temps
+								.getCustRegistrationNumber());// 证件编号
+						tnvoicePrintPoolHTemp.setCustContactName(temps
+								.getContactName());// 联系人
+						String uuId = IdGenerator.getUUID();
+						tnvoicePrintPoolHTemp.setInvoicePrintStatus("10");// 待打印
+						tnvoicePrintPoolHTemp.setId(uuId);// ID uuid
+						//tnvoicePrintPoolHTemp.setInvoicePrintDate(new Date());// 发票打印日期
+						if ("1".equals(temps.getCustLegalEntityType())&&("3".equals(temps.getInvoiceCategories()))) {
+							tnvoicePrintPoolHTemp.setInvoiceCategory("2");// 专票逻辑纳税人身份是一般纳税人 而且涉税交易类型是专票
+						} else {
+							tnvoicePrintPoolHTemp.setInvoiceCategory("1");// 普票
+						}
+						tnvoicePrintPoolHTemp
+								.setCrvatInvoicePreHId(ContextUtils
+										.getCurrentOrgId());// 发票打印需要参数
+						tnvoicePrintPoolHTemp.setTotalAmount(tempBigDecimal);
+						tnvoicePrintPoolHTemp.setArchiveBaseDate(new Date());
+						tnvoicePrintPoolHTemp.setBizOrgCode(tmsMdLegalEntity
+								.getBizOrgCode());
+						tnvoicePrintPoolHTemp.setCreatedBy(ContextUtils
+								.getCurrentUserName());
+						tnvoicePrintPoolHTemp.setCreateDate(new Date());
+						tnvoicePrintPoolHTemp.setModifiedBy(ContextUtils
+								.getCurrentUserName());
+						tnvoicePrintPoolHTemp.setModifiedDate(new Date());
+						tnvoicePrintPoolHTemp.setVersionId(0);
+						tmsCrvatInvReqBatchesLService
+								.save(tnvoicePrintPoolHTemp);
+						// invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
+						invoicePrintPoolLTemp.setId(IdGenerator.getUUID());
+						invoicePrintPoolLTemp.setIsTax(temps.getIsTax());// 是否含税
+						invoicePrintPoolLTemp.setInvoicePrtPoolHId(uuId);// H ID
+						invoicePrintPoolLTemp.setInvoiceAmount(tempBigDecimal);// 发票打印池行数据和头数据一对一
+						BigDecimal taxRate = new BigDecimal(temps.getTaxRate());// 税率
+						invoicePrintPoolLTemp.setTaxRate(taxRate);// 税率
+//						Double vatAmountDouble = taxRate.doubleValue()
+//								* tempBigDecimal.doubleValue();
+//						BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+//						invoicePrintPoolLTemp.setVatAmount(vatAmount);// 税额
+						if ("1".equals(temps.getIsTax())) {
+							double tempAmount = tempBigDecimal.doubleValue() / 1.06;
+							tempAmount = tempAmount * taxRate.doubleValue();
+							BigDecimal vatAmount = new BigDecimal(tempAmount);
+							invoicePrintPoolLTemp.setVatAmount(vatAmount);// 税额
+							BigDecimal acctdAmountCR = new BigDecimal(
+									tempBigDecimal.doubleValue()
+											- vatAmount.doubleValue());
+							invoicePrintPoolLTemp.setAcctdAmountCR(acctdAmountCR);//净额
+							// 含税 净额等于 金额减去 税额
+						} else {
+							// 不含税 净额等于金额 
+							invoicePrintPoolLTemp.setAcctdAmountCR(tempBigDecimal);//净额
+							 Double vatAmountDouble
+							 =taxRate.doubleValue()*tempBigDecimal.doubleValue();
+							 BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+							 invoicePrintPoolLTemp.setVatAmount(vatAmount);//税额
+						}
+						// invoicePrintPoolLTemp.setVatAmount(tempBigDecimal);
+						String bizOrgCode = temps.getBizOrgCode();//
+						// invoicePrintPoolLTemp.setBizOrgCode(bizOrgCode);
+
+						String inventoryNumber = temps.getInventoryItemNumber();
+						invoicePrintPoolLTemp
+								.setInventoryItemNumber(inventoryNumber);// 商品及服务编码
+						invoicePrintPoolLTemp.setInventoryItemQty(1);// 商品数量默认是1
+						invoicePrintPoolLTemp.setInventoryItemDescripton(temps
+								.getInventoryItemDescripton());
+						invoicePrintPoolLTemp.setInventoryItemId(temps
+								.getInventoryItemId());// 商品及服务ID
+						invoicePrintPoolLTemp.setArchiveBaseDate(new Date());
+						invoicePrintPoolLTemp.setBizOrgCode(tmsMdLegalEntity
+								.getBizOrgCode());
+						invoicePrintPoolLTemp.setPriceOfUnit(tempBigDecimal);// 单价
+						invoicePrintPoolLTemp.setCreatedBy(ContextUtils
+								.getCurrentUserName());
+						invoicePrintPoolLTemp.setCreateDate(new Date());
+						tnvoicePrintPoolHTemp.setInvoicePrintBy(ContextUtils
+								.getCurrentUserName());// 发票开具人
+						invoicePrintPoolLTemp.setModifiedBy(ContextUtils
+								.getCurrentUserName());
+						invoicePrintPoolLTemp.setModifiedDate(new Date());
+						invoicePrintPoolLTemp.setVersionId(0);// crvatInvReqBatchesLId
+						// BigDecimal taxRate
+						invoicePrintPoolLTemp.setCrvatInvReqBatchesLId(temps
+								.getId());
+						tmsCrvatInvReqBatchesLService
+								.save(invoicePrintPoolLTemp);
+						// invoicePrintPoolLs.add(invoicePrintPoolLTemp);
+					}
+					if ((totalAmount.doubleValue() - limitAmountLong
+							* loopTimes) > 0) {
+						BigDecimal tempBigDecimal = new BigDecimal(
+								totalAmount.doubleValue() - limitAmountLong
+										* loopTimes);
+						String invoiceReqNumber = temps
+								.getCrvatInvoiceReqNumber();// 申请单编号
+						tnvoicePrintPoolHTemp.setAttribute1(invoiceReqNumber);// 约定
+																				// attribute
+																				// 1
+																				// 是申请单号
+						tnvoicePrintPoolHTemp.setAttribute2("SP");//数据来源 特殊开票
+						tnvoicePrintPoolHTemp.setPayee(temps.getCreatedBy());//收款人 ==创建人
+						tnvoicePrintPoolHTemp.setChecker(temps.getApprovalBy());//最后审批人 == 复核人
+						String orgId = temps.getOrgId();// 组织编号
+						tnvoicePrintPoolHTemp.setAttribute3(orgId);//组织ID
+						tnvoicePrintPoolHTemp.setAttribute4(temps.getOrgCode());//组织编号
+						tnvoicePrintPoolHTemp.setAttribute5(temps.getOrgName());//组织名称
+						// 销售方信息
+						TmsMdLegalEntity tmsMdLegalEntity = (TmsMdLegalEntity) invoiceSpecialContractServiceImpli
+								.findById(TmsMdLegalEntity.class,
+										temps.getLegalEntityId());
+						tnvoicePrintPoolHTemp
+								.setLegalEntityCode(tmsMdLegalEntity
+										.getLegalEntityCode());// 销方纳税人编码
+						tnvoicePrintPoolHTemp
+								.setLegalEntityName(tmsMdLegalEntity
+										.getLegalEntityName());// 销方纳税名称
+						tnvoicePrintPoolHTemp.setLegalEntityId(tmsMdLegalEntity
+								.getId());// 销方纳税人ID
+						tnvoicePrintPoolHTemp
+								.setBankAccountNum(tmsMdLegalEntity
+										.getBankAccountNum());// 销方开户银行账号
+						tnvoicePrintPoolHTemp
+								.setBankBranchName(tmsMdLegalEntity
+										.getBankBranchName());// 销方开户银行
+						tnvoicePrintPoolHTemp
+								.setRegistrationContactPhone(tmsMdLegalEntity
+										.getRegistrationContactPhone());// 销方地址联系电话
+						tnvoicePrintPoolHTemp
+								.setRegistrationContactAddress(tmsMdLegalEntity
+										.getRegistrationContactAddress());// 销方地址
+						TmsMdEquipment tmsMdEquipment = invoiceSpecialContractServiceImpli
+								.getTmsMdEquipment(((TmsCrvatInvReqBatchesLInParam) temps)
+										.getLegalEntityId());// 查询终端信息
+						// 终端名称
+						tnvoicePrintPoolHTemp.setEquipmentName(tmsMdEquipment
+								.getEquipmentName());
+						// 终端ID
+						tnvoicePrintPoolHTemp.setEquipmentId(tmsMdEquipment
+								.getId());
+						tnvoicePrintPoolHTemp.setEquipmentCode(tmsMdEquipment
+								.getEquipmentCode());
+						String customerName = temps.getCustomerName();// 客户名称
+						tnvoicePrintPoolHTemp.setCustomerName(customerName);//
+						tnvoicePrintPoolHTemp.setCustomerId(temps
+								.getCustomerId());
+						String customerNumber = temps.getCustomerNumber();// 客户编号
+						tnvoicePrintPoolHTemp.setCustomerNumber(customerNumber);
+						tnvoicePrintPoolHTemp.setCustRegistrationAddress(temps
+								.getCustRegistrationAddress());// 地址
+						tnvoicePrintPoolHTemp.setCustContactPhone(temps
+								.getContactPhone());// 电话
+						tnvoicePrintPoolHTemp.setCustDepositBankName(temps
+								.getCustDepositBankName());// 开户行
+						tnvoicePrintPoolHTemp.setCustDepositBankNumber(temps
+								.getCustDepositBankNumber());// 开户行编号
+						// 6222208111014503024
+						if (temps.getCustDepositBankAccountNum() != null) {
+							tnvoicePrintPoolHTemp
+									.setCustDepositBankAccountNum(temps
+											.getCustDepositBankAccountNum());// 银行账号
+						} else {
+							tnvoicePrintPoolHTemp
+									.setCustDepositBankAccountNum("6222208111014503024");
+						}
+						tnvoicePrintPoolHTemp.setCustRegistrationNumber(temps
+								.getCustRegistrationNumber());// 证件编号
+						tnvoicePrintPoolHTemp.setCustContactName(temps
+								.getContactName());// 联系人
+						String uuId = IdGenerator.getUUID();
+						tnvoicePrintPoolHTemp.setInvoicePrintStatus("10");// 待打印
+					//	tnvoicePrintPoolHTemp.setInvoicePrintDate(new Date());// 发票打印日期
+						tnvoicePrintPoolHTemp.setId(uuId);// ID uuid
+						tnvoicePrintPoolHTemp
+								.setCrvatInvoicePreHId(ContextUtils
+										.getCurrentOrgId());// 发票打印需要参数
+						if ("1".equals(temps.getCustLegalEntityType())&&("3".equals(temps.getInvoiceCategories()))) {
+							tnvoicePrintPoolHTemp.setInvoiceCategory("2");// 专票逻辑纳税人身份是一般纳税人 而且涉税交易类型是专票
+						} else {
+							tnvoicePrintPoolHTemp.setInvoiceCategory("1");// 普票
+						}
+						tnvoicePrintPoolHTemp.setTotalAmount(tempBigDecimal);
+						tnvoicePrintPoolHTemp.setArchiveBaseDate(new Date());
+						tnvoicePrintPoolHTemp.setBizOrgCode(tmsMdLegalEntity
+								.getBizOrgCode());
+						tnvoicePrintPoolHTemp.setInvoicePrintBy(ContextUtils
+								.getCurrentUserName());// 发票开具人
+						tnvoicePrintPoolHTemp.setCreatedBy(ContextUtils
+								.getCurrentUserName());
+						tnvoicePrintPoolHTemp.setCreateDate(new Date());
+						tnvoicePrintPoolHTemp.setModifiedBy(ContextUtils
+								.getCurrentUserName());
+						tnvoicePrintPoolHTemp.setModifiedDate(new Date());
+						tnvoicePrintPoolHTemp.setVersionId(0);
+						tmsCrvatInvReqBatchesLService
+								.save(tnvoicePrintPoolHTemp);
+						// invoicePrintPoolHlist.add(tnvoicePrintPoolHTemp);
+						invoicePrintPoolLTemp.setId(IdGenerator.getUUID());
+						invoicePrintPoolLTemp.setIsTax(temps.getIsTax());// 是否含税
+						invoicePrintPoolLTemp.setPriceOfUnit(tempBigDecimal);// 单价
+						invoicePrintPoolLTemp.setInvoicePrtPoolHId(uuId);// H ID
+						invoicePrintPoolLTemp.setInvoiceAmount(tempBigDecimal);// 发票打印池行数据和头数据一对一
+						BigDecimal taxRate = new BigDecimal(temps.getTaxRate());// 税率
+						invoicePrintPoolLTemp.setTaxRate(taxRate);// 税额
+//						Double vatAmountDouble = taxRate.doubleValue()
+//								* tempBigDecimal.doubleValue();
+//						BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+//						invoicePrintPoolLTemp.setVatAmount(vatAmount);// 税额
+						if ("1".equals(temps.getIsTax())) {
+							double tempAmount = tempBigDecimal.doubleValue() / 1.06;
+							tempAmount = tempAmount * taxRate.doubleValue();
+							BigDecimal vatAmount = new BigDecimal(tempAmount);
+							invoicePrintPoolLTemp.setVatAmount(vatAmount);// 税额
+							BigDecimal acctdAmountCR = new BigDecimal(
+									tempBigDecimal.doubleValue()
+											- vatAmount.doubleValue());
+							invoicePrintPoolLTemp.setAcctdAmountCR(acctdAmountCR);//净额
+							// 含税 金额等于 金额减去 税额
+						} else {
+							// 不含税 金额等于金额
+							invoicePrintPoolLTemp.setAcctdAmountCR(tempBigDecimal);//净额
+							 Double vatAmountDouble
+							 =taxRate.doubleValue()*tempBigDecimal.doubleValue();
+							 BigDecimal vatAmount = new BigDecimal(vatAmountDouble);
+							 invoicePrintPoolLTemp.setVatAmount(vatAmount);//税额
+						}
+						// invoicePrintPoolLTemp.setVatAmount(totalAmount);
+						String bizOrgCode = temps.getBizOrgCode();//
+						// invoicePrintPoolLTemp.setBizOrgCode(bizOrgCode);
+						String inventoryNumber = temps.getInventoryItemNumber();
+						invoicePrintPoolLTemp
+								.setInventoryItemNumber(inventoryNumber);// 商品及服务编码
+						invoicePrintPoolLTemp.setInventoryItemQty(1);// 商品数量默认是1
+						invoicePrintPoolLTemp.setInventoryItemDescripton(temps
+								.getInventoryItemDescripton());
+						invoicePrintPoolLTemp.setInventoryItemId(temps
+								.getInventoryItemId());// 商品及服务ID
+						invoicePrintPoolLTemp.setArchiveBaseDate(new Date());
+						invoicePrintPoolLTemp.setBizOrgCode(tmsMdLegalEntity
+								.getBizOrgCode());
+						invoicePrintPoolLTemp.setCreatedBy(ContextUtils
+								.getCurrentUserName());
+						invoicePrintPoolLTemp.setCreateDate(new Date());
+
+						invoicePrintPoolLTemp.setModifiedBy(ContextUtils
+								.getCurrentUserName());
+						invoicePrintPoolLTemp.setModifiedDate(new Date());
+						invoicePrintPoolLTemp.setVersionId(0);// crvatInvReqBatchesLId
+						invoicePrintPoolLTemp.setCrvatInvReqBatchesLId(temps
+								.getId());
+						tmsCrvatInvReqBatchesLService
+								.save(invoicePrintPoolLTemp);
+						// invoicePrintPoolLs.add(invoicePrintPoolLTemp);
+					}
+				}
+
+			}
+			if (tmsCrvatInvReqBatchesL.size() > 0) {
+				tmsCrvatInvReqBatchesHNeedToUpdate = (TmsCrvatInvReqBatchesH) tmsCrvatInvReqBatchesLService
+						.findById(TmsCrvatInvReqBatchesH.class,
+								tmsCrvatInvReqBatchesL.get(0)
+										.getCrvatInvReqBatchesHId());
+				tmsCrvatInvReqBatchesHNeedToUpdate.setStatus("50");// 已经拆分完成的数据更新
+				tmsCrvatInvReqBatchesLService
+						.update(tmsCrvatInvReqBatchesHNeedToUpdate);
+			}
+		//}
+
+//		JSONObject object = new JSONObject();
+//		object.put("result", "true");
+//		object.put("success", "true");
+//		retJson(response, object);
+
+		// tmsCrvatInvReqBatchesLService.saveAll(invoicePrintPoolHlist);
+		// tmsCrvatInvReqBatchesLService.saveAll(invoicePrintPoolLs);
 	}
 
 	@ResponseBody

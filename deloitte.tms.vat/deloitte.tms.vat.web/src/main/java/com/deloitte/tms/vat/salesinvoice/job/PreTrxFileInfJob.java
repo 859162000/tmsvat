@@ -40,6 +40,7 @@ import com.deloitte.tms.pl.core.commons.utils.FileUtils;
 import com.deloitte.tms.pl.core.commons.utils.StringUtils;
 import com.deloitte.tms.pl.job.task.JobTest;
 import com.deloitte.tms.vat.salesinvoice.common.StringPool;
+import com.deloitte.tms.vat.salesinvoice.fileutils.DataUtils;
 import com.deloitte.tms.vat.salesinvoice.fileutils.JobDateUtils;
 import com.deloitte.tms.vat.salesinvoice.fileutils.JobFileUtils;
 import com.deloitte.tms.vat.salesinvoice.jobs.dao.TmsCrvatTrxInfDao;
@@ -132,45 +133,14 @@ public class PreTrxFileInfJob implements Job, JobTest {
 		mapFile.put("trigFilePath", JobFileUtils.genTriggerFile(filePath));// 生成触发文件
 		mapFile.put("filePath", filePath);
 		mapFile.put("fileOutPath", fileOutPath);
-		List<TmsCrvatTrxInf> allTmsCrvatTrxInfs = processTmsCrvatTrxInf(mapFile, file);
-		
-		int totalnum=allTmsCrvatTrxInfs.size();
-		
-		/*****************************开始批量处理用户数据**************************/
-		int pageIndex=0;
-		int pageSize=2000;
-		int totalsucess=0;
-		List<TmsCrvatTrxInf> batchTmsCrvatTrxInfs=new ArrayList<TmsCrvatTrxInf>();
-		Long totalsapstart = System.currentTimeMillis();		
-		for (TmsCrvatTrxInf trxinf : allTmsCrvatTrxInfs) {
-			if(pageIndex<pageSize){
-				batchTmsCrvatTrxInfs.add(trxinf);
-				pageIndex++;
-			}else{
-				batchTmsCrvatTrxInfs.add(trxinf);
-				int sucessnum = fileProcessJob.processSaveTmsCrvatTrxInf(batchTmsCrvatTrxInfs);
-				//重置计数器
-				totalsucess=totalsucess+sucessnum;
-				batchTmsCrvatTrxInfs=new ArrayList<TmsCrvatTrxInf>();					
-				pageIndex=0;
-			}
-		}
-		//末尾数据处理
-		int sucessnum = fileProcessJob.processSaveTmsCrvatTrxInf(batchTmsCrvatTrxInfs);
-		
-		totalsucess=totalsucess+sucessnum;
-		//处理合计输出
-		log.info("PreTrxFileInfJob "+totalnum+" data costs:："
-				+ (System.currentTimeMillis() - totalsapstart) + " ms"
-				+" sucess:"+totalsucess+"fail:"+(totalnum-totalsucess));
-		/***************************** end 批量处理用户数据**************************/
+		int postnum = processTmsCrvatTrxInf(mapFile, file);
 		
 		int postFileErrCount = processAllFiles(mapFile);
 
-		if (validateResult(totalnum-totalsucess, postFileErrCount, convertErrCount, processErrCount)) {
-			throw new BusinessException(sbError.toString());
-			//System.out.print(sbError.toString());
-		}
+//		if (validateResult(postnum-totalsucess, postFileErrCount, convertErrCount, processErrCount)) {
+//			throw new BusinessException(sbError.toString());
+//			//System.out.print(sbError.toString());
+//		}
 
 		return allCount;
 	}
@@ -237,16 +207,24 @@ public class PreTrxFileInfJob implements Job, JobTest {
 	 * @since [产品/模块版本] （可选）
 	 */
 
-	private List<TmsCrvatTrxInf> processTmsCrvatTrxInf(Map<String, String> mapFile, File file) {
-
+	private int processTmsCrvatTrxInf(Map<String, String> mapFile, File file) {
+		log.info("*******************beg read preTrxFileInfJob file ******************** ");
+		Long totalsapstart = System.currentTimeMillis();
+		
+		int postnum=0;
+		int errocount=0;
+		int totalsucess=0;
+		
+		int pageIndex=0;
+		int pageSize=2000;
+		
 		String lineTxt = null;// 一行字符串定义
 		InputStreamReader read = null;
 		BufferedReader br = null;
 		FileWriter fw = null;
 		BufferedWriter bw = null;
 		TmsCrvatTrxInf tmsCrvatTrxInf = new TmsCrvatTrxInf();
-		List<TmsCrvatTrxInf> list = new ArrayList<TmsCrvatTrxInf>();
-
+		List<TmsCrvatTrxInf> batchTmsCrvatTrxInfs = new ArrayList<TmsCrvatTrxInf>();
 		try {
 			read = new InputStreamReader(new FileInputStream(file), StringPool.UTF8_ENCODING);
 			br = new BufferedReader(read);
@@ -254,28 +232,87 @@ public class PreTrxFileInfJob implements Job, JobTest {
 			bw = new BufferedWriter(fw);
 
 			while ((lineTxt = br.readLine()) != null) {
+				postnum++;
 				tmsCrvatTrxInf = convertToEntity(lineTxt);
 				if (tmsCrvatTrxInf != null) {
 					tmsCrvatTrxInf.setInterfaceTrxDate(new Date());// 接口处理日期
 					tmsCrvatTrxInf.setInterfaceTrxFlag(StringPool.READY);// 接口处理标记
 					tmsCrvatTrxInf.setInterfaceTrxMsg(mapFile.get("doneFilePath") + "_" + allCount);// 接口处理信息存放处理文件名+第几批
-					list.add(tmsCrvatTrxInf);
+					if(pageIndex<pageSize){
+						batchTmsCrvatTrxInfs.add(tmsCrvatTrxInf);
+						pageIndex++;
+					}else{
+						batchTmsCrvatTrxInfs.add(tmsCrvatTrxInf);
+						int sucessnum = fileProcessJob.processSaveTmsCrvatTrxInf(batchTmsCrvatTrxInfs);
+						//重置计数器
+						totalsucess=totalsucess+sucessnum;
+						batchTmsCrvatTrxInfs=new ArrayList<TmsCrvatTrxInf>();					
+						pageIndex=0;
+					}
 				}
 				bw.append(lineTxt + "\n");
-				allCount++;
 			}
-			bw.close();
-			fw.close();
-			br.close();
-			read.close();
+			//末尾数据处理
+			int sucessnum = fileProcessJob.processSaveTmsCrvatTrxInf(batchTmsCrvatTrxInfs);
+			totalsucess=totalsucess+sucessnum;
+			
+			FileUtils.safeClose(bw);
+			FileUtils.safeClose(fw);
+			FileUtils.safeClose(br);
+			FileUtils.safeClose(read);
 		} catch (Exception e) {
-			errInfo.append(e.getMessage());
-			errInfo.append("\n");
-			processErrCount++;
+			errocount++;
+			log.error("process preTrxFileInfJob line erro:"+lineTxt+ "erro info:"+e.getMessage());
+			e.printStackTrace();
 		}
-		return list;
+		//处理合计输出
+		log.info("preTrxFileInfJob postnum num :"+postnum);
+		log.info("sucess process preTrxFileInfJob:"+totalsucess);
+		log.info("fail process preTrxFileInfJob:"+errocount);
+		log.info("costs: " + (System.currentTimeMillis() - totalsapstart) + " ms");
+		log.info("*******************end read preTrxFileInfJob file ******************** ");
+		return postnum;		
 	}
-
+	
+//	public int processItem(){
+//		int totalnum=allTmsCrvatTrxInfs.size();
+//		
+//		/*****************************开始批量处理用户数据**************************/
+//		int pageIndex=0;
+//		int pageSize=2000;
+//		int totalsucess=0;
+//		List<TmsCrvatTrxInf> batchTmsCrvatTrxInfs=new ArrayList<TmsCrvatTrxInf>();
+//		Long totalsapstart = System.currentTimeMillis();		
+//		for (TmsCrvatTrxInf trxinf : allTmsCrvatTrxInfs) {
+//			if(pageIndex<pageSize){
+//				batchTmsCrvatTrxInfs.add(trxinf);
+//				pageIndex++;
+//			}else{
+//				batchTmsCrvatTrxInfs.add(trxinf);
+//				int sucessnum = fileProcessJob.processSaveTmsCrvatTrxInf(batchTmsCrvatTrxInfs);
+//				//重置计数器
+//				totalsucess=totalsucess+sucessnum;
+//				batchTmsCrvatTrxInfs=new ArrayList<TmsCrvatTrxInf>();					
+//				pageIndex=0;
+//			}
+//		}
+//		//末尾数据处理
+//		int sucessnum = fileProcessJob.processSaveTmsCrvatTrxInf(batchTmsCrvatTrxInfs);
+//		
+//		totalsucess=totalsucess+sucessnum;
+//		//处理合计输出
+//		log.info("PreTrxFileInfJob "+totalnum+" data costs:："
+//				+ (System.currentTimeMillis() - totalsapstart) + " ms"
+//				+" sucess:"+totalsucess+"fail:"+(totalnum-totalsucess));
+//		/***************************** end 批量处理用户数据**************************/
+//		
+//		int postFileErrCount = processAllFiles(mapFile);
+//
+//		if (validateResult(totalnum-totalsucess, postFileErrCount, convertErrCount, processErrCount)) {
+//			throw new BusinessException(sbError.toString());
+//			//System.out.print(sbError.toString());
+//		}
+//	}
 	/**
 	 * 处理后续文件
 	 * 
@@ -342,36 +379,37 @@ public class PreTrxFileInfJob implements Job, JobTest {
 			tmsCrvatTrxInf.setTaxRate(Double.valueOf(StringUtils.trim(splitLineTxt[11])));// 税率
 			tmsCrvatTrxInf.setInvoiceCategory(StringUtils.trim(splitLineTxt[12])); // 交易开票规则
 			tmsCrvatTrxInf.setDeptId(StringUtils.trim(splitLineTxt[13])); // 部门
-			tmsCrvatTrxInf.setInventoryItemNumber(StringUtils.trim(splitLineTxt[14])); // 商品及服务分类编码货物或应税劳务名称
+			tmsCrvatTrxInf.setInventoryItemNumber(DataUtils.getNumeric(StringUtils.trim(splitLineTxt[14]))); // 商品及服务分类编码货物或应税劳务名称
 			tmsCrvatTrxInf.setInventoryItemDescripton(StringUtils.trim(splitLineTxt[14])); // 商品及服务分类编码货物或应税劳务名称
 			tmsCrvatTrxInf.setInventoryItemModels(StringUtils.trim(splitLineTxt[15]));
 			tmsCrvatTrxInf.setUomCode(StringUtils.trim(splitLineTxt[16]));
 			tmsCrvatTrxInf.setInventoryItemQty(Integer.valueOf(StringUtils.trim(splitLineTxt[17]))); // 数量
 			tmsCrvatTrxInf.setPriceOfUnit(Double.valueOf(StringUtils.trim(splitLineTxt[18])));// 单价
 			tmsCrvatTrxInf.setCustomerAccount(StringUtils.trim(splitLineTxt[19]));// 客户账号
-			//tmsCrvatTrxInf.setCustomerAccountLeCode(StringUtils.trim(splitLineTxt[20]));//客户账号开户机构号
-			tmsCrvatTrxInf.setCustomerNumber(StringUtils.trim(splitLineTxt[20])); // 客户号
-			tmsCrvatTrxInf.setCustomerName(StringUtils.trim(splitLineTxt[21]));// 客户名称
-			tmsCrvatTrxInf.setCustomerType(StringUtils.trim(splitLineTxt[22]));// 客户类型
-			tmsCrvatTrxInf.setLegalEntityType(StringUtils.trim(splitLineTxt[23]));// 纳税人类型
-			tmsCrvatTrxInf.setRegistrationNumber(StringUtils.trim(splitLineTxt[24]));// 纳税人识别号
-			tmsCrvatTrxInf.setCustBankBranchName(StringUtils.trim(splitLineTxt[25]));// 纳税人开户行名称
-			tmsCrvatTrxInf.setCustBankAccountNum(StringUtils.trim(splitLineTxt[26]));// 纳税人账号
-			tmsCrvatTrxInf.setCustRegistrationAddress(StringUtils.trim(splitLineTxt[27]));// 纳税人地址
-			tmsCrvatTrxInf.setCustContactPhone(StringUtils.trim(splitLineTxt[28]));// 纳税人联系电话
-			tmsCrvatTrxInf.setPrintPeriodName(StringUtils.trim(splitLineTxt[29]));// 打印频率
-			tmsCrvatTrxInf.setInvoicingType(StringUtils.trim(splitLineTxt[30]));// 开票方式
-			tmsCrvatTrxInf.setRecipientName(StringUtils.trim(splitLineTxt[31]));// 收件人姓名
-			tmsCrvatTrxInf.setRecipientComp(StringUtils.trim(splitLineTxt[32]));// 收件人公司
-			tmsCrvatTrxInf.setRecipientAddr(StringUtils.trim(splitLineTxt[33]));// 收件人地址
-			tmsCrvatTrxInf.setRecipientPhone(StringUtils.trim(splitLineTxt[34]));// 收件人电话
-			tmsCrvatTrxInf.setAutoreverseFlag(StringUtils.trim(splitLineTxt[35]));// 明细冲账标识
-			tmsCrvatTrxInf.setReverseTypeCode(StringUtils.trim(splitLineTxt[36]));// 冲账类型
-			tmsCrvatTrxInf.setReversalDate(JobDateUtils.dateParse(StringUtils.trim(splitLineTxt[37])));// 被冲/冲账交易日期
-			tmsCrvatTrxInf.setReversalTrxNumber(StringUtils.trim(splitLineTxt[38]));// 冲账交易日志号
-			tmsCrvatTrxInf.setAppointInvoiceOrgCode(StringUtils.trim(splitLineTxt[39]));// 预约开票管理机构
-			tmsCrvatTrxInf.setAttribute1(StringUtils.trim(splitLineTxt[40]));
-			tmsCrvatTrxInf.setAttribute2(StringUtils.trim(splitLineTxt[41]));
+			int i=20;
+			tmsCrvatTrxInf.setCustBankOrgCode(StringUtils.trim(splitLineTxt[i++]));//客户账号开户机构号
+			tmsCrvatTrxInf.setCustomerNumber(StringUtils.trim(splitLineTxt[i++])); // 客户号
+			tmsCrvatTrxInf.setCustomerName(StringUtils.trim(splitLineTxt[i++]));// 客户名称
+			tmsCrvatTrxInf.setCustomerType(StringUtils.trim(splitLineTxt[i++]));// 客户类型
+			tmsCrvatTrxInf.setLegalEntityType(StringUtils.trim(splitLineTxt[i++]));// 纳税人类型
+			tmsCrvatTrxInf.setRegistrationNumber(StringUtils.trim(splitLineTxt[i++]));// 纳税人识别号
+			tmsCrvatTrxInf.setCustBankBranchName(StringUtils.trim(splitLineTxt[i++]));// 纳税人开户行名称
+			tmsCrvatTrxInf.setCustBankAccountNum(StringUtils.trim(splitLineTxt[i++]));// 纳税人账号
+			tmsCrvatTrxInf.setCustRegistrationAddress(StringUtils.trim(splitLineTxt[i++]));// 纳税人地址
+			tmsCrvatTrxInf.setCustContactPhone(StringUtils.trim(splitLineTxt[i++]));// 纳税人联系电话
+			tmsCrvatTrxInf.setPrintPeriodName(StringUtils.trim(splitLineTxt[i++]));// 打印频率
+			tmsCrvatTrxInf.setInvoicingType(StringUtils.trim(splitLineTxt[i++]));// 开票方式
+			tmsCrvatTrxInf.setRecipientName(StringUtils.trim(splitLineTxt[i++]));// 收件人姓名
+			tmsCrvatTrxInf.setRecipientComp(StringUtils.trim(splitLineTxt[i++]));// 收件人公司
+			tmsCrvatTrxInf.setRecipientAddr(StringUtils.trim(splitLineTxt[i++]));// 收件人地址
+			tmsCrvatTrxInf.setRecipientPhone(StringUtils.trim(splitLineTxt[i++]));// 收件人电话
+			tmsCrvatTrxInf.setAutoreverseFlag(StringUtils.trim(splitLineTxt[i++]));// 明细冲账标识
+			tmsCrvatTrxInf.setReverseTypeCode(StringUtils.trim(splitLineTxt[i++]));// 冲账类型
+			tmsCrvatTrxInf.setReversalDate(JobDateUtils.dateParse(StringUtils.trim(splitLineTxt[i++])));// 被冲/冲账交易日期
+			tmsCrvatTrxInf.setReversalTrxNumber(StringUtils.trim(splitLineTxt[i++]));// 冲账交易日志号
+			tmsCrvatTrxInf.setAppointInvoiceOrgCode(StringUtils.trim(splitLineTxt[i++]));// 预约开票管理机构
+			tmsCrvatTrxInf.setAttribute1(StringUtils.trim(splitLineTxt[i++]));
+			tmsCrvatTrxInf.setAttribute2(StringUtils.trim(splitLineTxt[i++]));
 			tmsCrvatTrxInf.setIsAccount("Y");
 			return tmsCrvatTrxInf;
 		} catch (Exception e) {

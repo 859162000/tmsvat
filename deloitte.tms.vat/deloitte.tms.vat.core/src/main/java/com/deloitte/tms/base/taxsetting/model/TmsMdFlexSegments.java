@@ -18,6 +18,8 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Parameter;
 
 import com.deloitte.tms.pl.core.commons.annotation.ModelProperty;
@@ -108,13 +110,42 @@ public class TmsMdFlexSegments extends BaseEntity {
 	@ModelProperty(comment="组织ID")
 	private String orgId;
     
-	@ManyToOne
-	@Cascade(CascadeType.MERGE)
-	@JoinColumn(name="FLEX_STRUCTURES_ID",insertable=false,updatable=false,nullable=true)
+    @ManyToOne(fetch = FetchType.LAZY)  
+    @JoinColumn(name = "FLEX_STRUCTURES_ID",  unique = false, nullable = false, insertable = false, updatable = false)  
+    @NotFound(action=NotFoundAction.IGNORE) 
 	TmsMdFlexStructures tmsMdFlexStructures;
 	 
+	@ManyToOne(fetch = FetchType.LAZY)  
+	@JoinColumn(name = "FLEX_VALUE_SET_ID",  unique = false, nullable = false, insertable = false, updatable = false)  
+	@NotFound(action=NotFoundAction.IGNORE) 
+	TmsMdFlexValueSets tmsMdFlexValueSets;
+	
+	
+	
+	
+//	@ManyToOne
+//	@Cascade(CascadeType.MERGE)
+//	@JoinColumn(name="FLEX_VALUE_SET_ID",insertable=false,updatable=false,nullable=true)
+	
+	
+	
+	
 
+	public TmsMdFlexValueSets getTmsMdFlexValueSets() {
+		return tmsMdFlexValueSets;
+	}
 
+	public void setTmsMdFlexValueSets(TmsMdFlexValueSets tmsMdFlexValueSets) {
+		this.tmsMdFlexValueSets = tmsMdFlexValueSets;
+	}
+
+//	@ManyToOne
+//	@Cascade(CascadeType.MERGE)
+//	@JoinColumn(name="FLEX_STRUCTURES_ID",insertable=false,updatable=false,nullable=true)
+	
+	
+	
+	
 	public TmsMdFlexStructures getTmsMdFlexStructures() {
 		return tmsMdFlexStructures;
 	}

@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +52,7 @@ import com.deloitte.tms.vat.base.enums.InvoicePrintStatusEnums;
 import com.deloitte.tms.vat.base.enums.InvoiceReqTypeEnums;
 import com.deloitte.tms.vat.base.enums.VatCRInvoiceTypeEnums;
 import com.deloitte.tms.vat.controller.BaseController;
+import com.deloitte.tms.vat.core.common.JsonDateValueProcessor;
 import com.deloitte.tms.vat.inf.taxinfo.aisino.enums.FPZLEnums;
 import com.deloitte.tms.vat.inf.taxinfo.aisino.enums.HSBZEnums;
 import com.deloitte.tms.vat.inf.taxinfo.aisino.enums.KPBZEnums;
@@ -143,10 +146,9 @@ public class InvoicePrintPoolHController extends BaseController{
 		return daoPage;
 	}
 	
-	@ResponseBody
 	@RequestMapping(value = "/loadInvoicePrintPoolHPage", method = RequestMethod.POST)
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
-	public DaoPage loadInvoicePrintPoolHPage(@RequestParam Map<String,Object> parameter) throws Exception {
+	public void loadInvoicePrintPoolHPage(@RequestParam Map<String,Object> parameter,HttpServletResponse response) throws Exception {
 		DaoPage daoPage=invoicePrintPoolHService.findInvoicePrintPoolHByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
 		List<InvoicePrintPoolHInParam> result_list= (ArrayList<InvoicePrintPoolHInParam>)daoPage.getResult();
 		for(InvoicePrintPoolHInParam inParam:result_list){
@@ -156,7 +158,7 @@ public class InvoicePrintPoolHController extends BaseController{
 			inParam.setOrgId(invoiceReqH.getOrgId());
 			BizOrgNode orgNode = OrgCacheUtils.getNodeByOrgId(inParam.getOrgId());
 			if(orgNode!=null){
-				inParam.setOrgName(OrgCacheUtils.getNodeByOrgId(inParam.getOrgId()).getName());
+				inParam.setOrgName(OrgCacheUtils.getNodeByOrgId(inParam.getOrgId().trim()).getName());
 			}		
 			inParam.setInvoicePreNumber(temp.getCrvatInvoicePreNumber());
 			Map<String, Object> map=new HashMap<String, Object>();
@@ -179,17 +181,25 @@ public class InvoicePrintPoolHController extends BaseController{
 				}
 			}
 			inParam.setVatAmount(vatAmount.setScale(2, RoundingMode.HALF_UP));
-			inParam.setInvoiceAmount(vatAmount.add(acctdAmountCR).setScale(2, RoundingMode.HALF_UP));
+			inParam.setInvoiceAmount(invoiceAmount.setScale(2, RoundingMode.HALF_UP));
+			//inParam.setInvoiceAmount(vatAmount.add(acctdAmountCR).setScale(2, RoundingMode.HALF_UP));
 			inParam.setAcctdAmountCR(acctdAmountCR.setScale(2, RoundingMode.HALF_UP));
 			convertDictionaryData(inParam);
 		}
-		return daoPage;
+		//return daoPage;
+		JsonConfig jsonConfig = new JsonConfig();
+		jsonConfig.registerJsonValueProcessor(Date.class,new JsonDateValueProcessor("yyyy-MM-dd"));
+		JSONArray jsonArray = JSONArray.fromObject(daoPage.getResult(), jsonConfig);
+		JSONObject result = new JSONObject();
+		result.put("total", daoPage.getRecordCount());
+		result.put("rows", jsonArray.toString());
+		retJson(response, result);
+		
 	}
 	
-	@ResponseBody
 	@RequestMapping(value = "/loadInvoicePrintedPoolHPage", method = RequestMethod.POST)
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
-	public DaoPage loadInvoicePrintedPoolHPage(@RequestParam Map<String,Object> parameter) throws Exception {
+	public void loadInvoicePrintedPoolHPage(@RequestParam Map<String,Object> parameter,HttpServletResponse response) throws Exception {
 		parameter.put("invoicePrintStatus", InvoicePrintStatusEnums.PRINTED.getValue());
 		DaoPage daoPage=invoicePrintPoolHService.findInvoicePrintedPoolHByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
 		List<InvoicePrintPoolHInParam> result_list= (ArrayList<InvoicePrintPoolHInParam>)daoPage.getResult();
@@ -199,7 +209,7 @@ public class InvoicePrintPoolHController extends BaseController{
 			inParam.setInvoiceReqNumber(invoiceReqH.getCrvatInvoiceReqNumber());
 			inParam.setInvoicePreNumber(temp.getCrvatInvoicePreNumber());
 			inParam.setOrgId(invoiceReqH.getOrgId());
-			inParam.setOrgName(OrgCacheUtils.getNodeByOrgId(inParam.getOrgId()).getName());
+			inParam.setOrgName(OrgCacheUtils.getNodeByOrgId(inParam.getOrgId().trim()).getName());
 			Map<String, Object> map=new HashMap<String, Object>();
 			map.put("invoicePrtPoolHId", inParam.getId());
 			
@@ -219,12 +229,19 @@ public class InvoicePrintPoolHController extends BaseController{
 				}
 			}
 			inParam.setVatAmount(vatAmount.setScale(2, RoundingMode.HALF_UP));
-			inParam.setInvoiceAmount(vatAmount.add(acctdAmountCR).setScale(2, RoundingMode.HALF_UP));
+			inParam.setInvoiceAmount(invoiceAmount.setScale(2, RoundingMode.HALF_UP));
+			//inParam.setInvoiceAmount(vatAmount.add(acctdAmountCR).setScale(2, RoundingMode.HALF_UP));
 			inParam.setAcctdAmountCR(acctdAmountCR.setScale(2, RoundingMode.HALF_UP));
 			convertDictionaryData(inParam);
 		}
-		
-		return daoPage;
+		JsonConfig jsonConfig = new JsonConfig();
+		jsonConfig.registerJsonValueProcessor(Date.class,new JsonDateValueProcessor("yyyy-MM-dd"));
+		JSONArray jsonArray = JSONArray.fromObject(daoPage.getResult(), jsonConfig);
+		JSONObject result = new JSONObject();
+		result.put("total", daoPage.getRecordCount());
+		result.put("rows", jsonArray.toString());
+		retJson(response, result);
+		//return daoPage;
 	}
 	
 	
@@ -234,12 +251,16 @@ public class InvoicePrintPoolHController extends BaseController{
 	 * @return
 	 * @throws Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/loadInvoicePrintPoolL", method = RequestMethod.POST)
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
-	public Collection<InvoicePrintPoolLInParam> loadInvoicePrintPoolL(@RequestParam Map<String, Object> map) throws Exception {
-		List<InvoicePrintPoolLInParam> result=invoicePrintPoolHService.findInvoicePrintPoolLByParams(map);
-		return result;
+	public void loadInvoicePrintPoolL(@RequestParam Map<String, Object> map,HttpServletResponse response) throws Exception {
+		List<InvoicePrintPoolLInParam> result_temp=invoicePrintPoolHService.findInvoicePrintPoolLByParams(map);
+		JsonConfig jsonConfig = new JsonConfig();
+		jsonConfig.registerJsonValueProcessor(Date.class,new JsonDateValueProcessor("yyyy-MM-dd"));
+		JSONArray jsonArray = JSONArray.fromObject(result_temp, jsonConfig);
+		JSONObject result = new JSONObject();
+		result.put("result", jsonArray.toString());
+		retJson(response, result);
 	}
 	
 	/**
@@ -248,10 +269,9 @@ public class InvoicePrintPoolHController extends BaseController{
 	 * @return
 	 * @throws Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/loadInvoicePrintPoolHSubmitList", method = RequestMethod.POST)
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
-	public List<InvoicePrintPoolHInParam> loadInvoicePrintPoolHSubmitList(HttpServletRequest request,@RequestParam(value="id") String parameter) throws Exception {
+	public void loadInvoicePrintPoolHSubmitList(HttpServletRequest request,@RequestParam(value="id") String parameter,HttpServletResponse response) throws Exception {
 		AssertHelper.notEmpty_assert(parameter,"发票记录不能为空");
 		List<InvoicePrintPoolHInParam> result=new ArrayList<InvoicePrintPoolHInParam>();
 		String[] invoicePrintPoolHIds=parameter.split(",");
@@ -283,7 +303,12 @@ public class InvoicePrintPoolHController extends BaseController{
 				result.add(inParam_temp);
 			}
 		}
-		return result;
+		JsonConfig jsonConfig = new JsonConfig();
+		jsonConfig.registerJsonValueProcessor(Date.class,new JsonDateValueProcessor("yyyy-MM-dd"));
+		JSONArray jsonArray = JSONArray.fromObject(result, jsonConfig);
+		JSONObject result_temp = new JSONObject();
+		result_temp.put("result", jsonArray.toString());
+		retJson(response, result_temp);
 	}
 	
 	/**
@@ -295,7 +320,6 @@ public class InvoicePrintPoolHController extends BaseController{
 		InvoicePrintPoolH entity=(InvoicePrintPoolH)invoicePrintPoolHService.get(InvoicePrintPoolH.class,inParam.getId());
 		TmsCrvatInvoicePreH pre_temp=(TmsCrvatInvoicePreH)invoicePrintPoolHService.get(TmsCrvatInvoicePreH.class, entity.getCrvatInvoicePreHId());
 		InvoiceReqH invoiceReqH=(InvoiceReqH)invoicePrintPoolHService.get(InvoiceReqH.class,pre_temp.getCrvatInvoiceReqHId());
-		
 		InvoicePrintPoolHInParam return_param= new InvoicePrintPoolHInParam();
 		ReflectUtils.copyProperties(entity, return_param);
 		return_param.setInvoiceReqNumber(invoiceReqH.getCrvatInvoiceReqNumber());
@@ -344,9 +368,10 @@ public class InvoicePrintPoolHController extends BaseController{
 				break;
 			}
 		}
-			return_param.setOrgName(OrgCacheUtils.getNodeByOrgId(return_param.getOrgId()).getName());
+			return_param.setOrgName(OrgCacheUtils.getNodeByOrgId(return_param.getOrgId().trim()).getName());
 			return_param.setVatAmount(vatAmount.setScale(2, RoundingMode.HALF_UP));
-			return_param.setInvoiceAmount(vatAmount.add(acctdAmountCR).setScale(2, RoundingMode.HALF_UP));
+			return_param.setInvoiceAmount(invoiceAmount);
+			//return_param.setInvoiceAmount(vatAmount.add(acctdAmountCR).setScale(2, RoundingMode.HALF_UP));
 			return_param.setAcctdAmountCR(acctdAmountCR.setScale(2, RoundingMode.HALF_UP));
 		return return_param;
 	}
@@ -361,7 +386,6 @@ public class InvoicePrintPoolHController extends BaseController{
 	 * @see [相关类/方法]（可选）
 	 * @since [产品/模块版本] （可选）
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/loadInvoicePrintPoolHPrintSubmit", method = RequestMethod.POST)
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public void loadInvoicePrintPoolHPrintSubmit(@RequestParam(value="id") String parameter) throws Exception {
@@ -415,15 +439,20 @@ public class InvoicePrintPoolHController extends BaseController{
 	 * @return
 	 * @throws Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/loadInvoicePrintPoolHDetail", method = RequestMethod.POST)
-	public InvoicePrintPoolHInParam loadInvoicePrintPoolHDetail(@RequestParam("invoicePrtPoolHId") String invoicePrtPoolHId) throws Exception {
+	public void loadInvoicePrintPoolHDetail(@RequestParam("invoicePrtPoolHId") String invoicePrtPoolHId,HttpServletResponse response) throws Exception {
 		AssertHelper.notEmpty_assert(invoicePrtPoolHId,"主键不能为空");
 		InvoicePrintPoolH invoicePrintPoolH=new InvoicePrintPoolH();
 		invoicePrintPoolH.setId(invoicePrtPoolHId);
 		InvoicePrintPoolHInParam resultParam=loadInvoicePrintPoolHInParamDetail(invoicePrintPoolH);
-		
-		return resultParam;
+		JSONObject object=new JSONObject();
+		object.put("resultParam", resultParam);
+		if(AssertHelper.isOrNotEmpty_assert(resultParam.getId())){
+			object.put("success", true);
+		}else{
+			object.put("success", false);
+		}
+		retJson(response, object);
 	}
 	
 	/**
@@ -524,16 +553,25 @@ public class InvoicePrintPoolHController extends BaseController{
     }
 	
 	
-	@ResponseBody
 	@RequestMapping(value = "/getInvoicePrintPoolDInParamDetailList", method = RequestMethod.POST)
-	public InvoicePrintPoolLInParam getInvoicePrintPoolDInParamDetailList(@RequestParam(value="id") String id) throws Exception {
+	public void getInvoicePrintPoolDInParamDetailList(@RequestParam(value="id") String id,HttpServletResponse response) throws Exception {
 		AssertHelper.notEmpty_assert(id,"主键不能为空");
 		InvoicePrintPoolLInParam resultParam=new InvoicePrintPoolLInParam();
 		ReflectUtils.copyProperties(invoicePrintPoolHService.get(InvoicePrintPoolL.class, id.toString()), resultParam);
 		Map<String,String> param=new HashMap<String,String>();
 		param.put("invoicePrtPoolLId", resultParam.getId());
 		resultParam.setInvoicePrintPoolDList(invoicePrintPoolDService.findInvoicePrintPoolDByPoolLId(param));
-		return resultParam;
+		
+		//return resultParam;
+		
+		JSONObject object=new JSONObject();
+		object.put("resultParam", resultParam);
+		if(AssertHelper.isOrNotEmpty_assert(resultParam.getId())){
+			object.put("success", true);
+		}else{
+			object.put("success", false);
+		}
+		retJson(response, object);
 	}
 	
 	/**
@@ -573,7 +611,6 @@ public class InvoicePrintPoolHController extends BaseController{
 	 * @param response
 	 * @throws Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/loadApplyOrgListForInvoicePrint", method = RequestMethod.GET)
 	public void loadApplyOrgListForInvoicePrint(@RequestParam Map<String,Object> parameter, HttpServletResponse response) throws Exception {
 		Collection<OrgNode> orgNodes=OrgCacheUtils.getNodeByOrgId(ContextUtils.getCurrentOrgId()).getPosterities().values();
@@ -597,7 +634,6 @@ public class InvoicePrintPoolHController extends BaseController{
 	 * @param response
 	 * @throws Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/loadLegalEntityForInvoicePrint", method = RequestMethod.POST)
 	public void loadLegalEntityForInvoicePrint(@RequestParam Map<String,Object> parameter, HttpServletResponse response) throws Exception {
 		Object id=parameter.get("id");
@@ -632,9 +668,8 @@ public class InvoicePrintPoolHController extends BaseController{
 	 * @param response
 	 * @throws Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/saveLegalEntityForInvoicePrint", method = RequestMethod.POST)
-	public InvoicePrintPoolHInParam saveLegalEntityForInvoicePrint(@RequestParam Map<String,Object> parameter, HttpServletResponse response) throws Exception {
+	public void saveLegalEntityForInvoicePrint(@RequestParam Map<String,Object> parameter, HttpServletResponse response) throws Exception {
 		InvoicePrintPoolHInParam inParam =new InvoicePrintPoolHInParam();
 		Object id=parameter.get("id");
 		Object equipmentCode=parameter.get("equipmentCode");
@@ -655,7 +690,15 @@ public class InvoicePrintPoolHController extends BaseController{
 			throw new BusinessException("该发票不能再更新打印终端");
 		}
 		inParam=invoicePrintPoolHService.convertInvoicePrintPoolHToInParam(entity);
-		return inParam;
+		
+		JSONObject object=new JSONObject();
+		object.put("resultParam", inParam);
+		if(AssertHelper.isOrNotEmpty_assert(inParam.getId())){
+			object.put("success", true);
+		}else{
+			object.put("success", false);
+		}
+		retJson(response, object);
 	}
 	/**
 	 * 产生一张发票请求

@@ -216,8 +216,6 @@ public class InvoicePrintPoolH extends BaseEntity{
 	@ModelProperty(comment = "上传状态")
 	String uploadStatus;
 	
-
-	
 	@Column(name = "INVOICE_PRINT_BY",length=100)
 	@ModelProperty(comment = "发票开据人")
 	String invoicePrintBy;
@@ -259,16 +257,36 @@ public class InvoicePrintPoolH extends BaseEntity{
 	@ModelProperty(comment = "失效日期")
 	Date endDate;
 	
+	@Column(name = "PAYEE")
+	@ModelProperty(comment = "收款人")
+	String payee;
 	
+	@Column(name = "CHECKER")
+	@ModelProperty(comment = "复核人")
+	String checker;
+	
+	@Column(name = "IS_ISSUE_MANIFEST") 
+	@ModelProperty(comment = "是否开具清单")
+	String isIssueManifest;
+	
+	@Column(name = "SALES_DOCUMENT_NUM") 
+	@ModelProperty(comment = "销售单据编号")
+	String salesDocumentNum;
+	 
 	@OneToMany(mappedBy = "invoicePrintPoolH")
 	@Cascade(CascadeType.REFRESH)
 	@Where(clause="DELETED_FLAG=1")
 	Collection<InvoicePrintPoolL> invoicePrintPoolLs = new ArrayList<InvoicePrintPoolL>();
 	
+	
 	@ManyToOne
 	@Cascade(CascadeType.REFRESH)
 	@JoinColumn(name="CUSTOMER_ID",insertable=false,updatable=false,nullable=true)
 	Customer customer;
+	
+	@Column(name = "ATTRIBUTE6",  length = 240)
+	@ModelProperty(comment="扩展字段6")
+	String attribute6;
 	
 	@Transient
 	BigDecimal totalAmount;
@@ -676,8 +694,45 @@ public class InvoicePrintPoolH extends BaseEntity{
 	public void setRegistrationContactAddress(String registrationContactAddress) {
 		this.registrationContactAddress = registrationContactAddress;
 	}
-	
-	
-	
+
+	public String getPayee() {
+		return payee;
+	}
+
+	public void setPayee(String payee) {
+		this.payee = payee;
+	}
+
+	public String getChecker() {
+		return checker;
+	}
+
+	public void setChecker(String checker) {
+		this.checker = checker;
+	}
+
+	public String getIsIssueManifest() {
+		return isIssueManifest;
+	}
+
+	public void setIsIssueManifest(String isIssueManifest) {
+		this.isIssueManifest = isIssueManifest;
+	}
+
+	public String getSalesDocumentNum() {
+		return salesDocumentNum;
+	}
+
+	public void setSalesDocumentNum(String salesDocumentNum) {
+		this.salesDocumentNum = salesDocumentNum;
+	}
+
+	public String getAttribute6() {
+		return attribute6;
+	}
+
+	public void setAttribute6(String attribute6) {
+		this.attribute6 = attribute6;
+	}
 	
 }

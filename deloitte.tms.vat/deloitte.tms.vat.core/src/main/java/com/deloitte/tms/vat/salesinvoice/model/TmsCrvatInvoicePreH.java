@@ -168,6 +168,9 @@ public class TmsCrvatInvoicePreH extends BaseEntity {
 	private List<TmsCrvatInvoicePreL> tmsCrvatInvoicePreLs;
 	
 	@Transient
+	private List<TmsCrvatInvoicePreP> tmsCrvatInvoicePrePs;
+	
+	@Transient
 	BigDecimal totalAmount;
 	@Transient
 	BigDecimal accTotalAmount;
@@ -185,6 +188,19 @@ public class TmsCrvatInvoicePreH extends BaseEntity {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+
+
+	public List<TmsCrvatInvoicePreP> getTmsCrvatInvoicePrePs() {
+		return tmsCrvatInvoicePrePs;
+	}
+
+
+
+	public void setTmsCrvatInvoicePrePs(
+			List<TmsCrvatInvoicePreP> tmsCrvatInvoicePrePs) {
+		this.tmsCrvatInvoicePrePs = tmsCrvatInvoicePrePs;
 	}
 
 

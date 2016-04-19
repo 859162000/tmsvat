@@ -16,6 +16,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,8 +36,12 @@ import com.deloitte.tms.pl.flow.utils.FlowHelper;
 import com.deloitte.tms.vat.base.enums.AppFormStatuEnums;
 import com.deloitte.tms.vat.controller.BaseController;
 import com.deloitte.tms.vat.core.common.JsonDateValueProcessor;
+import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqH;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqHInParam;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoiceReqP;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoiceReqPInParam;
 import com.deloitte.tms.vat.salesinvoice.service.InvoiceSpecialService;
+import com.deloitte.tms.vat.salesinvoice.service.TmsCrvatInvoiceReqPService;
 
 /**
  * 特殊开票申请单，无合同
@@ -46,8 +51,13 @@ import com.deloitte.tms.vat.salesinvoice.service.InvoiceSpecialService;
 @Controller
 @RequestMapping(value="invoiceSpecial")
 public class InvoiceSpecialController extends BaseController{
+	
+	private final static Logger log = Logger.getLogger(InvoiceSpecialController.class);
+	
 	@Resource
 	InvoiceSpecialService invoiceSpecialServiceImpl;
+	@Resource
+	private TmsCrvatInvoiceReqPService reqPServiceImpl;
 	@Autowired
 	DictionaryService dictionaryService;
 	
@@ -56,7 +66,7 @@ public class InvoiceSpecialController extends BaseController{
 	 */
 	@RequestMapping(value="/index")
 	public String index(){
-		System.out.println("invoiceSpecial");
+		System.out.println("invoice Special with no contract");
 		return "invoiceprint/specialInvoice";
 	}
 	
@@ -77,6 +87,23 @@ public class InvoiceSpecialController extends BaseController{
 		result.put("rows", jsonArray1.toString());
 		retJson(response,result);
 	}
+	
+	@ResponseBody
+	@RequestMapping(value="/loadModifyInvoiceDetail", method = RequestMethod.POST)
+	public InvoiceReqHInParam getInvoiceDetail(@RequestParam Map<String, Object> map) throws Exception{
+		Object id = map.get("id");
+		AssertHelper.notEmpty_assert(id,"编辑的记录不能为空");
+		InvoiceReqH invoiceReqH = invoiceSpecialServiceImpl.getInvoiceReqH(id.toString());
+		List<TmsCrvatInvoiceReqP> reqPs = reqPServiceImpl.findInvoiceReLByReqHId(invoiceReqH.getId());
+		invoiceReqH.setInvoiceReqPs(reqPs);
+		
+		InvoiceReqHInParam reqHParam = invoiceSpecialServiceImpl.convertInvoiceReqHToInParam(invoiceReqH);
+		List<TmsCrvatInvoiceReqPInParam> reqPParams = invoiceSpecialServiceImpl.convertReqP2Param(reqPs);
+		reqHParam.setReqPList(reqPParams);
+		return reqHParam;
+	}
+	
+	
     /**
      * 申请单状态查询
      * @param response
@@ -201,31 +228,6 @@ public class InvoiceSpecialController extends BaseController{
 			result.put("success", "false");
 			e.printStackTrace();
 		}
-		
-		
-		for(Map.Entry<String, Object> entry:map.entrySet()){ 
-		     System.out.println(entry.getKey()+"--->"+entry.getValue());    
-		}
-		JSONArray jsonArray = JSONArray.fromObject(map.get("dgrequestdetaildata"));
-		for(int i=0;i<jsonArray.size(); i++){
-			JSONObject jsonJ = jsonArray.getJSONObject(i);
-			System.out.println("jsonJ="+jsonJ);
-			if(null!=jsonJ){
-				System.out.println(jsonJ.getString("id"));//商品及服务id
-				System.out.println(jsonJ.getString("inventoryItemDescripton"));//商品及服务名称
-				System.out.println(jsonJ.getString("inventoryItemModels"));//规格型号
-				System.out.println(jsonJ.getString("uomCode"));//单位
-				System.out.println(jsonJ.getString("taxTrxTypeCode"));//数量
-				System.out.println(jsonJ.getString("legalEntityName"));//单价
-				System.out.println(jsonJ.getString("legalEntityCode"));//合计金额
-				System.out.println(jsonJ.getString("taxRate"));//税率
-				System.out.println(jsonJ.getString("trxDate"));//净额
-				System.out.println(jsonJ.getString("inventory"));//税额
-			}
-		}
-		
-		InvoiceReqHInParam invoicereqhinparam = new InvoiceReqHInParam();//销项税开票申请单-头表数据
-		//TODO
 
 		retJson(response,result);
 	}

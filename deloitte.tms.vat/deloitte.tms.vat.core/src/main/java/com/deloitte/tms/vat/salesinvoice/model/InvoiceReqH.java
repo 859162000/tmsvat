@@ -73,14 +73,17 @@ public class InvoiceReqH extends BaseEntity{
 	private String crvatInvoiceReqNumber;
 
 	@Column(name="CUST_REGISTRATION_CODE")
+	@ModelProperty(comment="购方证件类型_枚举值")
 	private String custRegistrationCode;
 
 	@Column(name="CUST_REGISTRATION_NUMBER")
+	@ModelProperty(comment="购方证件号码")
 	private String custRegistrationNumber;
 
 	@Column(name="CUSTOMER_ID")
+	@ModelProperty(comment="购方证件ID")
 	String customerId;
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.EAGER)
 	@Cascade(CascadeType.REFRESH)
 	@JoinColumn(name="CUSTOMER_ID",insertable=false,updatable=false,nullable=true)
 	Customer customer;
@@ -138,6 +141,7 @@ public class InvoiceReqH extends BaseEntity{
 	private String isAllMapping;
 	
 	@Column(name="SOURCE_CODE")
+	@ModelProperty(comment="来源(手工/自动匹配)")
 	private String sourceCode;
 	
 	@Column(name="PROJECT_ID")

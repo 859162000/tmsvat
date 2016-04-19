@@ -11,37 +11,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javassist.expr.NewArray;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
 
-import org.hibernate.annotations.Check;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.deloitte.tms.base.cache.model.BizOrgNode;
-import com.deloitte.tms.base.cache.model.LeafNode;
-import com.deloitte.tms.base.cache.model.LegalEntityNode;
 import com.deloitte.tms.base.cache.model.OrgNode;
-import com.deloitte.tms.base.cache.model.PrinterTerminalNode;
-import com.deloitte.tms.base.cache.service.impl.LegalEntityCacheProvider;
-import com.deloitte.tms.base.cache.utils.LegalEntityCacheUtils;
 import com.deloitte.tms.base.cache.utils.OrgCacheUtils;
-import com.deloitte.tms.base.cache.utils.PrintOrgCacheUtils;
-import com.deloitte.tms.base.masterdata.dao.EquipmentDao;
 import com.deloitte.tms.base.masterdata.model.TmsMdEquipment;
-import com.deloitte.tms.base.masterdata.model.TmsMdLegalEnablePrint;
-import com.deloitte.tms.base.masterdata.service.TmsMdLegalEnablePrintService;
 import com.deloitte.tms.base.masterdata.service.TmsMdLegalEquipmentService;
 import com.deloitte.tms.pl.core.commons.exception.BusinessException;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
-import com.deloitte.tms.pl.core.commons.utils.DateUtils;
 import com.deloitte.tms.pl.core.commons.utils.PageUtils;
 import com.deloitte.tms.pl.core.commons.utils.reflect.ReflectUtils;
 import com.deloitte.tms.pl.core.context.utils.ContextUtils;
@@ -68,8 +58,6 @@ import com.deloitte.tms.vat.salesinvoice.model.InvoicePrintPoolH;
 import com.deloitte.tms.vat.salesinvoice.model.InvoicePrintPoolHInParam;
 import com.deloitte.tms.vat.salesinvoice.model.InvoicePrintPoolL;
 import com.deloitte.tms.vat.salesinvoice.model.InvoicePrintPoolLInParam;
-import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqH;
-import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreH;
 import com.deloitte.tms.vat.salesinvoice.service.InvoicePrintPoolDService;
 import com.deloitte.tms.vat.salesinvoice.service.InvoicePrintPoolHService;
 import com.deloitte.tms.vat.salesinvoice.service.InvoicePrintPoolLService;
@@ -178,12 +166,6 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 		DaoPage daoPage=invoicePrintPoolHService.findInvoicePrintPoolHByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
 		List<InvoicePrintPoolHInParam> result_list= (ArrayList<InvoicePrintPoolHInParam>)daoPage.getResult();
 		for(InvoicePrintPoolHInParam inParam:result_list){
-			//TmsCrvatInvoicePreH temp=(TmsCrvatInvoicePreH)invoicePrintPoolHService.get(TmsCrvatInvoicePreH.class, inParam.getCrvatInvoicePreHId());
-			//InvoiceReqH invoiceReqH=(InvoiceReqH)invoicePrintPoolHService.get(InvoiceReqH.class,temp.getCrvatInvoiceReqHId());
-			//inParam.setInvoiceReqNumber(invoiceReqH.getCrvatInvoiceReqNumber());
-			//inParam.setOrgId(invoiceReqH.getOrgId());
-			//inParam.setOrgName(OrgCacheUtils.getNodeByOrgId(inParam.getOrgId()).getName());
-			//inParam.setInvoicePreNumber(temp.getCrvatInvoicePreNumber());
 			Map<String, Object> map=new HashMap<String, Object>();
 			map.put("invoicePrtPoolHId", inParam.getId());
 			
@@ -206,6 +188,9 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 			inParam.setVatAmount(vatAmount);
 			inParam.setInvoiceAmount(invoiceAmount);
 			inParam.setAcctdAmountCR(acctdAmountCR);
+			System.out.println(inParam.getAttribute1());
+			System.out.println(inParam.getAttribute2());
+			System.out.println(inParam.getAttribute3());
 			convertDictionaryData(inParam);
 		}
 		return daoPage;
@@ -213,19 +198,12 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 	
 	@ResponseBody
 	@RequestMapping(value = "/loadInvoicePrintedPoolHPage", method = RequestMethod.POST)
-	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public DaoPage loadInvoicePrintedPoolHPage(@RequestParam Map<String,Object> parameter) throws Exception {
 		parameter.put("project", "changzheng");
 		parameter.put("invoicePrintStatus", InvoicePrintStatusEnums.PRINTED.getValue());
 		DaoPage daoPage=invoicePrintPoolHService.findInvoicePrintedPoolHByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
 		List<InvoicePrintPoolHInParam> result_list= (ArrayList<InvoicePrintPoolHInParam>)daoPage.getResult();
 		for(InvoicePrintPoolHInParam inParam:result_list){
-			//TmsCrvatInvoicePreH temp=(TmsCrvatInvoicePreH)invoicePrintPoolHService.get(TmsCrvatInvoicePreH.class, inParam.getCrvatInvoicePreHId());
-			//InvoiceReqH invoiceReqH=(InvoiceReqH)invoicePrintPoolHService.get(InvoiceReqH.class,temp.getCrvatInvoiceReqHId());
-			//inParam.setInvoiceReqNumber(invoiceReqH.getCrvatInvoiceReqNumber());
-			//inParam.setInvoicePreNumber(temp.getCrvatInvoicePreNumber());
-			//inParam.setOrgId(invoiceReqH.getOrgId());
-			//inParam.setOrgName(OrgCacheUtils.getNodeByOrgId(inParam.getOrgId()).getName());
 			Map<String, Object> map=new HashMap<String, Object>();
 			map.put("invoicePrtPoolHId", inParam.getId());
 			
@@ -262,7 +240,6 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/loadInvoicePrintPoolL", method = RequestMethod.POST)
-	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public Collection<InvoicePrintPoolLInParam> loadInvoicePrintPoolL(@RequestParam Map<String, Object> map) throws Exception {
 		List<InvoicePrintPoolLInParam> result=invoicePrintPoolHService.findInvoicePrintPoolLByParams(map);
 		return result;
@@ -276,8 +253,10 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/loadInvoicePrintPoolHSubmitList", method = RequestMethod.POST)
-	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public List<InvoicePrintPoolHInParam> loadInvoicePrintPoolHSubmitList(HttpServletRequest request,@RequestParam(value="id") String parameter) throws Exception {
+		
+		long begin = System.currentTimeMillis();
+		
 		AssertHelper.notEmpty_assert(parameter,"发票记录不能为空");
 		List<InvoicePrintPoolHInParam> result=new ArrayList<InvoicePrintPoolHInParam>();
 		String[] invoicePrintPoolHIds=parameter.split(",");
@@ -290,11 +269,6 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 				if(entity.getInvoicePrintStatus().equals(InvoicePrintStatusEnums.TOBEINVOICE.getValue())){
 					//开票接口调用
 					InvoiceIssueRequest invoiceIssueRequest=new InvoiceIssueRequest();
-					AssertHelper.notEmpty_assert(entity.getEquipmentId(), "打印终端为空，请检查！");
-					TmsMdEquipment tmsMdEquipment=(TmsMdEquipment)invoicePrintPoolHService.get(TmsMdEquipment.class, entity.getEquipmentId());
-					AssertHelper.notEmpty_assert(tmsMdEquipment.getId(), "打印终端为空，请检查！");
-					invoiceIssueRequest.setIp(tmsMdEquipment.getEquipmentIp());
-					invoiceIssueRequest.setPort(tmsMdEquipment.getEquipmentPort());
 					List<InvoiceIssue> prints=new ArrayList<InvoiceIssue>();
 					InvoiceIssue temp_issue=buildInvoiceIssue(entity);
 					prints.add(temp_issue);
@@ -311,6 +285,9 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 				result.add(inParam_temp);
 			}
 		}
+		
+		long end = System.currentTimeMillis();
+		System.out.println("开具所花费的时间："+(end-begin));
 		return result;
 	}
 	
@@ -321,14 +298,9 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 	 */
 	protected InvoicePrintPoolHInParam loadInvoicePrintPoolHInParamDetail(InvoicePrintPoolH inParam)throws Exception{
 		InvoicePrintPoolH entity=(InvoicePrintPoolH)invoicePrintPoolHService.get(InvoicePrintPoolH.class,inParam.getId());
-		//TmsCrvatInvoicePreH pre_temp=(TmsCrvatInvoicePreH)invoicePrintPoolHService.get(TmsCrvatInvoicePreH.class, entity.getCrvatInvoicePreHId());
-		//InvoiceReqH invoiceReqH=(InvoiceReqH)invoicePrintPoolHService.get(InvoiceReqH.class,pre_temp.getCrvatInvoiceReqHId());
 		
 		InvoicePrintPoolHInParam return_param= new InvoicePrintPoolHInParam();
 		ReflectUtils.copyProperties(entity, return_param);
-		//return_param.setInvoiceReqNumber(invoiceReqH.getCrvatInvoiceReqNumber());
-		//return_param.setInvoicePreNumber(pre_temp.getCrvatInvoicePreNumber());
-		//return_param.setOrgId(invoiceReqH.getOrgId());
 		Map<String, Object> map=new HashMap<String, Object>();
 		map.put("invoicePrtPoolHId", inParam.getId());
 		BigDecimal vatAmount=new BigDecimal(0);
@@ -338,11 +310,17 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 		return_param.setPrintPoolLInParamList(temp_list);
 			
 		for(InvoicePrintPoolLInParam invoicePrintPoolLInParam:temp_list){
-			if(AssertHelper.notEmpty(invoicePrintPoolLInParam.getInvoiceAmount())){
-				invoiceAmount=invoiceAmount.add(invoicePrintPoolLInParam.getInvoiceAmount());
-			}
 			if(AssertHelper.notEmpty(invoicePrintPoolLInParam.getVatAmount())){
 				vatAmount=vatAmount.add(invoicePrintPoolLInParam.getVatAmount());
+			}
+			if(AssertHelper.notEmpty(invoicePrintPoolLInParam.getInvoiceAmount())){
+				
+				if(HSBZEnums.include.getValue().equals(invoicePrintPoolLInParam.getIsTax())){
+					invoiceAmount=invoiceAmount.add(invoicePrintPoolLInParam.getInvoiceAmount());
+				}else{
+					invoiceAmount=invoiceAmount.add(invoicePrintPoolLInParam.getInvoiceAmount()).add(invoicePrintPoolLInParam.getVatAmount());
+				}
+				
 			}
 			if(AssertHelper.notEmpty(invoicePrintPoolLInParam.getAcctdAmountCR())){
 				acctdAmountCR=acctdAmountCR.add(invoicePrintPoolLInParam.getAcctdAmountCR());
@@ -390,8 +368,10 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/loadInvoicePrintPoolHPrintSubmit", method = RequestMethod.POST)
-	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public void loadInvoicePrintPoolHPrintSubmit(@RequestParam(value="id") String parameter) throws Exception {
+		
+		long begin = System.currentTimeMillis();
+		
 		AssertHelper.notEmpty_assert(parameter,"发票记录不能为空");
 		List<InvoicePrintPoolHInParam> result=new ArrayList<InvoicePrintPoolHInParam>();
 		String[] invoicePrintPoolHIds=parameter.split(",");
@@ -403,31 +383,14 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 				if(entity.getInvoicePrintStatus().equals(InvoicePrintStatusEnums.TOBEPRINT.getValue())){
 					//满足条件时，调用开票接口,根据返回结果状态，更新数据库
 					InvoicePrintRequest invoicePrintRequest=new InvoicePrintRequest();
-					//AssertHelper.notEmpty_assert(entity.getEquipmentId(), "打印终端为空，请检查！");
 					TmsMdEquipment tmsMdEquipment=(TmsMdEquipment)invoicePrintPoolHService.get(TmsMdEquipment.class, entity.getEquipmentId());
-					//AssertHelper.notEmpty_assert(tmsMdEquipment.getId(), "打印终端为空，请检查！");
-					//System.out.println("打印终端："+entity.getEquipmentId());
-					//invoicePrintRequest.setIp(tmsMdEquipment.getEquipmentIp());
-					//invoicePrintRequest.setPort(tmsMdEquipment.getEquipmentPort());
 					List<InvoicePrint> invoicePrintList=new ArrayList<InvoicePrint>();
 					invoicePrintList.add(buildInvoicePrint(entity));
 					invoicePrintRequest.setRecords(invoicePrintList);
  					taxInterface.processPrintInvoice(invoicePrintRequest);
 					
-					/*String return_value="1";
-					if(return_value.equals("1")){
-						//回写开票结果
-						entity.setInvoicePrintStatus(InvoicePrintStatusEnums.PRINTED.getValue());
-						invoicePrintPoolHService.update(entity);
-						//回写发票库存
-					}else {
-						//inParam_temp.setInvoiceSendResultStatus("发票接口接口调用失败");
-						throw new BusinessException("发票打印接口调用失败!");
-					}*/
-					
 				}else {
 					throw new BusinessException("发票不具备打印的条件!");
-					//inParam_temp.setInvoiceSendResultStatus("发票状态有误");
 				}
 				
 				inParam_temp=loadInvoicePrintPoolHInParamDetail(entity);
@@ -435,10 +398,13 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 			}
 		}
 		
+		long end = System.currentTimeMillis();
+		System.out.println("打印所花费的时间："+(end-begin));
+		
 	}
 	
 	/**
-	 * 发票详情查询
+	 * 发票明细查询
 	 * @param map
 	 * @return
 	 * @throws Exception
@@ -464,7 +430,7 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 		return "vat/invoice/invoicePrintPoolH/printPoolHManageInit_cz";
 	}
 	/**
-	 * 发票打印查询
+	 * 发票打印池查询
 	 * @return
 	 * @throws Exception
 	 */
@@ -482,18 +448,6 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 	public List<Map<String, Object>> invoicePrintLegalEntityCodeList()throws Exception{
 		
 		List<Map<String, Object>> results = new ArrayList<Map<String,Object>>();	
-		/*LegalEntityCacheUtils.geTerminalNodesByLegalId()
-		for(InvoicePrintStatusEnums eunm:InvoicePrintStatusEnums.values()){
-		       String value = eunm.getValue();
-		       String text =eunm.getText();
-		       String retextString  = getMessage(text);
-		       Map<String, Object> map = new HashMap<String, Object>();
-		       map.put("value", value);
-		       map.put("text",retextString);
-		       if(!value.equals("30")){
-		    	   results.add(map);
-		       }
-		 }*/
 		return results;
 	}
 	/**
@@ -692,75 +646,57 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 	 * @return
 	 * @throws Exception
 	 */
-	protected InvoiceIssue buildInvoiceIssue(InvoicePrintPoolH model)throws Exception{
+	protected InvoiceIssue buildInvoiceIssue(InvoicePrintPoolH entity)throws Exception{
 		InvoiceIssue invoiceIssue=new InvoiceIssue();
-		InvoicePrintPoolH current = (InvoicePrintPoolH)invoicePrintPoolHService.get(InvoicePrintPoolH.class, model.getId());
-		
-		invoiceIssueCheck(current);
-		
+		invoiceIssueCheck(entity);
+
 		//头信息封装
-		invoiceIssue.setKey(current.getId());
+		invoiceIssue.setKey(entity.getId());
 		InvoiceIssueHead invoiceHead=new InvoiceIssueHead();
-		if(current.getInvoiceCategory().equals(VatCRInvoiceTypeEnums.VAT_CR_INVOICE_ZP.getValue())){//专票
+		if(entity.getInvoiceCategory().equals(VatCRInvoiceTypeEnums.VAT_CR_INVOICE_ZP.getValue())){//专票
 			invoiceHead.setInvoiceType(FPZLEnums.zp.getValue());//发票种类 字符  2 是 //0 专票 2普票 11货运票 12机动车票
-		}else if(current.getInvoiceCategory().equals(VatCRInvoiceTypeEnums.VAT_CR_INVOICE_PP.getValue())){
+		}else if(entity.getInvoiceCategory().equals(VatCRInvoiceTypeEnums.VAT_CR_INVOICE_PP.getValue())){
 			invoiceHead.setInvoiceType(FPZLEnums.pp.getValue());//发票种类 字符  2 是 //0 专票 2普票 11货运票 12机动车票
 		}
 		
-		String machine_tax_id= "420100999999206";
-		String machine_id="0";
-		
-		
-		invoiceHead.setMachineTaxNo(machine_tax_id);
-		invoiceHead.setMachineNo(machine_id);
-		
-		//TODO 不确定
-		SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		if(current.getInvoicePrintDate()!=null){
-			invoiceHead.setDocdate(format.format(current.getInvoicePrintDate()));
-		}else{
-			invoiceHead.setDocdate("2015-07-03 15:05:12");
-		}
-		invoiceHead.setDocnr(current.getId());
-		
-		invoiceHead.setDrawer(ContextUtils.getCurrentUserName());//开票人 字符 8 是 8个字节，4个汉字
-		invoiceHead.setPurchaserName(current.getCustomerName());//购方名称 字符 100  是
-		invoiceHead.setPurchaserTaxNo(current.getCustRegistrationNumber());//购方税号 字符 20 是
-		
+		invoiceHead.setMachineTaxNo(entity.getLegalEntityCode());
+		invoiceHead.setMachineNo("0");
+		SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+		invoiceHead.setDocdate(format.format(entity.getCreateDate()));
+		invoiceHead.setDocnr(entity.getId());
+		invoiceHead.setPurchaserName(entity.getCustomerName());//购方名称 字符 100  是
+		invoiceHead.setPurchaserTaxNo(entity.getCustRegistrationNumber());//购方税号 字符 20 是
 		String custRegistrationAddress="";
 		String custContactPhone="";
-		if(AssertHelper.notEmpty(current.getCustRegistrationAddress())){
-			custRegistrationAddress = current.getCustRegistrationAddress();
+		if(AssertHelper.notEmpty(entity.getCustRegistrationAddress())){
+			custRegistrationAddress = entity.getCustRegistrationAddress();
 		}
-		if(AssertHelper.notEmpty(current.getCustContactPhone())){
-			custContactPhone = current.getCustContactPhone();
+		if(AssertHelper.notEmpty(entity.getCustContactPhone())){
+			custContactPhone = entity.getCustContactPhone();
 		}
-		System.out.println(custRegistrationAddress+" "+custContactPhone);
 		invoiceHead.setPurchaserTel(custRegistrationAddress+" "+custContactPhone);//购方地址电话 字符 100  否 
-		invoiceHead.setPurchaserBankNo(current.getCustDepositBankAccountNum());//购方银行账户 字符 100  否
+		invoiceHead.setPurchaserBankNo(entity.getCustDepositBankAccountNum());//购方银行账户 字符 100  否
 		//invoiceHead.setBark("1111");//备注 字符 230  否 
-		invoiceHead.setReciver(current.getLegalEntityName());//收款人 字符 8 是 8个字节，4个汉字 //默认为当前
-		invoiceHead.setChecker(ContextUtils.getCurrentUserName());//复核人 字符 8 是 8个字节，4个汉字 //默认为当前用户
-		invoiceHead.setSalesBankNo(current.getBankAccountNum());//销方银行账户 字符 100  否 
+		invoiceHead.setDrawer(entity.getInvoicePrintBy());//开票人 字符 8 是 8个字节，4个汉字
+		invoiceHead.setReciver(entity.getPayee());//收款人 字符 8 是 8个字节，4个汉字 //默认为当前
+		invoiceHead.setChecker(entity.getChecker());//复核人 字符 8 是 8个字节，4个汉字 //默认为当前用户
+		invoiceHead.setSalesBankNo(entity.getBankAccountNum());//销方银行账户 字符 100  否 
 		
 		String registrationContactAddress="";
 		String registrationContactPhone="";
-		if(AssertHelper.notEmpty(current.getRegistrationContactAddress())){
-			registrationContactAddress = current.getRegistrationContactAddress();
+		if(AssertHelper.notEmpty(entity.getRegistrationContactAddress())){
+			registrationContactAddress = entity.getRegistrationContactAddress();
 		}
-		if(AssertHelper.notEmpty(current.getRegistrationContactPhone())){
-			registrationContactPhone = current.getCustContactPhone();
+		if(AssertHelper.notEmpty(entity.getRegistrationContactPhone())){
+			registrationContactPhone = entity.getCustContactPhone();
 		}
-		System.out.println(registrationContactPhone+" "+registrationContactPhone);
 		invoiceHead.setSalesBankTel(registrationContactAddress+" "+registrationContactPhone);//销方地址电话  字符 100  否
-		invoiceHead.setIsDetail(QDBZEnums.open.getValue());//QDBZ  清单标志 字符 2 是 固定值 0：不开具清单 1：开具清单
-		//invoiceHead.setSalesDocNo("8000000");;// XSDJBH 销售单据编号 字符  100  否 
+		invoiceHead.setIsDetail(QDBZEnums.notopen.getValue());//QDBZ  清单标志 字符 2 是 固定值 0：不开具清单 1：开具清单
 		invoiceHead.setInvoiceMethod(KPBZEnums.open.getValue());// KPBZ 开票标志 字符 2 是 固定值 0：开票 1：校验 2：空白作废下一张
 		invoiceIssue.setHead(invoiceHead);
 		
 		Map<String, Object> map=new HashMap<String, Object>();
-		map.put("invoicePrtPoolHId", current.getId());
-		System.out.println(current.getId());
+		map.put("invoicePrtPoolHId", entity.getId());
 		BigDecimal vatAmount=new BigDecimal(0);
 		BigDecimal invoiceAmount=new BigDecimal(0);
 		BigDecimal acctdAmountCR=new BigDecimal(0);
@@ -782,8 +718,9 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 			invoiceDetailCheck(inParam);
 			InvoiceIssueDetail detail=new InvoiceIssueDetail();
 	         detail.setCommodityName(inParam.getInventoryItemDescripton());//SPMC 商品名称  字符 92 是
-	         //
-	         detail.setIsTax(HSBZEnums.exclude.getValue());//HSBZ  含税标志 字符 2 是 固定值 0：不含税 1：含税------------
+	         if(AssertHelper.notEmpty(inParam.getIsTax())){
+	        	 detail.setIsTax(inParam.getIsTax());
+	         }
 	         if(!AssertHelper.empty(inParam.getTaxRate())){
 	        	 detail.setTaxRate(inParam.getTaxRate().doubleValue());//SLV 税率 数值 10,6 是 
 	         }
@@ -795,19 +732,15 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 	         }
 	         detail.setMeasurementUnit(inParam.getUomCodeDescripton());//JLDW  计量单位  字符 22 否
 	         detail.setSpecification(inParam.getInventoryItemModels());//GGXH  规格型号  字符 40 否 
-	        /* if(!AssertHelper.empty(inParam.getVatAmount())){
+	         if(!AssertHelper.empty(inParam.getVatAmount())){
 	        	 detail.setTaxAmount(inParam.getVatAmount().doubleValue());//SE 税额 数值 16,2 是 
-	         }*/
+	         }
 	         if(!AssertHelper.empty(inParam.getInventoryItemQty())){
 	        	 detail.setQuantity(inParam.getInventoryItemQty().longValue());//SL  数量 数值 36,15  否
 	         }
 	         detail_list.add(detail);
-	         //商品单价、数量和金额不符合计算关系
-	         //商品单价、数量和金额不符合计算关系
-	         //购买方纳税人识别号长度不正确三证合一后 6-20位
 		}
 		invoiceIssue.setDetails(detail_list);
-		
 		return invoiceIssue;
 		
 		
@@ -858,27 +791,42 @@ public class InvoicePrintPoolHChangzhengController extends BaseController{
 			return print;*/
 		
 	}
+	
+	private void invoiceIssueCheck(InvoicePrintPoolH entity) {
+		AssertHelper.notEmpty_assert(entity.getInvoiceCategory(), "发票类型不能为空！！");
+		AssertHelper.notEmpty_assert(entity.getCustomerName(), "购方名称不能为空！！");
+		AssertHelper.notEmpty_assert(entity.getCustContactPhone(), "购方手机号码不能为空！！");
+		
+		//TODO 数据库字段加上了  再校验开票人   复核人
+		AssertHelper.notEmpty_assert(entity.getChecker(), "复核人不能为空！！");
+		AssertHelper.notEmpty_assert(entity.getPayee(), "收款人不能为空！！");
+		
+		//需要测试一下
+		if(entity.getInvoiceCategory().equals(VatCRInvoiceTypeEnums.VAT_CR_INVOICE_ZP.getValue())){//专票
+			AssertHelper.notEmpty_assert(entity.getBankAccountNum(), "销方银行账户不能为空！！");
+			AssertHelper.notEmpty_assert(entity.getRegistrationContactAddress(), "销方地址不能为空！！");
+			AssertHelper.notEmpty_assert(entity.getRegistrationContactPhone(), "销方电话号码不能为空！！");
+			//AssertHelper.notEmpty_assert(current.getBankBranchName(), "销方开户银行不能为空！！");
+			
+			AssertHelper.notEmpty_assert(entity.getCustomerName(), "购方名称不能为空！！");
+			AssertHelper.notEmpty_assert(entity.getCustRegistrationAddress(), "购方地址不能为空！！");
+			AssertHelper.notEmpty_assert(entity.getCustContactPhone(), "购方电话号码不能为空！！");
+			AssertHelper.notEmpty_assert(entity.getCustDepositBankAccountNum(), "购方银行账户不能为空！！");
+			AssertHelper.notEmpty_assert(entity.getCustRegistrationNumber(), "购方税号不能为空！！");
+			
+		}
+	
+		
+	}
+	
 	private void invoiceDetailCheck(InvoicePrintPoolLInParam inParam) {
-//		AssertHelper.notEmpty_assert(inParam.getInventoryItemDescripton(), "商品名称不能为空！！");
-//		AssertHelper.notEmpty_assert(inParam.getUomCodeDescripton(), "商品数量不能为空");
-//		AssertHelper.notEmpty_assert(inParam.getTaxRate(), "税率名称不能为空！！");
-//		AssertHelper.notEmpty_assert(inParam.getInvoiceAmount(), "金额不能为空！！");
+		AssertHelper.notEmpty_assert(inParam.getInventoryItemDescripton(), "商品或服务名称不能为空！！");
+		AssertHelper.notEmpty_assert(inParam.getInventoryItemQty(), "商品数量不能为空");
+		AssertHelper.notEmpty_assert(inParam.getIsTax(),"是否含税不能为空！！");
+		AssertHelper.notEmpty_assert(inParam.getTaxRate(), "税率不能为空！！");
+		AssertHelper.notEmpty_assert(inParam.getInvoiceAmount(), "金额不能为空！！");
 	}
 
-	private void invoiceIssueCheck(InvoicePrintPoolH current) {
-		/*AssertHelper.notEmpty_assert(current.getInvoiceCategory(), "发票类型不能为空！！");
-		AssertHelper.notEmpty_assert(current.getInvoicePrintDate(), "发票开具日期不能为空！！");
-		AssertHelper.notEmpty_assert(current.getCustomerName(), "购方名称不能为空！！");
-		AssertHelper.notEmpty_assert(current.getCustContactPhone(), "购方手机号码不能为空！！");
-		AssertHelper.notEmpty_assert(current.getLegalEntityName(), "收款人不能为空！！");
-		AssertHelper.notEmpty_assert(current.getLegalEntityName(), "收款人不能为空！！");*/
-		
-		//AssertHelper.notEmpty_assert(current.getCustDepositBankAccountNum(), "购方银行账户不能为空！！");
-		//AssertHelper.notEmpty_assert(current.getBankAccountNum(), "销方银行账户不能为空！！");
-		//AssertHelper.notEmpty_assert(current.getRegistrationContactAddress(), "销方税号不能为空！！");
-		//AssertHelper.notEmpty_assert(current.getRegistrationContactPhone(), "销方地址不能为空！！");
-		
-	}
 
 	/**
 	 * 产生一个发票打印请求

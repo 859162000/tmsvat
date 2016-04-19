@@ -20,6 +20,8 @@ import java.util.Map;
 
 
 
+
+
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +33,7 @@ import com.deloitte.tms.pl.core.dao.impl.BaseDao;
 import com.deloitte.tms.vat.salesinvoice.dao.InvoicePreHDao;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreH;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreL;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreP;
 import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 
 @Component(InvoicePreHDao.BEAN_ID)
@@ -43,15 +46,19 @@ public class InvoicePreHDaoImpl extends BaseDao<TmsCrvatInvoicePreH> implements 
 		int pageIndex = PageUtils.getPageNumber(map);
 		int pageSize = PageUtils.getPageSize(map);
 		StringBuffer query=new StringBuffer();
-		query.append("select preh  from TmsCrvatInvoicePreH preh,InvoiceReqH reh,Customer cust where 1=1 and preh.crvatInvoiceReqHId=reh.id and preh.customerId = cust.id");
+		query.append("select preh from TmsCrvatInvoicePreH preh,InvoiceReqH reh,Customer cust where 1=1 and preh.crvatInvoiceReqHId=reh.id and preh.customerId = cust.id");
 		Map values=new HashMap();
+		if(!AssertHelper.empty(map.get("customerId"))){
+			query.append(" and  preh.customerId = :customerId");
+			values.put("customerId", map.get("customerId"));
+		}
+		
 		if(!AssertHelper.empty(map.get("custRegistrationCode"))){
 			query.append(" and  preh.custRegistrationCode = :custRegistrationCode");
 			values.put("custRegistrationCode", map.get("custRegistrationCode"));
 		}
 		
 		//新增柜台，预约，特殊开票 
-		
 		if(!AssertHelper.empty(map.get("invoiceReqType"))){
 			query.append(" and  preh.invoiceReqType = :invoiceReqType");
 			values.put("invoiceReqType", map.get("invoiceReqType"));		
@@ -114,8 +121,7 @@ public class InvoicePreHDaoImpl extends BaseDao<TmsCrvatInvoicePreH> implements 
 			query.append(" and  reh.invoiceReqDate < :applyDateto");
 			values.put("applyDateto", dateToDate);	
 		}
-		query.append(" order by   preh.crvatInvoicePreNumber desc");
-		
+		query.append(" order by preh.crvatInvoicePreNumber desc");
 		return pageBy(query, values, pageIndex, pageSize);
 	}
 
@@ -168,6 +174,16 @@ public class InvoicePreHDaoImpl extends BaseDao<TmsCrvatInvoicePreH> implements 
 			query.append(")");
 		}
 		executeSql(query, values);
+	}
+
+	@Override
+	public List<TmsCrvatInvoicePreP> getCrvatInvoicePrePsByPreHId(String preHid) {
+			StringBuffer query=new StringBuffer();
+			query.append(" from TmsCrvatInvoicePreP where 1=1 ");
+			query.append(" and crvatInvoicePreHId = :preHid");
+			Map values=new HashMap();
+			values.put("preHid", preHid);
+		return findBy(query,values);
 	}
 	
 	

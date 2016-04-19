@@ -19,6 +19,8 @@ public interface TmsMdContractService extends IService{
 	public List<TaxRuleAndRateInParam> findTmsMdContractByParams(Map params);
 	
 	public TmsMdContract getContractById(String id);
+	
+	public TmsMdContract getContractByNumber(String contractNumber);
 
 	public void deleteContractById(String id);
 

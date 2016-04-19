@@ -277,7 +277,18 @@ public class InvoiceAllocController extends BaseController{
 			
 			distributeInvoiceRequest.setKey(invoiceAllocL.getId());
 			distributeInvoiceRequest.setTaxPayerNo(tmsMdLegalEntity.getLegalEntityCode());
-			distributeInvoiceRequest.setServerCode(tmsMdEquipment.getParent().getEquipmentSeqNo());
+			
+			if(null==tmsMdEquipment.getParentEquipmentId()){
+				distributeInvoiceRequest.setServerCode("");
+			}else{
+				TmsMdEquipment parent = (TmsMdEquipment) invoiceAllocService.get(TmsMdEquipment.class, tmsMdEquipment.getParentEquipmentId());
+				if(null!=parent){					
+					distributeInvoiceRequest.setServerCode(parent.getEquipmentSeqNo());
+				}else{
+					distributeInvoiceRequest.setServerCode("");
+				}
+			}
+			
 			distributeInvoiceRequest.setKeyNo(tmsMdEquipment.getEquipmentSeqNo());
 			if(invoiceAllocL.getInvoiceCategory() == "2"){ //1 增值税普通发票, 2 增值税专用发票
 				distributeInvoiceRequest.setInoviceType(FPZLEnums.zp.getValue());

@@ -14,6 +14,7 @@
 package com.deloitte.tms.vat.salesinvoice.model;
 
 import java.util.Date;
+import java.util.List;
 
 
 /**  
@@ -125,6 +126,8 @@ public class InvoiceReqHInParam extends InvoiceReqH {
 	private String orgName;
 	
 	private boolean havereql=false;
+	
+	private List<TmsCrvatInvoiceReqPInParam> reqPList;
 	
 	public String getAcctdAmountCr() {
 		return acctdAmountCr;
@@ -332,6 +335,12 @@ public class InvoiceReqHInParam extends InvoiceReqH {
 	}
 	public void setHavereql(boolean havereql) {
 		this.havereql = havereql;
+	}
+	public List<TmsCrvatInvoiceReqPInParam> getReqPList() {
+		return reqPList;
+	}
+	public void setReqPList(List<TmsCrvatInvoiceReqPInParam> reqPList) {
+		this.reqPList = reqPList;
 	}
 	
 	

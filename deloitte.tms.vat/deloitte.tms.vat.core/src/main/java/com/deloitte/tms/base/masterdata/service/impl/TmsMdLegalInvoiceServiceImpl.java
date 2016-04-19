@@ -50,7 +50,7 @@ public class TmsMdLegalInvoiceServiceImpl extends BaseService implements TmsMdLe
 		{
 			params=new HashMap();
 		}	
-		if(AssertHelper.isOrNotEmpty_assert(params.get("legalEntityCode"))){
+		if(AssertHelper.isOrNotEmpty_assert(params.get("registrationNumber"))){
 			TmsMdLegalEntity entity=this.findLegalEntity(params);
 			params.put("legalEntityId", entity.getId());
 		}
@@ -103,6 +103,7 @@ public class TmsMdLegalInvoiceServiceImpl extends BaseService implements TmsMdLe
 			TmsMdLegalInvoiceInParam inparam=convertTmsMdLegalInvoiceToInParam(initiation);
 			inparam.setLegalEntityCode(initiation.getTmsMdLegalEntity().getLegalEntityCode());
 			inparam.setLegalEntityName(initiation.getTmsMdLegalEntity().getLegalEntityName());
+			inparam.setRegistrationNumber(initiation.getTmsMdLegalEntity().getRegistrationNumber());
 			List<DictionaryEntity>list=dictionaryService.loadDictionaryEntities("VAT_CR_INVOICE_TYPE");
 			for (int i = 0; i < list.size(); i++) {
 				if(initiation.getInvoiceCategory().equals(list.get(i).getCode())){

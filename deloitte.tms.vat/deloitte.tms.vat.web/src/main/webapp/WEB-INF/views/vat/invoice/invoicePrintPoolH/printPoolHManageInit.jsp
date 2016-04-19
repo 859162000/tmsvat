@@ -187,7 +187,7 @@
 				    			<td><input name="invoicePrintDate" data-options="formatter:myformatter,parser:myparser" readonly/></td>
 			    				<td align='right'>开具人:</td>
 			    				<td><input name="invoicePrintBy" readonly/></td>
-			    				<td align='right'>合计金额(含税):</td>
+			    				<td align='right'>合计金额:</td>
 			    				<td><input name="invoiceAmount" readonly/></td>
 			    				<td align='right'>不含税金额:</td>
 			    				<td><input name="acctdAmountCR" readonly/></td>
@@ -296,10 +296,10 @@
 				if(typeof(id)!='undefined'&&id!=''){
 					$(this).combogrid('grid').datagrid('selectRecord',id);
 				}
-				printPoolHManageInit_Search();
+				
 				}
 			});	
-		
+		printPoolHManageInit_Search();
 	});
 	//页面表格绑定初始化
 	function pageDataSettingInit(){
@@ -323,7 +323,7 @@
      					{field:'uomCodeDescripton',title:"单位",width:90,align:'center'},
      					{field:'inventoryItemQty',title:"数量",width:90,halign:'center',align:'right'},
      					{field:'customerName',title:"单价",width:90,halign:'center',align:'right'},
-     					{field:'acctdAmountCR',title:"金额",width:90,halign:'center',align:'right',formatter:function(value,rec){
+     					{field:'invoiceAmount',title:"金额",width:90,halign:'center',align:'right',formatter:function(value,rec){
      							//var temp_value='<span style="color:red">'+value+'</span>';
      							var temp_value=value;
      						return temp_value;
@@ -331,12 +331,8 @@
      					/* {field:'bankAccountNum',title:"净额",width:80,align:'center'},
      					{field:'bankAccountNum',title:"税额",width:80,align:'center'},
      					{field:'bankAccountNum',title:"合计",width:80,align:'center'}, */
-     					{field:'taxRate',title:"税率",width:90,halign:'center',align:'center',formatter:function(value,rec){
-	   						if (typeof(value)!="undefined"&&value!=null){
-								return value+"%";
-							}
-	  					}},
-     					{field:'vatAmount',title:"税额",width:90,halign:'center',align:'right'},
+     					{field:'taxRate',title:"税率(%)",width:90,halign:'center',align:'center'}
+     					/* {field:'vatAmount',title:"税额",width:90,halign:'center',align:'right'}, */
      			]],
 			onLoadSuccess:function(){  
                 $('#printPoolHManageInit_poolDDetail_dataGrid').datagrid('clearSelections'); //一定要加上这一句，要不然datagrid会记住之前的选择状态，删除时会出问题  
@@ -362,7 +358,7 @@
      					{field:'uomCodeDescripton',title:"单位",width:90,align:'center'},
      					{field:'inventoryItemQty',title:"数量",width:90,halign:'center',align:'right'},
      					{field:'customerName',title:"单价",width:90,halign:'center',align:'right'},
-     					{field:'acctdAmountCR',title:"金额",width:90,halign:'center',align:'right',formatter:function(value,rec){
+     					{field:'invoiceAmount',title:"金额",width:90,halign:'center',align:'right',formatter:function(value,rec){
      							//var temp_value='<span style="color:red">'+value+'</span>';
      							var temp_value=value;
      						return temp_value;
@@ -370,12 +366,8 @@
      					/* {field:'bankAccountNum',title:"净额",width:80,align:'center'},
      					{field:'bankAccountNum',title:"税额",width:80,align:'center'},
      					{field:'bankAccountNum',title:"合计",width:80,align:'center'}, */
-     					{field:'taxRate',title:"税率",width:90,halign:'center',align:'center',formatter:function(value,rec){
-	   						if (typeof(value)!="undefined"&&value!=null){
-								return value+"%";
-							}
-	  					}},
-     					{field:'vatAmount',title:"税额",width:90,halign:'center',align:'right'},
+     					{field:'taxRate',title:"税率(%)",width:90,halign:'center',align:'center'}
+     					/* {field:'vatAmount',title:"税额",width:90,halign:'center',align:'right'}, */
      			]],
      			onDblClickRow:function(index,data){
      				printPoolHManageInit_poolD_view(index,data);
@@ -412,8 +404,8 @@
 	   					{field:'custRegistrationCode',title:"购方证件类型",width:100,align:'center'}, 
 	   					{field:'custRegistrationNumber',title:"购方证件号码",width:100,align:'center'},
 	   					{field:'invoiceCategoryName',title:"发票类型",width:100,align:'center'},
-	   					{field:'acctdAmountCR',title:"金额",width:100,halign:'center',align:'right'},
-	   					{field:'vatAmount',title:"税额",width:100,halign:'center',align:'right'},
+	   					/* {field:'acctdAmountCR',title:"金额",width:100,halign:'center',align:'right'}, */
+	   					/* {field:'vatAmount',title:"税额",width:100,halign:'center',align:'right'}, */
 	   					{field:'invoiceAmount',title:"合计金额",width:100,halign:'center',align:'right'},
 	 					{field:'equipmentCode',title:"打印终端编号",align:'center',width:100,editor: {
 	 						type: 'combogrid', options: { required: false } 
@@ -571,7 +563,6 @@
 				idField:'id',//主键字段
 				frozenColumns:[[
 				{field:'id',hidden:true,width:80,align:'center'},
-				{field:'ck',checkbox:true,width:80,align:'center'}
                 ]],
                 columns:[[
          					{field:'checkFlag',checkbox:true,width:80,align:'center'},
@@ -589,8 +580,8 @@
 		   					{field:'custRegistrationCode',title:"购方证件类型",width:100,align:'center'}, 
 		   					{field:'custRegistrationNumber',title:"购方证件号码",width:100,align:'center'},
 		   					{field:'invoiceCategoryName',title:"发票类型",width:100,align:'center'},
-		   					{field:'acctdAmountCR',title:"金额",width:100,halign:'center',align:'right'},
-		   					{field:'vatAmount',title:"税额",width:100,halign:'center',align:'right'},
+		   					/* {field:'acctdAmountCR',title:"金额",width:100,halign:'center',align:'right'}, */
+		   					/* {field:'vatAmount',title:"税额",width:100,halign:'center',align:'right'}, */
 		   					{field:'invoiceAmount',title:"合计金额",width:100,halign:'center',align:'right'},
 		 					{field:'equipmentCode',title:"打印终端编号",align:'center',width:100},
 		 					{field:'equipmentName',title:"打印终端名称",width:100,align:'center'},
@@ -630,11 +621,12 @@
 			},
 			success:function(result){
 				var result = $.parseJSON(result);
-				if(result.status=='0'){
+				$("#printPoolHManageInit_dataGrid").datagrid('loadData', result);
+				/* if(result.status=='0'){
 				     $("#printPoolHManageInit_dataGrid").datagrid('loadData', result.data);
 				}else if(result.status=='1'){
 					$.messager.alert('<spring:message code="system.alert"/>',result.erroMessage,'info');
-				}
+				} */
 				$("#printPoolHManageInit_dataGrid").datagrid("loaded"); 
 		     }
 		});
@@ -698,19 +690,23 @@
 		        	        cache: false,  
 		        	        success: function(result){
 		        	        	$.messager.progress('close');
-		        	        	if(result.status=='0'){
+		        	        	$('#printPoolHManageInit_printSubmit_print_buttons').linkbutton("enable");
+	        	        		$("#printPoolHManageInit_printSubmit_dlg").dialog('open').dialog('setTitle',
+	        	        		"发票开具接口调用");
+	        	        		$("#printPoolHManageInit_printSubmit_dataGrid").datagrid('loadData',result.result);
+		        	        	/* if(result.status=='0'){
 		        	        		$('#printPoolHManageInit_printSubmit_print_buttons').linkbutton("enable");
 		        	        		$("#printPoolHManageInit_printSubmit_dlg").dialog('open').dialog('setTitle',
 		        	        		"发票开具接口调用");
-		        	        		$("#printPoolHManageInit_printSubmit_dataGrid").datagrid('loadData',result.data);
+		        	        		$("#printPoolHManageInit_printSubmit_dataGrid").datagrid('loadData',result.data); */
 		        	        		/* $('#printPoolHManageInit_printSubmit_editform').form('load', {
 		        	        			taxIdStart : result.data.taxIdStart
 		        	        		}); */
 		        	        		//$("#printPoolHManageInit_editform").form('load', {custRegistrationDate:myformatter(new Date())});
 		        	        		//$.messager.alert('操作结果','数据传送功能正在开发中');
-		        	        	}else{
+		        	        	/* }else{
 		        	        		$.messager.alert('<spring:message code="system.alert"/>',result.erroMessage);
-		        	        	}
+		        	        	} */
 		        	        	/* printPoolHManageInit_Search();
 		        	        	printPoolHManageInit_clearForm(); */
 		        	        } 
@@ -758,21 +754,17 @@
      		        success: function(result){
      		        	//$("#printPoolHManageInit_details_dataGrid").datagrid("loaded"); 
      		        	 $.messager.progress('close');
-     		        	if(result.status=='0'){
      		        		$('#layoutid').layout('expand', 'east');
-     		        		$("#printPoolHManageInit_details_searchform").form('load',result.data);
+     		        		$("#printPoolHManageInit_details_searchform").form('load',result.resultParam);
      		        		$("#printPoolHManageInit_details_searchform").form('load',{invoicePrintDate:function(){
-     			        			var value=result.data.invoicePrintDate;
+     			        			var value=result.resultParam.invoicePrintDate;
      			        			if (typeof(value)!="undefined"&&value!=0&&value!=null){
      									return new Date(value).format("yyyy-MM-dd");
      								}
      		        			}
      		        		});
      		        		//$("#printPoolHManageInit_details_searchform").form('load',result.data);
-     		        		$('#printPoolHManageInit_details_dataGrid').datagrid('loadData',result.data.printPoolLInParamList);
-     		        	}else{
-     		        		//$.messager.alert('<spring:message code="system.alert"/>','<spring:message code="system.delete.fail.text"/>');
-     		        	}
+     		        		$('#printPoolHManageInit_details_dataGrid').datagrid('loadData',result.resultParam.printPoolLInParamList);
      		        } 
      		    });
     		 }
@@ -791,7 +783,10 @@
     	        dataType: "json",  
     	        cache: false,  
     	        success: function(result){
-    	        	if(result.status=='0'){
+    	        	$("#printPoolHManageInit_poolDDetail_dlg").dialog('open').dialog('setTitle',
+	        		"明细查看");
+    	        	$("#printPoolHManageInit_poolDDetail_dataGrid").datagrid('loadData',result.resultParam.invoicePrintPoolDList);
+    	        	/* if(result.status=='0'){
     	        		$("#printPoolHManageInit_poolDDetail_dlg").dialog('open').dialog('setTitle',
     	        		"明细查看");
     	        		$("#printPoolHManageInit_poolDDetail_dataGrid").datagrid('loadData',result.data.invoicePrintPoolDList);
@@ -799,7 +794,7 @@
     	        		//$('#printPoolHManageInit_details_dataGrid').datagrid('loadData',result.data.invoicePrintPoolLInParamList);
     	        	}else{
     	        		//$.messager.alert('<spring:message code="system.alert"/>','<spring:message code="system.delete.fail.text"/>');
-    	        	}
+    	        	} */
     	        } 
     	    });
     }
@@ -846,13 +841,14 @@
     			        dataType: "json",  
     			        cache: false,  
     			        success: function(result){
-    			        	if(result.status=='0'){
+    			        	$('#printPoolHManageInit_printSubmit_dlg').dialog('close');
+    			        	/* if(result.status=='0'){
     			        		//$.messager.alert('提示','发送税控系统成功操作成功');
     			        		$('#printPoolHManageInit_printSubmit_dlg').dialog('close');
     			        		printPoolHManageInit_Search();
     			        	}else{
     			        		$.messager.alert('<spring:message code="system.alert"/>',result.erroMessage);
-    			        	}
+    			        	} */
     			        	printPoolHManageInit_Search();
 	        	        	printPoolHManageInit_clearForm();
     			        } 
@@ -906,14 +902,16 @@
     			        dataType: "json",  
     			        cache: false,  
     			        success: function(result){
-    			        	if(result.status=='0'){
+    			        	$.messager.alert('提示','发票打印成功');
+			        		$('#printPoolHManageInit_printSubmit_dlg').dialog('close');
+    			        	/* if(result.status=='0'){
     			        		$.messager.alert('提示','发票打印成功');
     			        		$('#printPoolHManageInit_printSubmit_dlg').dialog('close');
     			        		printPoolHManageInit_Search();
     			        		//$('#printPoolHManageInit_details_dataGrid').datagrid('loadData',result.data);
     			        	}else{
     			        		$.messager.alert('<spring:message code="system.alert"/>',result.erroMessage);
-    			        	}
+    			        	} */
     			        } 
     			    });
     			}

@@ -30,6 +30,8 @@ public interface InvoiceTrxService extends IService{
 	
 	public List<InvoiceTrxD> findInvoiceTrxDByParams(Map params);
 	
+	public List<InvoiceTrxL> findAllInvoiceTrxL(Map params);
+	
 	public List<InvoiceTrxHInParam> findInvoiceTrxByParams(Map params);
 	
 	public void saveInvoiceTrxDataListsMap(Map dataListsMap);

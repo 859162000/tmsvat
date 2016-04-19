@@ -13,6 +13,7 @@ import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.dao.IDao;
 import com.deloitte.tms.pl.core.service.impl.BaseService;
 import com.deloitte.tms.vat.salesinvoice.dao.TmsCrvatInvoiceReqPDao;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoiceReqP;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoiceReqPInParam;
 import com.deloitte.tms.vat.salesinvoice.service.TmsCrvatInvoiceReqPService;
 
@@ -55,6 +56,12 @@ public class TmsCrvatInvoiceReqPServiceImpl extends BaseService implements
 			result.add(inParam);
 		}
 		return result;
+	}
+
+	@Override
+	public List<TmsCrvatInvoiceReqP> findInvoiceReLByReqHId(
+			String crvatInvoiceReqHId) {
+		return tmsCrvatInvoiceReqPDao.findInvoiceReLByReqHId(crvatInvoiceReqHId);
 	}
 
 }

@@ -91,8 +91,22 @@ public class TmsCrvatTrxInfDaoImpl extends BaseDao<TmsCrvatTrxInf> implements Tm
 	public List<TmsCrvatTrxInf> findTmsCrvatTrxInf(String ready, int pageIndex,
 			int pageSize) {
 		StringBuffer query=new StringBuffer();
+		Map<String,Object> values=new HashMap<String,Object>();
 		query.append(" from TmsCrvatTrxInf where 1=1 ");
-		return findByPage(query, new HashMap<String, Object>(), pageIndex, pageSize); 
+		query.append(" and interfaceTrxFlag=:interfaceTrxFlag");
+		values.put("interfaceTrxFlag", ready);
+		return findByPage(query, values, pageIndex, pageSize); 
+	}
+
+	@Override
+	public int findTmsCrvatTrxInfNum(String ready) {
+		AssertHelper.notEmpty_assert(ready, "数据状态不能为空");
+		StringBuffer query=new StringBuffer();
+		Map<String,Object> values=new HashMap<String,Object>();
+		query.append(" select count(*) from TmsCrvatTrxInf where 1=1 ");
+		query.append(" and interfaceTrxFlag=:interfaceTrxFlag)");
+		values.put("interfaceTrxFlag", ready);
+		return findNumhql(query, values); 
 	}
 
 }

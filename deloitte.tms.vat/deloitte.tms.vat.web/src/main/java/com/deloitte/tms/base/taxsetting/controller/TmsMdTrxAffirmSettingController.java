@@ -173,11 +173,22 @@ DaoPage daoPage=tmsMdTrxAffirmSettingService.findTmsMdTrxAffirmSettingByParams(p
 		Object id=map.get("id");
 		AssertHelper.notEmpty_assert(id,"编辑的主键不能为空");
 		TmsMdTrxAffirmSetting entity=(TmsMdTrxAffirmSetting)tmsMdTrxAffirmSettingService.get(TmsMdTrxAffirmSetting.class,id.toString());
-		entity.getBaseOrg().setId((String)map.get("orgId"));
-		entity.getTmsMdInventoryItems().setId((String)map.get("inventoryItemId"));
-		entity.getTaxCategory().setId((String)map.get("taxCategoryId"));
-		entity.getItems().setId((String)map.get("taxItemId"));
-		entity.getTmsMdTaxTrxType().setId((String)map.get("taxTrxTypeId"));
+		if(map.get("orgId") != null && !"".equals(map.get("orgId"))){
+			entity.getBaseOrg().setId((String)map.get("orgId"));
+		}
+		if(map.get("inventoryItemId")!=null&&!"".equals(map.get("inventoryItemId"))){
+			entity.getTmsMdInventoryItems().setId((String)map.get("inventoryItemId"));
+		}
+		if(map.get("taxCategoryId")!=null&&!"".equals(map.get("taxCategoryId"))){
+			entity.getTaxCategory().setId((String)map.get("taxCategoryId"));
+		}
+		if(map.get("taxItemId")!=null && !"".equals(map.get("taxItemId"))){
+			entity.getItems().setId((String)map.get("taxItemId"));
+		}
+		if(map.get("taxTrxTypeId")!=null && !"".equals(map.get("taxTrxTypeId"))){
+			entity.getTmsMdTaxTrxType().setId((String)map.get("taxTrxTypeId"));
+		}
+	
 		TmsMdTrxAffirmSettingInParam inParam=tmsMdTrxAffirmSettingService.convertTmsMdTrxAffirmSettingToInParam(entity);
 		JSONObject result = new JSONObject();
 		JsonConfig jsonConfig = new JsonConfig();

@@ -157,12 +157,12 @@ public class LegalEntityCacheUtils {
 	 * @return
 	 */
 	public static Long getSelfInvoiceLimitAmountValueByLegalId(String LegalId,String invoiceType){
-		AssertHelper.notEmpty_assert(LegalId,"orgCode不能为空");
-		AssertHelper.notEmpty_assert(invoiceType,"invoiceType不能为空");
+		//AssertHelper.notEmpty_assert(LegalId,"orgCode不能为空");
+		//AssertHelper.notEmpty_assert(invoiceType,"invoiceType不能为空");
 //		LegalEntityNode legalEntityNode=(LegalEntityNode)getTopNode().getPosterities().get(LegalId);
 //		AssertHelper.notEmpty_assert(legalEntityNode,"没有找到纳税实体Id为:"+LegalId+"的纳税实体");
 //		return legalEntityNode.getSelfInvoiceLimitAmountValue(invoiceType);
-		return 100000l;
+		return 10000000l;
 	}
 	/**
 	 * 获取纳税实体所有的打印终端
@@ -231,7 +231,7 @@ public class LegalEntityCacheUtils {
 			LegalEntityNode printEntityNode=PrintOrgCacheUtils.getLegalNodeByOrgId(orgId);
 			codes.add(printEntityNode.getCode());
 			for(OrgNode child:printEntityNode.getPosterities().values()){
-				if(child.getCode()!=null){
+				if(child.getCode()!=null&&!codes.contains(child.getCode())){
 					codes.add(child.getCode());
 				}
 			}

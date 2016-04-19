@@ -1151,7 +1151,7 @@ $(function(){
 	
 	
 </script>
-<body class="easyui-layout">
+<body class="easyui-layout"  style="overflow-y: hidden" scroll="yes">
 	<div data-options="region:'west',split:true,title:'纳税主体'"
 		style="width: 20%;">
 

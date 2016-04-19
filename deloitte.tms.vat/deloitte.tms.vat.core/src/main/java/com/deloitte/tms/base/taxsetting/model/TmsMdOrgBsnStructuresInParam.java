@@ -7,6 +7,8 @@ public class TmsMdOrgBsnStructuresInParam extends TmsMdOrgBsnStructures {
 	
 	private String orgCode;
 	
+	
+	
 	private String accdflexStructuresCode;
 	
 	private String accdflexStructuresDescription; 
@@ -18,10 +20,7 @@ public class TmsMdOrgBsnStructuresInParam extends TmsMdOrgBsnStructures {
     private String legalEntityCode;
 	
     private String legalEntityName;;
-
-    
-
-
+   
 	public String getLegalEntityCode() {
 		return legalEntityCode;
 	}

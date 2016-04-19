@@ -532,7 +532,7 @@
 									{
 										field : 'custRegistrationNumber',
 										title : '<spring:message code="invoiceprint.validName"/>',
-										width : 150,
+										width : 100,
 										align : 'center'
 									},
 									{
@@ -626,38 +626,14 @@
 										width : 2
 									}, //显示复选框     
 									{
-										field : 'orgCode',
-										title : '<spring:message code="invoiceTrxPool.orgCode"/>',
-										width : 100,
-										align : 'center'
-									},
-									{
-										field : 'orgName',
-										title : '<spring:message code="invoiceTrxPool.orgName"/>',
-										width : 100,
-										align : 'center'
-									},
-									{
-										field : 'taxTrxTypeName',
-										title : '<spring:message code="invoiceprint.taxType"/>',
-										width : 100,
-										align : 'center'
-									},
-									{
-										field : 'taxTrxTypeCode',
-										title : '<spring:message code="invoiceprint.taxCode"/>',
+										field : 'legalEntityCode',
+										title : '销方交易机构代码',
 										width : 100,
 										align : 'center'
 									},
 									{
 										field : 'legalEntityName',
-										title : '<spring:message code="invoiceprint.search.sellerCompanyName"/>',
-										width : 100,
-										align : 'center'
-									},
-									{
-										field : 'legalEntityCode',
-										title : '<spring:message code="invoiceprint.sellerCompanyNo"/>',
+										title : '销方交易机构名称',
 										width : 100,
 										align : 'center'
 									},
@@ -668,12 +644,59 @@
 										align : 'center'
 									},
 									{
+										field : 'trxBatchNum',
+										title : '交易批次号',
+										width : 100,
+										align : 'center'
+									},
+									{
 										field : 'trxDate',
 										title : '<spring:message code="invoiceTrxPool.trxDate"/>',
 										width : 100,
 										align : 'center'
 									},
-									//{ field:'inventoryItemDescripton', title:'<spring:message code="product"/>',width:100,align:'center'},
+									{
+										field : 'sourceCode',
+										title : '系统来源',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'customerNumber',
+										title : '购方客户编码',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'customerName',
+										title : '购方单位名称',
+										width : 100,
+										align : 'center'
+									},
+								/* 	{
+										field : 'custRegistrationCode',
+										title : '购方证件类型',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'custRegistrationNumber',
+										title : '购方证件号码',
+										width : 100,
+										align : 'center'
+									}, */
+									{
+										field : 'custBankAccountNum',
+										title : '购方客户账号',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'custBankBranchName',
+										title : '购方客户账号开户机构',
+										width : 100,
+										align : 'center'
+									},
 									{
 										field : 'inventoryItemNumber',
 										title : '<spring:message code="TmsMdInventoryItems.inventoryItemNumber"/>',
@@ -688,12 +711,73 @@
 									},
 									{
 										field : 'invoiceAmount',
-										title : '<spring:message code="invoiceprint.amountAll"/>',
+										title : '开票交易金额',
 										width : 100,
 										align : 'center'
 									},
-									//{ field:'taxTrxTypeName', title:'<spring:message code="taxItemsmaintain.itemInfo"/>',width:100,align:'center'},
 									{
+										field : 'taxBaseName',
+										title : '税目',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'taxSettingMethod',
+										title : '计税规则',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'taxRate',
+										title : '税率',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'invoiceCategoryName',
+										title : '开票规则',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'registrationNumber',
+										title : '销方纳税人识别号',
+										width : 100,
+										align : 'center'
+									},
+									/* {
+										field : 'registrationNumber',
+										title : '销方交易机构名称',
+										width : 100,
+										align : 'center'
+									}, */
+									/* {
+										field : 'orgCode',
+										title : '<spring:message code="invoiceTrxPool.orgCode"/>',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'orgName',
+										title : '<spring:message code="invoiceTrxPool.orgName"/>',
+										width : 100,
+										align : 'center'
+									}, */
+									{
+										field : 'taxTrxTypeName',
+										title : '<spring:message code="invoiceprint.taxType"/>',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'taxTrxTypeCode',
+										title : '<spring:message code="invoiceprint.taxCode"/>',
+										width : 100,
+										align : 'center'
+									},
+									//{ field:'inventoryItemDescripton', title:'<spring:message code="product"/>',width:100,align:'center'},
+									//{ field:'taxTrxTypeName', title:'<spring:message code="taxItemsmaintain.itemInfo"/>',width:100,align:'center'},
+									/* {
 										field : 'taxRate',
 										title : '<spring:message code="taxRate"/>',
 										width : 100,
@@ -704,10 +788,10 @@
 										title : '<spring:message code="invoiceprint.canAmount"/>',
 										width : 100,
 										align : 'center'
-									},
+									}, */
 									{
-										field : 'usedAmount',
-										title : '<spring:message code="invoiceprint.billingAmount"/>',
+										field : 'invoiceAmount',
+										title : '实际开具金额',
 										width : 100,
 										align : 'center'
 									}, ] ],
@@ -842,17 +926,119 @@
 										width : 2
 									}, //显示复选框     
 									{
-										field : 'orgCode',
-										title : '<spring:message code="invoiceTrxPool.orgCode"/>',
+										field : 'legalEntityCode',
+										title : '销方交易机构代码',
 										width : 100,
 										align : 'center'
 									},
 									{
-										field : 'orgName',
-										title : '<spring:message code="invoiceTrxPool.orgName"/>',
-										width : 150,
+										field : 'legalEntityName',
+										title : '销方交易机构名称',
+										width : 100,
 										align : 'center'
 									},
+									{
+										field : 'trxNumber',
+										title : '<spring:message code="invoiceTrxPool.trxNumber"/>',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'trxBatchNum',
+										title : '交易批次号',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'trxDate',
+										title : '<spring:message code="invoiceTrxPool.trxDate"/>',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'sourceCode',
+										title : '系统来源',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'customerNumber',
+										title : '购方客户编码',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'customerName',
+										title : '购方单位名称',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'custBankAccountNum',
+										title : '购方客户账号',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'custBankBranchName',
+										title : '购方客户账号开户机构',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'inventoryItemNumber',
+										title : '<spring:message code="TmsMdInventoryItems.inventoryItemNumber"/>',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'inventoryItemDescripton',
+										title : '<spring:message code="goodsName"/>',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'invoiceAmount',
+										title : '开票交易金额',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'taxBaseName',
+										title : '税目',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'taxSettingMethod',
+										title : '计税规则',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'taxRate',
+										title : '税率',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'invoiceCategoryName',
+										title : '开票规则',
+										width : 100,
+										align : 'center'
+									},
+									{
+										field : 'registrationNumber',
+										title : '销方纳税人识别号',
+										width : 100,
+										align : 'center'
+									},
+									/* {
+										field : 'registrationNumber',
+										title : '销方交易机构名称',
+										width : 100,
+										align : 'center'
+									}, */
 									{
 										field : 'taxTrxTypeName',
 										title : '<spring:message code="invoiceprint.taxType"/>',
@@ -866,63 +1052,8 @@
 										align : 'center'
 									},
 									{
-										field : 'legalEntityName',
-										title : '<spring:message code="invoiceprint.search.sellerCompanyName"/>',
-										width : 100,
-										align : 'center'
-									},
-									{
-										field : 'legalEntityCode',
-										title : '<spring:message code="invoiceprint.sellerCompanyNo"/>',
-										width : 100,
-										align : 'center'
-									},
-									{
-										field : 'trxNumber',
-										title : '<spring:message code="invoiceTrxPool.trxNumber"/>',
-										width : 100,
-										align : 'center'
-									},
-									{
-										field : 'trxDate',
-										title : '<spring:message code="invoiceTrxPool.trxDate"/>',
-										width : 100,
-										align : 'center'
-									},
-									//{ field:'inventoryItemDescripton', title:'<spring:message code="product"/>',width:100,align:'center'},
-									{
-										field : 'inventoryItemNumber',
-										title : '<spring:message code="TmsMdInventoryItems.inventoryItemNumber"/>',
-										width : 120,
-										align : 'center'
-									},
-									{
-										field : 'inventoryItemDescripton',
-										title : '<spring:message code="goodsName"/>',
-										width : 150,
-										align : 'center'
-									},
-									{
 										field : 'invoiceAmount',
-										title : '<spring:message code="invoiceprint.amountAll"/>',
-										width : 100,
-										align : 'center'
-									},									
-									{
-										field : 'taxRate',
-										title : '<spring:message code="taxRate"/>',
-										width : 100,
-										align : 'center'
-									},
-									{
-										field : 'userfulAmount',
-										title : '<spring:message code="invoiceprint.canAmount"/>',
-										width : 100,
-										align : 'center'
-									},
-									{
-										field : 'usedAmount',
-										title : '<spring:message code="invoiceprint.billingAmount"/>',
+										title : '实际开具金额',
 										width : 100,
 										align : 'center'
 									}, ] ],
@@ -1036,6 +1167,10 @@
 		 $("input",$("#invoice_print_newSearch_customerCode").next("span")).blur(function(){				
 				getCustomerInfoByNumber();
 		 }); 
+		 //根据客户账号搜索客户信息
+		 $("input",$("#invoice_print_newSearch_custBankAccountNum").next("span")).blur(function(){				
+				getCustomerInfoByBankNum();
+		 }); 
 		 
 
 		 $('#invoice_print_newSearch_validNo').textbox('textbox').keydown(function (e) {
@@ -1050,6 +1185,12 @@
              }
 
           });
+		 $('#invoice_print_newSearch_custBankAccountNum').textbox('textbox').keydown(function (e) {
+		        if (e.keyCode == 13) {
+		        	getCustomerInfoByBankNum();
+		        }
+
+		   });
 			Search();
 	});
 
@@ -1178,6 +1319,9 @@
 					}, function(result) {					
 						$("#dgrequestdetail").datagrid('loadData', result);																	
 						$('#dgrequestdetail').datagrid('loaded');
+						//$('#invoice_print_newSearch_customerId').val()
+						$('#invoice_print_newSearch_customerId').textbox('setValue',result.customerId);
+						$('#invoice_req_dlg_customerId').textbox('setValue',result.customerId);
 					}, 'json');
 		}
 		if(flag=='add'){
@@ -1222,7 +1366,8 @@
 					custRegistrationNumber : row.custRegistrationNumber,
 					customerNumber : row.customerNumber,
 					reqAmount : row.reqAmount,
-					newformflag : 'edit'				
+					newformflag : 'edit',
+					customerId:row.customerId
 					/* pageNumber : 1,
 					pageSize : 10 */
 				});  
@@ -1242,9 +1387,10 @@
 									'options').pageNumber,
 							pageSize : $('#dgrequestdetail')
 									.datagrid('options').pageSize
-						}, function(result) {							
+						}, function(result) {		
 							$("#dgrequestdetail").datagrid('loadData', result);																																		
 							$('#dgrequestdetail').datagrid('loaded');
+							//$('#invoice_print_newSearch_customerId').val()
 						}, 'json');
 			 } else {
 				$.messager.confirm(
@@ -1444,9 +1590,9 @@
 				 var ps = "";
 					$.each(rows, function(i, n) {
 						if (i == 0)
-							ps += n.id;
+							ps += n.tempId;
 						else
-							ps += "," + n.id;
+							ps += "," + n.tempId;
 					});
 				 var id = $('#detail_Hid').val();
 				 var flag = $('#newformflag').textbox('getValue');
@@ -1470,10 +1616,17 @@
 					if(flag=='edit'){
 						$("#dgrequestdetail").datagrid("loading");					
 						var id = $('#detail_Hid').val();
+						var lids = "";
+							$.each(rows, function(i, n) {
+								if (i == 0)
+									lids += n.lid;
+								else
+									lids += "," + n.lid;
+							});
 						$.post('citicInvoiceReq/deletereql.do',
 								{
 							        crvatInvoiceReqHId : id,
-									reqlids : ps,
+									reqlids : lids,
 									pageNumber : $('#dgrequestdetail').datagrid(
 											'options').pageNumber,
 									pageSize : $('#dgrequestdetail')
@@ -1649,7 +1802,7 @@
 				$('#invoice_print_newSearch_reqStatus').combobox('setValue',
 						object.invoiceReadyData.status);
 				var rows = $('#dgrequestdetail').datagrid('getRows');				
-				$('#invoice_print_newSearch_level').combobox('setValue','2');
+				$('#invoice_print_newSearch_level').combobox('setValue','3');
 				
 				if('0' == rows.length){
 					$('#saveHeadbtn').linkbutton('disable');
@@ -1751,6 +1904,54 @@
 						/* $('#invoice_print_newSearch_validNo').textbox('setValue',
 								object.customer.custRegistrationNumber); */
 						
+					 	$('#invoice_print_newSearch_customerCode').val(object.customer.customerNumber);
+						/* $('#invoice_print_newSearch_validNo').val(object.customer.custRegistrationNumber); */ 
+						$('#invoice_print_searchOut_validType').combobox('setValue',object.customer.custRegistrationCode);
+						//$('invoice_print_newSearch_customerCode').textbox('required','false');//将另外一个条件变为非必输项
+						/* if (object.customer.id) {
+							$('#newsearchbtn').linkbutton('enable');
+						} */
+					}else{
+						$('#invoice_print_newSearch_bank').textbox('clear');
+						$('#invoice_print_newSearch_bankNum').textbox('clear');
+						$('#invoice_print_newSearch_contactName').textbox('clear');
+						$('#invoice_print_newSearch_address').textbox('clear');
+						$('#invoice_print_newSearch_buyerCompanyName').textbox('clear');
+						$('#invoice_print_newSearch_customerCode').textbox('clear');
+						$.messager.alert('<spring:message code="invoiceprint.reqinfo"/>',
+						'系统内没有相关客户');
+					}
+				}
+			});
+		}
+	}
+	//通过客户账号找出客户信息
+	function getCustomerInfoByBankNum(){
+		var number=$('#invoice_print_newSearch_custBankAccountNum').val();
+		if(number){
+			$.ajax({
+				url : "citicInvoiceReq/getCustomerParam.do?&custBankAccountNum=" + number,
+				dataType : "json",
+				cache : false,
+				success : function(object) {
+					if(object.success){
+						$('#invoice_print_newSearch_bank').textbox('setValue',
+								object.customer.custDepositBankName);
+						$('#invoice_print_newSearch_bankNum').textbox('setValue',
+								object.customer.custDepositBankAccountNum);
+						$('#invoice_print_newSearch_contactName').textbox('setValue',
+								object.customer.contactName);
+						$('#invoice_print_newSearch_address').textbox('setValue',
+								object.customer.custRegistrationAddress);
+						$('#invoice_print_newSearch_buyerCompanyName').textbox(
+								'setValue', object.customer.customerName);
+						$('#invoice_print_newSearch_customerId').textbox('setValue',
+								object.customer.id);
+						$('#invoice_print_newSearch_customerCode').textbox(
+								'setValue', object.customer.customerNumber);
+						/* $('#invoice_print_newSearch_validNo').textbox('setValue',
+								object.customer.custRegistrationNumber); */
+						$('#invoice_print_newSearch_validNo').val(object.customer.custRegistrationNumber); 
 					 	$('#invoice_print_newSearch_customerCode').val(object.customer.customerNumber);
 						/* $('#invoice_print_newSearch_validNo').val(object.customer.custRegistrationNumber); */ 
 						$('#invoice_print_searchOut_validType').combobox('setValue',object.customer.custRegistrationCode);
@@ -1879,6 +2080,10 @@
 						Search();
 					}
 				});		
+	}
+		
+	function revertReq(){
+		
 	}
 	
 	function enableOrdisable(enable){

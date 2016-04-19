@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.deloitte.tms.base.masterdata.model.BaseOrg;
-import com.deloitte.tms.base.taxsetting.model.TmsMdProject;
+import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.DateUtils;
@@ -31,6 +31,7 @@ public class InvoiceSpecialDaoImpl extends BaseDao<InvoiceReqH> implements
 	 * @param pageSize
 	 * @return
 	 */
+	@Override
 	public DaoPage findInvoiceReqHByParams(Map params, Integer pageIndex,
 			Integer pageSize) {
 		StringBuffer query = new StringBuffer();
@@ -119,24 +120,33 @@ public class InvoiceSpecialDaoImpl extends BaseDao<InvoiceReqH> implements
 	}
 
 	/**
-	 * 项目查询
+	 * 根据客户编号查询客户信息
 	 */
 	@Override
-	public List<TmsMdProject> findTmsMdProjectByParams(String contractId) {
-		StringBuffer query = new StringBuffer();
-		Map values = new HashMap();
-		query.append(" from TmsMdProject where 1=1 ");// contractId
-		if (contractId != null) {
-			query.append(" and contractId=:contractId");
-			values.put("contractId", contractId);
+	public List<Customer> findCustomer(String string,String string1) {
+		StringBuffer query=new StringBuffer();
+		Map<String,Object> values=new HashMap<String,Object>();
+		List<Customer> list = null;
+		if(AssertHelper.notEmpty(string))
+		{
+			query.append(" from Customer where 1=1 ");
+			query.append(" and customerNumber=:customerNumber");
+			values.put("customerNumber", string);
+			list =  findBy(query, values);
 		}
-		List<TmsMdProject> list = this.findBy(query.toString(), values);
+		if(AssertHelper.notEmpty(string1)){
+			query.append(" from Customer where 1=1 ");
+			query.append(" and id=:id");
+			values.put("id", string1);
+			list =  findBy(query, values);
+		}
+		
 		return list;
 	}
 
 	@Override
-	public InvoiceReqH getInvoiceReqH(String id) {
-		return (InvoiceReqH) this.get(InvoiceReqH.class, id);
+	public DaoPage findInvoiceReqPByParams(Map params, Integer pageIndex,
+			Integer pageSize) {
+		return null;
 	}
-
 }

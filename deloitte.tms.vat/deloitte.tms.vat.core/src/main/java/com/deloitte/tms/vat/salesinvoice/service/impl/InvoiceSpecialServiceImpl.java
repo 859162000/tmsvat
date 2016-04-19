@@ -17,15 +17,13 @@ import org.springframework.stereotype.Service;
 
 import com.deloitte.tms.base.cache.model.BizOrgNode;
 import com.deloitte.tms.base.cache.utils.OrgCacheUtils;
+import com.deloitte.tms.base.masterdata.dao.TmsMdLegalEntityDao;
 import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.base.masterdata.model.CustomerInParam;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
 import com.deloitte.tms.base.masterdata.service.CustomerService;
-import com.deloitte.tms.base.taxsetting.model.TmsMdContract;
-import com.deloitte.tms.base.taxsetting.model.TmsMdContractInParam;
 import com.deloitte.tms.base.taxsetting.model.TmsMdInventoryItems;
 import com.deloitte.tms.base.taxsetting.model.TmsMdInventoryItemsInParam;
-import com.deloitte.tms.base.taxsetting.model.TmsMdProject;
 import com.deloitte.tms.pl.cache.utils.DictionaryCacheUtils;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
@@ -33,7 +31,6 @@ import com.deloitte.tms.pl.core.commons.utils.reflect.ReflectUtils;
 import com.deloitte.tms.pl.core.dao.IDao;
 import com.deloitte.tms.pl.core.service.impl.BaseService;
 import com.deloitte.tms.pl.flow.utils.FlowHelper;
-import com.deloitte.tms.vat.base.enums.CrvatTaxPoolStatuEnums;
 import com.deloitte.tms.vat.base.enums.InvoiceReqTypeEnums;
 import com.deloitte.tms.vat.base.enums.InvoicingTypeEnums;
 import com.deloitte.tms.vat.core.common.IdGenerator;
@@ -41,8 +38,8 @@ import com.deloitte.tms.vat.salesinvoice.dao.InvoiceSpecialDao;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqH;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqHInParam;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceReqL;
-import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxPool;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoiceReqP;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoiceReqPInParam;
 import com.deloitte.tms.vat.salesinvoice.service.InvoiceSpecialService;
 import com.deloitte.tms.vat.salesinvoice.service.TmsCrvatInvoiceReqPService;
 
@@ -137,6 +134,7 @@ public class InvoiceSpecialServiceImpl extends BaseService implements
 			inparam.setCustDepositBankName(model.getCustomer().getCustDepositBankName());//购方开户银行名称
 			inparam.setCustDepositBankAccountNum(model.getCustomer().getCustDepositBankAccountNum());//购方开户账号
 			inparam.setContactName(model.getCustomer().getContactName());////购方纳税联系人
+			inparam.setCustomerId(model.getCustomerId());
 			
 		}if(AssertHelper.isOrNotEmpty_assert(model.getStatus())){//状态
 			inparam.setStatus(DictionaryCacheUtils.getCodeName("VAT_CR_INVOICE_APPFORM_STATUS",model.getStatus()));
@@ -146,7 +144,7 @@ public class InvoiceSpecialServiceImpl extends BaseService implements
 			BizOrgNode node=OrgCacheUtils.getNodeByOrgId(model.getOrgId());//查询组织信息
 			if(node!=null){
 				inparam.setOrgName(node.getName());//组织名称
-				inparam.setOrgCode(node.getCode());	//组织code	
+				inparam.setOrgCode(node.getCode());	//组织code
 			}
 			
 		}
@@ -244,17 +242,16 @@ public class InvoiceSpecialServiceImpl extends BaseService implements
 
 	@Override
 	/**
-	 * 
+	 * 保存
 	 */
 	public String setUpHead(Map<String, Object> map) throws ParseException {
 		String hid="";
-		String name=map.get("name").toString();
 		if(!AssertHelper.empty(map.get("id"))){//编辑
 			String id = map.get("id").toString();
-			InvoiceReqH invoiceReqH = invoiceSpecialDaoImpl.getInvoiceReqH(id);
+			InvoiceReqH invoiceReqH = (InvoiceReqH) invoiceSpecialDaoImpl.get(InvoiceReqH.class, id);
 			
 			JSONArray jsonArray = JSONArray.fromObject(map.get("dgrequestdetaildata"));
-			List<TmsCrvatInvoiceReqP> invoiceReqPs = new ArrayList<TmsCrvatInvoiceReqP>();				
+			List<TmsCrvatInvoiceReqP> invoiceReqPs = new ArrayList<TmsCrvatInvoiceReqP>();		
 			for(int i=0;i<jsonArray.size(); i++){
 				JSONObject jsonJ = jsonArray.getJSONObject(i);
 				if(null!=jsonJ){
@@ -266,28 +263,32 @@ public class InvoiceSpecialServiceImpl extends BaseService implements
 					invoiceReqP.setInventoryItemId(jsonJ.getString("id"));//商品及服务id
 					invoiceReqP.setInventoryItemQty(Long.parseLong(jsonJ.getString("taxTrxTypeCode")));//数量
 					invoiceReqP.setPriceOfUnit(Long.parseLong(jsonJ.getString("legalEntityName")));//单价
-					invoiceReqP.setAcctdAmountCr(Long.parseLong(jsonJ.getString("legalEntityCode")));//合计金额
-					invoiceReqP.setVatAmount(Long.parseLong(jsonJ.getString("inventory")));//税额
-					invoiceReqP.setInvoiceAmount(Long.parseLong(jsonJ.getString("trxDate")));//净额
+					invoiceReqP.setAcctdAmountCr(new BigDecimal(jsonJ.getString("legalEntityCode")));//合计金额
+					invoiceReqP.setVatAmount(new BigDecimal(jsonJ.getString("inventory")));//税额
+					invoiceReqP.setInvoiceAmount(new BigDecimal(jsonJ.getString("trxDate")));//净额
 					
 					invoiceReqPs.add(invoiceReqP);
 				}
 			}
 			invoiceReqH.setInvoiceReqPs(invoiceReqPs);
 			this.saveInvoiceReqHeadAndRel(invoiceReqH);
-			// TODO this.updateInvoiceReq(invoiceReqH);
 			hid=invoiceReqH.getId();
 		}else{//新建
 			InvoiceReqH invoiceReqH = new InvoiceReqH();
 			invoiceReqH.setId(IdGenerator.getUUID());
-			invoiceReqH.setCustomerId(map.get("customerId").toString());
-			invoiceReqH.setCustRegistrationNumber(map.get("custRegistrationNumber").toString());
-			if(null!=map.get("crvatInvoiceReqNumber")&&map.get("crvatInvoiceReqNumber").toString().length()>0){
-				invoiceReqH.setCrvatInvoiceReqNumber(map.get("crvatInvoiceReqNumber").toString());
-			}else{
-				String sequece = FlowHelper.getNextFlowNo("INVOICEREQ");
-				invoiceReqH.setCrvatInvoiceReqNumber(sequece);
+			
+			//根据客户编号查询客户信息
+			List<Customer> listCustomer = invoiceSpecialDaoImpl.findCustomer(map.get("customerNumber").toString(),null);
+			if(listCustomer.size()>0){
+				Customer customer = listCustomer.get(0);
+				invoiceReqH.setCustomerName(customer.getCustomerName());//购方名称
+				invoiceReqH.setCustomerId(customer.getId());
+				invoiceReqH.setCustRegistrationCode(customer.getCustRegistrationCode());//购方证件类型
+				invoiceReqH.setCustRegistrationNumber(customer.getCustRegistrationNumber());//购方证件号码
 			}
+			//前端页面不去生成申请单编号，后台创建时生成
+			String sequece = FlowHelper.getNextFlowNo("INVOICEREQ");
+			invoiceReqH.setCrvatInvoiceReqNumber(sequece);
 			invoiceReqH.setStatus(map.get("status").toString());
 			invoiceReqH.setIsAllMapping("0");
 			invoiceReqH.setMappingStatus("0");
@@ -304,7 +305,6 @@ public class InvoiceSpecialServiceImpl extends BaseService implements
 			List<TmsCrvatInvoiceReqP> invoiceReqPs = new ArrayList<TmsCrvatInvoiceReqP>();
 			for(int i=0;i<jsonArray.size(); i++){
 				JSONObject jsonJ = jsonArray.getJSONObject(i);
-				System.out.println("jsonJ="+jsonJ);
 				if(null!=jsonJ){
 					TmsCrvatInvoiceReqP p = new TmsCrvatInvoiceReqP();
 					p.setId(IdGenerator.getUUID());
@@ -314,9 +314,10 @@ public class InvoiceSpecialServiceImpl extends BaseService implements
 					p.setInventoryItemId(jsonJ.getString("id"));//商品及服务id
 					p.setInventoryItemQty(new BigDecimal(jsonJ.getString("taxTrxTypeCode")).longValue());//数量
 					p.setPriceOfUnit(new BigDecimal(jsonJ.getString("legalEntityName")).longValue());//单价
-					p.setAcctdAmountCr(new BigDecimal(jsonJ.getString("legalEntityCode")).longValue());//合计金额
-					p.setVatAmount(new BigDecimal(jsonJ.getString("inventory")).longValue());//税额
-					p.setInvoiceAmount(new BigDecimal(jsonJ.getString("trxDate")).longValue());//净额
+					p.setAcctdAmountCr(new BigDecimal(jsonJ.getString("legalEntityCode")));//合计金额
+					p.setVatAmount(new BigDecimal(jsonJ.getString("inventory")));//税额
+					p.setInvoiceAmount(new BigDecimal(jsonJ.getString("trxDate")));//净额
+					//开票方式，枚举值：D=明细，S=汇总
 					p.setInvoicingType(InvoicingTypeEnums.DETAIL.getValue());
 					
 					System.out.println(jsonJ.getString("taxRate"));//税率
@@ -355,7 +356,7 @@ public class InvoiceSpecialServiceImpl extends BaseService implements
 	public void updateInvoiceReqHeadAndRel(InvoiceReqH invoiceReqH) {
 		invoiceSpecialDaoImpl.save(invoiceReqH);
 		String hid = invoiceReqH.getId();
-		this.deleteInvoiceReLByReHId(hid);
+		this.deleteInvoiceReLByReqHId(hid);
 		for(TmsCrvatInvoiceReqP invoiceReqP:invoiceReqH.getInvoiceReqPs()){
 			invoiceReqP.setCrvatInvoiceReqHId(hid);
 			//save it
@@ -368,25 +369,50 @@ public class InvoiceSpecialServiceImpl extends BaseService implements
 	 * 根据头表ID删除发票明细
 	 * @param id
 	 */
-	public void deleteInvoiceReLByReHId(String id) {
-		Map<String,Object> values = new HashMap<String, Object>();
-		values.put("id", id);
-		invoiceSpecialDaoImpl.executeHqlProduce("delete from TmsCrvatInvoiceReqP where crvatInvoiceReqHId = :id", values);
+	public void deleteInvoiceReLByReqHId(String id) {
+		List<TmsCrvatInvoiceReqP> reqPs = invoiceReqPService.findInvoiceReLByReqHId(id);
+		if(reqPs.size()>0){
+			for(TmsCrvatInvoiceReqP reqP:reqPs){
+				invoiceReqPService.remove(reqP);
+			}
+		}
 	}
 
 	@Override
+	/**
+	 * 删除选中的特殊发票申请单（无合同）
+	 */
 	public void deleteFromReqAll(String[] ids) {
 		for (int i = 0; i < ids.length; i++) {
 			InvoiceReqH entity=(InvoiceReqH) invoiceSpecialDaoImpl.get(InvoiceReqH.class, ids[i]);
-			/*List<InvoiceReqL>list=(List<InvoiceReqL>) entity.getInvoiceReqLs();*/
-			List<TmsCrvatInvoiceReqP> list = (List<TmsCrvatInvoiceReqP>) entity.getInvoiceReqPs();
+			deleteInvoiceReLByReqHId(entity.getId());
 			invoiceSpecialDaoImpl.remove(entity);
-			for (int j = 0; j < list.size(); j++) {
-				String invoiceReqPID = list.get(i).getId();
-				TmsCrvatInvoiceReqP p = (TmsCrvatInvoiceReqP) invoiceReqPService.get(TmsCrvatInvoiceReqP.class, invoiceReqPID);
-				invoiceReqPService.remove(p);
-			}
-			invoiceSpecialDaoImpl.removeAll(list);
 		}
+	}
+
+	@Override
+	public InvoiceReqH getInvoiceReqH(String id) {
+		return (InvoiceReqH) invoiceSpecialDaoImpl.get(InvoiceReqH.class, id);
+	}
+
+	public TmsCrvatInvoiceReqPInParam convertReqP2Param(TmsCrvatInvoiceReqP reqP) {
+		TmsCrvatInvoiceReqPInParam inParam = new TmsCrvatInvoiceReqPInParam();
+		ReflectUtils.copyProperties(reqP, inParam);
+		//从商品信息获取税率数据
+		TmsMdInventoryItems item = (TmsMdInventoryItems) invoiceSpecialDaoImpl.get(TmsMdInventoryItems.class, reqP.getInventoryItemId());
+		if (null != item && null != item.getTaxRate()) {
+			inParam.setTaxRate(item.getTaxRate());
+		}
+		return inParam;
+	}
+
+	@Override
+	public List<TmsCrvatInvoiceReqPInParam> convertReqP2Param(
+			List<TmsCrvatInvoiceReqP> reqPs) {
+		List<TmsCrvatInvoiceReqPInParam> inParams = new ArrayList<TmsCrvatInvoiceReqPInParam>();
+		for(TmsCrvatInvoiceReqP reqP:reqPs){
+			inParams.add(convertReqP2Param(reqP));
+		}
+		return inParams;
 	}
 }

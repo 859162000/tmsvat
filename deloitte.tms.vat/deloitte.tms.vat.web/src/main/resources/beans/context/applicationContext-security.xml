@@ -35,7 +35,11 @@
 	<beans:bean parent="ling2.anonymousUrl">
 	  <beans:property name="urlPattern" value="/cache/testOrg1.do"></beans:property> 
 	</beans:bean>
-
+	
+	<beans:bean parent="ling2.anonymousUrl">
+	  <beans:property name="urlPattern" value="/vat/todoTaskInit.do"></beans:property> 
+	</beans:bean>
+	
 </beans:beans>
 
 

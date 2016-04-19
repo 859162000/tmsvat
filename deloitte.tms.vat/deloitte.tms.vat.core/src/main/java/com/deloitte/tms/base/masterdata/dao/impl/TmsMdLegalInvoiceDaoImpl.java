@@ -71,6 +71,9 @@ public class TmsMdLegalInvoiceDaoImpl extends BaseDao<TmsMdLegalInvoice> impleme
 		}if(AssertHelper.isOrNotEmpty_assert(params.get("id"))){
 			query.append(" and legalInvoiceId=:legalInvoiceId");
 			values.put("legalInvoiceId", params.get("id"));
+		}if(AssertHelper.isOrNotEmpty_assert(params.get("registrationNumber"))){
+			query.append(" and registrationNumber=:registrationNumber");
+			values.put("registrationNumber", params.get("registrationNumber"));
 		}
 	}
 	@Override

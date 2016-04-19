@@ -284,7 +284,9 @@ public class InvoiceSpecialContractBathController extends BaseController {
 		JSONArray jsonArray1 = JSONArray.fromObject(daoPage.getResult(),jsonConfig);
 		result.put("total", daoPage.getRecordCount());
 		result.put("success", "success");
+		if(li.size()>0){
 		result.put("invoiceAmount", li.get(li.size()-1).getInvoiceAmounts());
+		}
 		result.put("rows", jsonArray1.toString());
 		retJson(response,result);
 		

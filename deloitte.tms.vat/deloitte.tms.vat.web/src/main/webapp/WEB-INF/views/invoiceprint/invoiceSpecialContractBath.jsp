@@ -11,7 +11,7 @@
 </head>
 <body class="easyui-layout" id="layoutid" style="overflow-y: hidden"
 	scroll="no">
-	<div data-options="region:'east',split:true"
+	<%-- <div data-options="region:'east',split:true"
 		title="<spring:message code="invoiceprint.reqinfo"/>"
 		style="width: 100%;">
 
@@ -30,20 +30,20 @@
 								<table style="width: 1000px; height: 100%">
 									<tr>
 
-										<%--申请单编号 --%>
+										申请单编号
 										<td><spring:message
 												code="invoiceSpecialContractBath.save.readyNo" />：</td>
 										<td><input class="easyui-textbox"
 											id="invoice_print_newSearch_readyNo"
 											name="crvatInvoiceReqNumber" readonly="true"
 											style="width: 120px;" /></td>
-										<%--申请日期 --%>
+										申请日期
 										<td><spring:message
 												code="invoiceSpecialContractBath.save.invoiceReqDate" />：</td>
 										<td><input id="invoice_print_newSearch_applyTime"
 											readonly="true" name="invoiceReqDate" readonly="true"
 											class="easyui-datebox" style="width: 120px;" /></td>
-										<%--申请状态 --%>
+										申请状态
 										<td><spring:message
 												code="invoiceSpecialContractBath.save.readyStatus" />：</td>
 										<td><input:select easyuiStyle="width:150px;"
@@ -52,29 +52,29 @@
 												<input:systemStatusOption
 													parentCode="VAT_CR_INVOICE_APPFORM_STATUS" />
 											</input:select></td>
-										<%--合计金额 --%>
+										合计金额
 										<td><spring:message code="invoiceprint.amountAll" />：</td>
 										<td><input id="invoice_print_newSearch_amountAll"
 											name="invoiceAmount" class="easyui-textbox" readonly="true"
 											style="width: 120px;"></td>
 									</tr>
 									<tr>
-										<%--销方纳税人识别号registration_number --%>
+										销方纳税人识别号registration_number
 										<td><spring:message
 												code="invoiceSpecialContractBath.save.registrationNumber" /></td>
 										<td><input id="legalEntityCode" name="registrationNumber"
 											class="easyui-textbox" style="width: 120px;" readonly="true" /></td>
-										<%--销方纳税人名称taxpayerName --%>
+										销方纳税人名称taxpayerName
 										<td><spring:message
 												code="invoiceSpecialContractBath.save.taxpayerName" /></td>
 										<td><input id="taxpayerName" name="legalEntityName"
 											class="easyui-textbox" style="width: 120px;" readonly="true" /></td>
-										<%--发票打印组织 --%>
+										发票打印组织
 										<td><spring:message
 												code="invoiceSpecialContractBath.save.orgName" /></td>
 										<td><input id="orgNameId" name="orgName"
 											class="easyui-textbox" style="width: 150px;" readonly="true" /></td>
-										<%--打印终端编号 --%>
+										打印终端编号
 										<td><spring:message
 												code="invoiceSpecialContractBath.save.equipmentNumber" /></td>
 										<td><input id="equipmentId" name="equipmentCode"
@@ -82,23 +82,23 @@
 
 									</tr>
 									<tr>
-										<%--开户银行 --%>
+										开户银行
 										<td><spring:message code="client.bank" />：</td>
 										<td><select id="invoice_print_newSearch_bank"
 											name="bankBranchName" class="easyui-textbox" readonly="true"
 											style="width: 120px;"></td>
-										<%--开户账号 --%>
+										开户账号
 										<td><spring:message code="client.bankNum" />：</td>
 										<td><input id="invoice_print_newSearch_bankNum"
 											name="bankAccountNum" class="easyui-textbox" readonly="true"
 											style="width: 120px;"></td>
-										<%--联系电话 --%>
+										联系电话
 										<td><spring:message
 												code="com.vat.base.model.customer.contactPhone.text" />：</td>
 										<td><select id="invoice_print_newSearch_contactName"
 											name="registrationContactPhone" class="easyui-textbox"
 											readonly="true" style="width: 150px;"></td>
-										<%--注册地址--%>
+										注册地址
 										<td><spring:message code="crvatInvoicePre.address" />：</td>
 										<td><input id="invoice_print_newSearch_address"
 											name="registrationContactAddress" class="easyui-textbox"
@@ -106,7 +106,7 @@
 
 									</tr>
 									<tr>
-										<%--是否已收款 --%>
+										是否已收款
 										<td>是否已收款：</td>
 										<td><select class="easyui-combobox" style="width: 120px;"
 											id="isReceipts" name="isReceipts">
@@ -124,7 +124,7 @@
 
 									</tr>
 									<tr style="display: none">
-										<%--分页数据 --%>
+										分页数据
 										<td><input id="newpageNumber" class="easyui-textbox"
 											type="text" style="width: 0px;" name="pageNumber" value=""></input></td>
 										<td><input id="newpageSize" class="easyui-textbox"
@@ -132,19 +132,19 @@
 									</tr>
 
 									<tr style="display: none">
-										<%--销方纳税人id --%>
+										销方纳税人id
 										<td><input id="legalEntityId" class="easyui-textbox"
 											name="legalEntityId" style="height: 20px"></input></td>
-										<%--特殊批量开票申请ID--%>
+										特殊批量开票申请ID
 										<td><input id="appuseruuid_id" class="easyui-textbox"
 											name="appuseruuid" style="height: 20px"></input></td>
-										<%--发票明细数据 --%>
+										发票明细数据
 										<td input id="rowsid" name="dgrequestdetaildata"
 											class="easyui-textbox" style="height: 20px"></td>
-										<%--组织id --%>
+										组织id
 										<td input id="orgId_id" name="orgId" class="easyui-textbox"
 											style="height: 20px"></td>
-											<%--提交或者保存标识 --%>
+											提交或者保存标识
 										<td input id="tips_id" name="tips" class="easyui-textbox"
 											style="height: 20px"></td>
 									</tr>
@@ -180,7 +180,7 @@
 
 
 
-	</div>
+	</div> --%>
 
 	<div data-options="region:'center',iconCls:'icon-ok'"
 		title="<spring:message code="sourcesubject.quicksearch"/>">
@@ -235,6 +235,8 @@
 									style="width: 0px;" name="pageSize" value=""></input></td>
 								<td><input id="categoryName" name="categoryName"
 									class="easyui-combobox" style="width: 0px;"></input></td>
+									<td><input id="appuseruuid_ids" class="easyui-textbox"
+											name="appuseruuid" style="height: 20px"></td>
 							</tr>
 						</table>
 					</form>
@@ -261,7 +263,7 @@
 		</div>
 	</div>
 
-	<%--导入弹出框 --%>
+	<%-- 
 	<div class="easyui-dialog" id="values_dialog"
 		style="height: 30%; width: 30%" title="导入发票明细"
 		data-options="				
@@ -287,7 +289,7 @@
 			<input id="teacher_dialog" name="sourceFile" />
 		</form>
 
-	</div>
+	</div> --%>
 <%--查看明细 --%>
 <div class="easyui-dialog" id="examineList"
 		style="height: 100%; width: 100%" title="查看发票明细"
@@ -368,12 +370,6 @@
 										align : 'center'
 									},
 									{
-										field : 'orgCode',//开票申请组织
-										title : '<spring:message code="invoiceprint.dept"/>',
-										width : 100,
-										align : 'center'
-									},
-									{
 										field : 'invoiceReqDate',//申请日期
 										title : '<spring:message code="invoiceprint.search.applyTime"/>',
 										width : 100,
@@ -386,12 +382,25 @@
 										align : 'center'
 									},
 									{
+										field : 'approvalBy',//审批人
+										title : '审批人',
+										width : 100,
+										align : 'center'
+									},
+									{
 										field : 'attribute1',//合计金额
 										title : '<spring:message code="invoiceprint.amountAll"/>',
 										width : 100,
 										align : 'center'
-									}, ] ],
-							toolbar : [ {
+									}, {
+										field : 'attribute4',//申请单处理状态
+										title : '申请单处理状态',
+										width : 100,
+										align : 'center'
+									}, 
+									
+									] ],
+							toolbar : [/*  {
 								text : '新增申请单',
 								iconCls : 'icon-add',
 								handler : function() {
@@ -430,7 +439,7 @@
 								cautious(); //申请单查询页面提交申请单
 								}
 							}, '-' ,
-							    {
+							    */ {
 											text : '查看明细',
 											iconCls : 'icon-redo',
 											handler : function() {
@@ -470,7 +479,7 @@
 	 * ready加载事件
 	 */
 	$(document).ready(function() {
-		$("#layoutid").layout('collapse', 'east');//隐藏右侧面板
+		//$("#layoutid").layout('collapse', 'east');//隐藏右侧面板
 		$('#searchform').form('load', {
 			pageNumber : $('#dg').datagrid('options').pageNumber,
 			pageSize : $('#dg').datagrid('options').pageSize
@@ -486,7 +495,8 @@ function examineList(){
 		if (rows.length == 1) {//判断行数
 			var row = $('#dg').datagrid('getSelected');//得到行数据
 		
-				$('#appuseruuid_id').textbox('setValue', row.id);
+				$('#appuseruuid_ids').textbox('setValue', row.id);
+				
 				var url = "${vat}/invoiceSpecialContractBathController/listTmsCrvatInvReqBatchesL.do";
 				dgrequestdetailexamineList(url);
 				$("#examineList").dialog('open');//打开弹出框
@@ -507,17 +517,35 @@ function dgrequestdetailexamineList(url) {
 				rownumbers : true,
 				pagination : true,
 				queryParams : {
-					appuseruuid : $("#appuseruuid_id").textbox('getValue'),
+					appuseruuid : $("#appuseruuid_ids").textbox('getValue'),
 				},
 				columns : [ [ {
+					colspan : 2,
+					title : '处理结果',
+					align : 'center',
+				}, {
 					colspan : 8,
 					title : '客户基本信息',
 					align : 'center',
 				}, {
-					colspan : 20,
+					colspan : 21,
 					title : ' 开票交易信息',
 					align : 'center',
-				}, ], [ {
+				}, ], 
+				[ {
+					field : 'attribute4',//申请单处理状态
+					title : '申请单处理状态',
+					width : 100,
+					align : 'center',
+				 
+
+				}, {
+					field : 'attribute5',//错误信息
+					title : '错误信息',
+					width : 500,
+					align : 'center'
+				},
+				  {
 					field : 'customerNumber',
 					title : "客户编码",
 					width : 80,
@@ -668,6 +696,11 @@ function dgrequestdetailexamineList(url) {
 					title : '是否含税',
 					width : 80,
 					editor : 'text',
+				},  {
+					field : 'isReceipts',
+					title : '是否已收款',
+					width : 80,
+					editor : 'text',
 				}, {
 					field : 'invoiceAmount',
 					title : '开票金额',
@@ -675,12 +708,29 @@ function dgrequestdetailexamineList(url) {
 					align : 'center',
 					editor : 'numberbox'
 				} ] ],
+				   onLoadSuccess:function(data){   
+				        $('#dgrequestdetailexamineList').datagrid('doCellTip',{cls:{'background-color':'red'},delay:1000});   
+				    }  
+				
 			});
 
 }
-	/**
+function orgFormat(val, row) {
+	if (val)
+		return val.orgName;
+	else
+		return "";
+}
+//弹出框
+function initValues_dialog() {
+	$("#examineList").dialog({
+		closed : true,
+		region : 'center',//弹出框位置
+	});
+}
+	/* 
 	 * 左滑面板发票明细表格
-	 */
+	
 	function rightDgrequestdetail(url) {
 		$('#dgrequestdetail').datagrid(
 				{
@@ -908,9 +958,9 @@ function dgrequestdetailexamineList(url) {
 
 	}
 
-	/**
+	
 	 * 发票弹出框
-	 */
+	 
 	function initValues_dialog() {
 		$("#values_dialog").dialog({
 			closed : true,
@@ -922,9 +972,9 @@ function dgrequestdetailexamineList(url) {
 		});
 	}
 
-	/**
+	
 	 * 发票明细保存
-	 */
+	 
 	function inventoryItemSave() {
 		$('#dgrequestdetail').datagrid('acceptChanges');
 		$('#dgrequestdetail').datagrid('clearSelections');
@@ -932,9 +982,9 @@ function dgrequestdetailexamineList(url) {
 		$("#addba").linkbutton("enable");
 		$("#deletem").linkbutton("enable");
 	}
-	/**
+	
 	 * 添加交易信息
-	 */
+	
 	var leijisumCount = 0;
 	function addDetails() {
 
@@ -955,21 +1005,21 @@ function dgrequestdetailexamineList(url) {
 		leijisumCount = leijisumCount + 1;
 
 	}
-	/**
+	
 	 * 导入事件
-	 */
+	 
 	function teacher() {
 		$("#values_dialog").dialog('open');//打开弹出框
 	}
 	/**
 	 * 设置文件框
-	 */
+	
 	$('#teacher_dialog').filebox({
 		buttonText : '选择文件',
 	});
 	/**
 	 * 上传文件
-	 */
+	 
 	function contractNumberSave() {
 		$("#ff")
 				.form(
@@ -1003,7 +1053,7 @@ function dgrequestdetailexamineList(url) {
 	}
 /**
  * 下载
- */
+ 
 function downloadExcel(){
 	window.location.href='${vat}/invoiceSpecialContractBathController/download.do';
 	}
@@ -1011,7 +1061,7 @@ function downloadExcel(){
 
 	/**
 	 * 发票明细删除
-	 */
+	 
 	function inventoryItemRemove() {
 		$.messager.confirm('确认', '确认删除?', function(row) {
 			if (row) {
@@ -1030,7 +1080,7 @@ function downloadExcel(){
 				$('#dgrequestdetail').datagrid('selectRow', 0);
 			}
 		});
-	}
+	} */
 	/**
 	 * 重新对申请表单明细分页信息
 	 */
@@ -1057,9 +1107,9 @@ function downloadExcel(){
 						});
 
 	}
-	/**
+/* 	
 	 * 编辑申请单
-	 */
+	 
 	function editDetail() {
 		var rows = $('#dg').datagrid('getSelections');//得到选择数据行
 		if (rows.length == 1) {//判断行数
@@ -1158,9 +1208,9 @@ function downloadExcel(){
 					'<spring:message code="invoiceprint.error"/>');
 		}
 	}
-/**
+
  * 审批
- */
+
  function cautious(){
 		var rows = $('#dg').datagrid('getSelections');//得到选择数据行
 		var id = [];
@@ -1186,7 +1236,7 @@ function downloadExcel(){
 		
 		}
 			
-}
+} */
 	function clearSearchForm() {//清除申请表单
 		$('#searchform').form('clear');
 		var pageNumber = $('#dg').datagrid('options').pageNumber;
@@ -1196,7 +1246,7 @@ function downloadExcel(){
 			pageSize : pageSize
 		});
 	}
-	function clearDetailForm() {//清空右侧滑动面版表单
+	/* function clearDetailForm() {//清空右侧滑动面版表单
 		$('#newDetailForm').form('clear');
 		var pageNumber = $('#dgrequestdetail').datagrid('options').pageNumber;
 		var pageSize = $('#dgrequestdetail').datagrid('options').pageSize;
@@ -1362,12 +1412,12 @@ function downloadExcel(){
 				if (object.success) {
 					Search();
 				}
-				/* $.messager.alert('<spring:message code="system.alert"/>',
-						object.msg); */
+				$.messager.alert('<spring:message code="system.alert"/>',
+						object.msg); 
 			}
 		});
 	}
-	
+	 */
 	function addTo() {
 		$('#saveform').form('clear');
 		initProjdg('');
@@ -1434,6 +1484,121 @@ function downloadExcel(){
 	};
 	$.fn.datagrid.defaults.onHeaderContextMenu = createGridHeaderContextMenu;
 	$.fn.treegrid.defaults.onHeaderContextMenu = createGridHeaderContextMenu;
+	
+
+    /**  
+     * 扩展两个方法  
+     */  
+    $.extend($.fn.datagrid.methods, {   
+        /**
+         * 开打提示功能  
+         * @param {} jq  
+         * @param {} params 提示消息框的样式  
+         * @return {}  
+         */  
+        doCellTip : function(jq, params) {   
+            function showTip(data, td, e) {   
+                if ($(td).text() == "")   
+                    return;   
+                data.tooltip.text($(td).text()).css({   
+                            top : (e.pageY + 10) + 'px',   
+                            left : (e.pageX + 20) + 'px',   
+                            'z-index' : $.fn.window.defaults.zIndex,   
+                            display : 'block'   
+                        });   
+            };   
+            return jq.each(function() {   
+                var grid = $(this);   
+                var options = $(this).data('datagrid');   
+                if (!options.tooltip) {   
+                    var panel = grid.datagrid('getPanel').panel('panel');   
+                    var defaultCls = {   
+                        'border' : '1px solid #333',   
+                        'padding' : '1px',   
+                        'color' : '#333',   
+                        'background' : '#f7f5d1',   
+                        'position' : 'absolute',   
+                        'max-width' : '200px',   
+                        'border-radius' : '4px',   
+                        '-moz-border-radius' : '4px',   
+                        '-webkit-border-radius' : '4px',   
+                        'display' : 'none'   
+                    }   
+                    var tooltip = $("<div id='celltip'></div>").appendTo('body');   
+                    tooltip.css($.extend({}, defaultCls, params.cls));   
+                    options.tooltip = tooltip;   
+                    panel.find('.datagrid-body').each(function() {   
+                        var delegateEle = $(this).find('> div.datagrid-body-inner').length   
+                                ? $(this).find('> div.datagrid-body-inner')[0]   
+                                : this;   
+                        $(delegateEle).undelegate('td', 'mouseover').undelegate(   
+                                'td', 'mouseout').undelegate('td', 'mousemove')   
+                                .delegate('td', {   
+                                    'mouseover' : function(e) {   
+                                        if (params.delay) {   
+                                            if (options.tipDelayTime)   
+                                                clearTimeout(options.tipDelayTime);   
+                                            var that = this;   
+                                            options.tipDelayTime = setTimeout(   
+                                                    function() {   
+                                                        showTip(options, that, e);   
+                                                    }, params.delay);   
+                                        } else {   
+                                            showTip(options, this, e);   
+                                        }   
+      
+                                    },   
+                                    'mouseout' : function(e) {   
+                                        if (options.tipDelayTime)   
+                                            clearTimeout(options.tipDelayTime);   
+                                        options.tooltip.css({   
+                                                    'display' : 'none'   
+                                                });   
+                                    },   
+                                    'mousemove' : function(e) {   
+                                        var that = this;   
+                                        if (options.tipDelayTime) {   
+                                            clearTimeout(options.tipDelayTime);   
+                                            options.tipDelayTime = setTimeout(   
+                                                    function() {   
+                                                        showTip(options, that, e);   
+                                                    }, params.delay);   
+                                        } else {   
+                                            showTip(options, that, e);   
+                                        }   
+                                    }   
+                                });   
+                    });   
+      
+                }   
+      
+            });   
+        },   
+        /**
+         * 关闭消息提示功能  
+         * @param {} jq  
+         * @return {}  
+         */  
+        cancelCellTip : function(jq) {   
+            return jq.each(function() {   
+                        var data = $(this).data('datagrid');   
+                        if (data.tooltip) {   
+                            data.tooltip.remove();   
+                            data.tooltip = null;   
+                            var panel = $(this).datagrid('getPanel').panel('panel');   
+                            panel.find('.datagrid-body').undelegate('td',   
+                                    'mouseover').undelegate('td', 'mouseout')   
+                                    .undelegate('td', 'mousemove')   
+                        }   
+                        if (data.tipDelayTime) {   
+                            clearTimeout(data.tipDelayTime);   
+                            data.tipDelayTime = null;   
+                        }   
+                    });   
+        }   
+    });  
+
+	
 </script>
 
 </html>

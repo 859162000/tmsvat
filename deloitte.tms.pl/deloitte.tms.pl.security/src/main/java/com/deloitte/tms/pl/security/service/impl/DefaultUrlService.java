@@ -64,7 +64,7 @@ public class DefaultUrlService extends BaseService implements IUrlService{
 
 	@Override
 	public List<DefaultUrl> loadAllUrls() {
-		return urlDao.find("from DefaultUrl where 1=1");
+		return urlDao.find("from DefaultUrl where 1=1 order by order");
 	}
 
 	@Override

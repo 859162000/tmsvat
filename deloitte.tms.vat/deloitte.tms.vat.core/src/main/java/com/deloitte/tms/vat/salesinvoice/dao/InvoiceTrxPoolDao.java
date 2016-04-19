@@ -23,6 +23,7 @@ public interface InvoiceTrxPoolDao extends IDao<InvoiceTrxPool>{
 	public void deleteTempCrvatInvoiceReqLByReqHid(String reqHid);
 	public void deleteTempCrvatInvoiceReqLById(String id);
 	public void deleteTempCrvatInvoiceReqLByUserName(String userName);
+    public DaoPage findInvoiceTrxPoolByParams4Query(Map params, Integer pageIndex,Integer pageSize);
 
 }
 

@@ -23,6 +23,7 @@ import com.deloitte.tms.base.taxsetting.model.TmsMdProject;
 import com.deloitte.tms.base.taxsetting.model.TmsMdProjectInParam;
 import com.deloitte.tms.base.taxsetting.service.TmsMdContractService;
 import com.deloitte.tms.base.taxsetting.service.TmsMdProjectService;
+import com.deloitte.tms.pl.core.commons.exception.BusinessException;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.vat.controller.BaseController;
@@ -87,14 +88,27 @@ public class TmsMdContractController extends BaseController{
 	@ResponseBody
 	@RequestMapping(value = "/saveOrUpdateTmsMdContract", method = RequestMethod.POST)
 	public void saveTmsMdFlexValueSets(TmsMdContractInParam inParam,HttpServletResponse response) throws Exception {
+		
+		JSONObject result = new JSONObject();
+		
 		TmsMdContract entity=tmsMdContractService.convertTmsMdContractInParamToEntity(inParam);
+		entity.setEnabledFlag("1");
 		if(AssertHelper.empty(entity.getId())||"0".equals(entity.getId())){
 			entity.setId(IdGenerator.getUUID());
+			
+			TmsMdContract tmsMdContract = tmsMdContractService.getContractByNumber(entity.getContractNumber());
+			if(AssertHelper.notEmpty(tmsMdContract)){
+				result.put("status", false);
+				result.put("errMsg", "编码为"+entity.getContractNumber()+"的合同已存在！！");
+				retJson(response, result);
+				return;
+			}
+			
 			tmsMdContractService.save(entity);
 		}else{
 			tmsMdContractService.update(entity);
 		}
-		JSONObject result = new JSONObject();
+		
 		result.put("contract_id", entity.getId());
 		result.put("status", true);
 		retJson(response, result);
@@ -139,14 +153,17 @@ public class TmsMdContractController extends BaseController{
 	@ResponseBody
 	@RequestMapping(value = "/saveOrUpdateProject")
 	public void saveTmsMdFlexValues(TmsMdProjectInParam inParam,HttpServletResponse response) throws Exception {
+		
+		JSONObject result = new JSONObject();
+		
 		TmsMdProject entity=tmsMdProjectService.convertTmsMdProjectInParamToEntity(inParam);
+		entity.setEnabledFlag("1");
 		if(AssertHelper.empty(entity.getId())){
 			entity.setId(IdGenerator.getUUID());
 			tmsMdProjectService.save(entity);
 		}else{
 			tmsMdProjectService.update(entity);
 		}
-		JSONObject result = new JSONObject();
 		result.put("status", true);
 		retJson(response, result);
 	}

@@ -614,8 +614,29 @@
     			   flag = 0;
     			   break;
     		   }else{
-    			   flag = 1;
-    		   }
+			    	var senddata = 'startInvoiceNumber='+validataData[i].startInvoiceNumber+'&endInvoiceNumber='+validataData[i].endInvoiceNumber+'&invoiceCode='+validataData[i].invoiceCode;
+	                var breakFlag = 0;
+				    $.ajax({
+				        url: '${vat}/invoiceTrx/determineExistOrNot.do',  
+				        type: "POST",
+				        async: false,  
+				        data: senddata,
+				        dataType: "json",  
+				        cache: false,  
+				        success: function(result){
+				    		if(result.existOrNot == "true"){
+				    		    alert("入库发票号码不能重复！");
+								breakFlag = 1;
+				    			flag = 0;
+							}else{
+								flag = 1;
+							}
+				        }
+				    });
+					if(breakFlag == 1){
+		    			break;
+					}
+	            }
     		}
     		if(flag == 1){
     				$.messager.confirm("<spring:message code='client.datacommit.formsave.confirm.title'/>","<spring:message code='client.datacommit.formsave.confirm.text'/>",function(result){

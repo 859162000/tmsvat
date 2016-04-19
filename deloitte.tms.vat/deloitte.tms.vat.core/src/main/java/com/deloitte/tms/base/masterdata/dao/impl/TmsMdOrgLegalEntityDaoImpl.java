@@ -16,6 +16,7 @@ import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
 import com.deloitte.tms.base.masterdata.model.TmsMdOrgLegalEntity;
 import com.deloitte.tms.base.masterdata.model.TmsMdOrgLegalEntityInParam;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
+import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.dao.impl.BaseDao;
 import com.deloitte.tms.pl.security.utils.LittleUtils;
 /**
@@ -105,8 +106,12 @@ legalEntityName
 				Set<String> keys = params.keySet(); 
 				for(String k : keys ){
 					
-					if( !LittleUtils.strEmpty(  params.get(k) ) ){
+					//if( !LittleUtils.strEmpty(  params.get(k) ) &&(!"null".equalsIgnoreCase(params.get(k) ) )  ){
+					
+					if( AssertHelper.empty(params.get(k)) || LittleUtils.strEmpty(params.get(k)) ){
 						
+						
+					}else{
 						valueNoEmptyMap.put(k, params.get(k).trim());
 					}
 				}

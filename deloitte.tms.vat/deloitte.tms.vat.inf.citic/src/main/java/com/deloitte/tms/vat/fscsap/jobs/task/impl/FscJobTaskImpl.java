@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.StringUtils;
 import com.deloitte.tms.pl.security.model.impl.DefaultUser;
+import com.deloitte.tms.pl.security.utils.LittleUtils;
 import com.deloitte.tms.vat.fscsap.ftputils.ReadFTPFile;
 import com.deloitte.tms.vat.fscsap.ftputils.WriteFTPFile;
 import com.deloitte.tms.vat.fscsap.jobs.task.FscJobTask;
@@ -46,8 +47,9 @@ import com.deloitte.tms.vat.purchinvoice.service.TmsDrvatInvoiceTrxHService;
 @Component(FscJobTask.BEAN_ID)
 public class FscJobTaskImpl implements FscJobTask {
 
-	private static final Logger LOGGER = LoggerFactory
+	public static Logger logger = LoggerFactory
 			.getLogger(FscJobTaskImpl.class);
+	
 
 	public static String filePathSep="/";
 	public static String sep="^";
@@ -78,6 +80,9 @@ public class FscJobTaskImpl implements FscJobTask {
 	public static String fpztO="1";
 	public static String fpxt1="FSC";
 	public static String fpxt2="SAP";
+	
+	public static String fpztP="P";
+	public static String fpztF="F";
 	
 	public int fscCount=0;
 	
@@ -156,11 +161,11 @@ public class FscJobTaskImpl implements FscJobTask {
 	
 	public boolean getFscSapConfig(){
 
-
+		InputStream in = null ;
 		try {
 		/*	InputStream in = FTPUtil.class.getClassLoader()
 					.getResourceAsStream("fscsap.properties");*/
-			InputStream in = null ;
+			
 			
 			in =this.getClass().getResourceAsStream("/config/fsc.properties");
 					
@@ -193,7 +198,16 @@ public class FscJobTaskImpl implements FscJobTask {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		}finally{
+			if(in!=null){
+				try{
+				in.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
 		}
+		
 		return true;
 	}
 	
@@ -217,6 +231,8 @@ public class FscJobTaskImpl implements FscJobTask {
 	public boolean readInputDataFile(){
 		
 		try{
+			
+		inputRecordsMap = new ArrayList<HashMap<String, Object>>();
 		ReadFTPFile read = new ReadFTPFile();
 		
 		String result = read.readConfigFileForFTP(ftpUserName, ftpPassword, ftpPath, ftpHost, ftpPort, this.inputDataFile);
@@ -235,7 +251,14 @@ public class FscJobTaskImpl implements FscJobTask {
 			return false;
 		}else{
 			
-			//inputRecordsMap = new ArrayList<HashMap<String, Object>>();
+			inputRecordsMap = new ArrayList<HashMap<String, Object>>();
+			
+			try{
+			logger.info("inputRecordsMap newer, should size 0:"+inputRecordsMap.size());
+			System.out.println("inputRecordsMap newer, should size 0:"+inputRecordsMap.size());
+			}catch(Exception x){
+				
+			}
 			
 			String[] allLines = result.split("\n");//split能识别\n?不识别就用其它编码
 			
@@ -271,7 +294,9 @@ public class FscJobTaskImpl implements FscJobTask {
 				System.out.println("--!!!---input data contain fileds length: "+len+"; but expected length is: "+wantLen);
 			}
 			
-			for(; i<len; i++){
+			int mixLen = len < wantLen ? len : wantLen;
+			
+			for(; i<mixLen; i++){
 				
 				if (i == 5) { // ("invoicingDate"); //开票日期 Date
 					// YYYYMMDD VARCHAR(8)
@@ -426,7 +451,7 @@ public class FscJobTaskImpl implements FscJobTask {
 	 params.put("invoiceCode", inputMap.get("invoiceCode"));
 	 params.put("invoiceNumber", inputMap.get("invoiceNumber"));
 
-	 LOGGER.info("invoiceCode:"+params.get("invoiceCode")+";invoiceNumber:"+params.get("invoiceCode"));
+	 logger.info("invoiceCode:"+params.get("invoiceCode")+";invoiceNumber:"+params.get("invoiceCode"));
 	 System.out.println("invoiceCode:"+params.get("invoiceCode")+";invoiceNumber:"+params.get("invoiceCode"));
 	 
 		 listInpara = this.tmsDrvatInvoiceTrxHService.findTmsDrvatInvoiceTrxLByParams2(params);
@@ -439,8 +464,8 @@ public class FscJobTaskImpl implements FscJobTask {
 		 }
 		 
 		 if(listInpara.size() > 1){
-			 System.out.println("find4ExistByInput > exception: result size: "+listInpara.size() +", should be only 1");
-			 return null;
+			 System.out.println("find4ExistByInput > : result size: "+listInpara.size() +", only 1 is perfect");
+			 //return null;
 		 }
 		 
 		 record = listInpara.get(0);
@@ -454,9 +479,27 @@ public class FscJobTaskImpl implements FscJobTask {
 		return record;
 	}
 		 
+	/**
+	 * 
+	 *〈一句话功能简述〉 
+	 * 功能详细描述
+	 * @param record from db result
+	 * @param inputMap from request line
+	 * @return
+	 * @see [相关类/方法]（可选）
+	 * @since [产品/模块版本] （可选）
+	 */
 	public StringBuffer verifyOut(TmsDrvatInvoiceTrxLInParam record, HashMap inputMap){
 			 
-		record.setInvoiceAuthenticationStatus(this.fpztY);
+		String orgIAStatus = record.getInvoiceAuthenticationStatus();
+		if(LittleUtils.strEmpty(orgIAStatus)){
+			orgIAStatus="";
+		}
+		
+		//record.setInvoiceAuthenticationStatus(this.fpztY);
+		
+		record.setInvoiceAuthenticationStatus(orgIAStatus+this.fpztY);
+		
 		record.setAttribute2(this.fpxt1);
 		record.setAttribute5("");
 		 
@@ -474,7 +517,7 @@ public class FscJobTaskImpl implements FscJobTask {
 			 params.put("vatAmount", inputMap.get("vatAmount"));*/
 		 }else{
 			 
-			 record.setInvoiceAuthenticationStatus(this.fpztN);
+			 record.setInvoiceAuthenticationStatus(orgIAStatus+this.fpztN);
 			
 			 record.setAttribute5("纳税人识别号(venderRegistrationNumber)");
 			 
@@ -486,7 +529,7 @@ public class FscJobTaskImpl implements FscJobTask {
 		 if(this.dateEqu8(record.getInvoicingDate(),  inputMap.get("invoicingDate")   )){
 			 //invoicingDate=Tue Mar 29 00:00:00 CST 2016
 		 }else{
-			 record.setInvoiceAuthenticationStatus(this.fpztN);
+			 record.setInvoiceAuthenticationStatus(orgIAStatus+this.fpztN);
 			
 			 record.setAttribute5("开票日期(invoicingDate) ");
 			 
@@ -497,10 +540,10 @@ public class FscJobTaskImpl implements FscJobTask {
 		 
 		// if( (record.getEnteredAmount() + record.getVatAmount()) ==  Double.parseDouble(  (String)inputMap.get("enteredAmount+vatAmount") ) ){
 		 
-		 if( this.strEqu(record.getAttribute6(), (String)inputMap.get("attribute6") )    ){
+		 if( this.strEqu4Money(record.getAttribute6(), (String)inputMap.get("attribute6") )    ){
 			 
 		 }else{
-			 record.setInvoiceAuthenticationStatus(this.fpztN);
+			 record.setInvoiceAuthenticationStatus(orgIAStatus+this.fpztN);
 			 
 			 //record.setAttribute5("含税金额(enteredAmount+vatAmount)");
 			 record.setAttribute5("含税金额");
@@ -510,12 +553,15 @@ public class FscJobTaskImpl implements FscJobTask {
 			 return null;
 		 }
 		 
-		 if( ( record.getVatAmount()) ==  Double.parseDouble(  (String)inputMap.get("vatAmount") ) ){
+		 //if( ( record.getVatAmount()) ==  Double.parseDouble(  (String)inputMap.get("vatAmount") ) ){
 			 
+		 if( this.strEqu4Money(record.getAttribute7(), (String)inputMap.get("vatAmount") )    ){
+		 
 		 }else{
-			 record.setInvoiceAuthenticationStatus(this.fpztN);
+			 record.setInvoiceAuthenticationStatus(orgIAStatus+this.fpztN);
 			 
-			 record.setAttribute5("税金(vatAmount)");
+			// record.setAttribute5("税金(vatAmount)"); ->record use attribute7 name, inputMap use vatAmount name
+			 record.setAttribute5("税金");
 			 
 			 //todo  write output file using N format tempalte
 			 return null;
@@ -531,6 +577,80 @@ public class FscJobTaskImpl implements FscJobTask {
 	
 	
 }
+
+	public boolean strEqu4Money(String l, String r){	
+
+		
+		if(AssertHelper.empty(l)  && AssertHelper.empty(r)){
+			return true;
+		}
+		
+		if(AssertHelper.empty(l) && !AssertHelper.empty(r)){
+			return false;
+		}
+		
+		if(!AssertHelper.empty(l) && AssertHelper.empty(r)){
+			return false;
+		}
+		
+		if((l instanceof String )  && !(r instanceof String)){
+			return false;
+		}
+		
+		if(!(l instanceof String )  && (r instanceof String)){
+			return false;
+		}
+		
+		int point=l.indexOf(".");
+		String llp="";
+		String lrp="";
+		if(point>-1){
+			llp=l.substring(0, point);
+			lrp=l.substring(point);
+			
+			lrp=strNoRZeroAfterPoint(lrp);
+		}
+		
+		String lstr=llp+lrp;
+		
+		
+		
+		int rpoint=r.indexOf(".");
+		String rlp="";
+		String rrp="";
+		if(rpoint>-1){
+			rlp=l.substring(0, rpoint);
+			rrp=l.substring(rpoint);
+			
+			rrp=strNoRZeroAfterPoint(rrp);
+		}
+		String rstr=rlp+rrp;
+		
+		if(lstr.trim().equalsIgnoreCase(rstr.trim())){
+			return true;
+		}
+		
+		return false;		
+	}
+	
+	public String strNoRZeroAfterPoint(String org){
+		
+		//String nowStr="";
+		
+		if(LittleUtils.strEmpty(org)){
+			return "";
+		}
+		
+		int zp = org.lastIndexOf("0");
+		
+		if(  zp > -1   && zp==org.length()-1    ){
+			org=org.substring(0, org.length()-1);
+			
+			this.strNoRZeroAfterPoint(org);
+		}
+		
+		return org;
+	}
 	
 	public boolean strEqu(Object l, Object r){
 		
@@ -687,6 +807,16 @@ public String getDay8StrBySt(String s){
 	public StringBuffer generateOutput(){
 			
 			StringBuffer sb = new StringBuffer();
+			
+			fscCount=0; //must init to 0
+			
+			try{
+			
+			logger.info("now should init fscCount="+fscCount+"; have value of inputRecordsMap:"+inputRecordsMap.size());
+			System.out.println("now should init fscCount="+fscCount+"; have value of inputRecordsMap:"+inputRecordsMap.size());
+			}catch(Exception exx){
+				
+			}
 		
 			for(HashMap map : this.inputRecordsMap){
 			
@@ -709,8 +839,14 @@ public String getDay8StrBySt(String s){
 					sb.append(one.getInvoiceNumber()).append(sep);
 					sb.append(one.getVenderRegistrationNumber()).append(sep);
 					sb.append(this.getDay8StrByDate( one.getInvoicingDate())   ).append(sep);//FSC^Tue Mar 29 00:00:00 CST 2016^fpdh125^ppph125^nsrsbh125^2016-03-29 14:00:00.0^
-					sb.append(one.getEnteredAmount() + one.getVatAmount()).append(sep);//FSC^Tue Mar 29 00:00:00 CST 2016^fpdh125^ppph125^nsrsbh125^2016-03-29 14:00:00.0^-89.2^
+					
+			/*		sb.append(one.getEnteredAmount() + one.getVatAmount()).append(sep);//FSC^Tue Mar 29 00:00:00 CST 2016^fpdh125^ppph125^nsrsbh125^2016-03-29 14:00:00.0^-89.2^
 					sb.append(one.getVatAmount()).append(sep);//税金
+					*/
+					sb.append(one.getAttribute6()).append(sep);//含税金额       FSC^Tue Mar 29 00:00:00 CST 2016^fpdh125^ppph125^nsrsbh125^2016-03-29 14:00:00.0^-89.2^
+					sb.append(one.getAttribute7()).append(sep);//税金 - 暂时用attribute7代替VatAmount
+					
+					
 					sb.append(one.getVenderName()).append(sep);
 					sb.append(one.getAttribute3()).append(sep);
 					sb.append(one.getAttribute4()).append(sep);//FSC^Tue Mar 29 00:00:00 CST 2016^fpdh125^ppph125^nsrsbh125^2016-03-29 14:00:00.0^-89.2^3s^9999^fpyzr3^

@@ -105,6 +105,12 @@ public class InvoiceTrxServiceImpl extends BaseService implements InvoiceTrxServ
 		List<InvoiceTrxD> temp= invoiceTrxDao.findInvoiceTrxDByParams(params);
 		return temp;
 	}
+
+	@Override
+	public List<InvoiceTrxL> findAllInvoiceTrxL(Map params) {
+		List<InvoiceTrxL> temp= invoiceTrxDao.findAllInvoiceTrxL(params);
+		return temp;
+	}
 	
 	@Override
 	public void saveInvoiceTrxDataListsMap(Map dataListsMap) {

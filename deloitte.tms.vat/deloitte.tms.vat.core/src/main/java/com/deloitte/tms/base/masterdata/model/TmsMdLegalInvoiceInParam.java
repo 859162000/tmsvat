@@ -29,7 +29,16 @@ public class TmsMdLegalInvoiceInParam extends TmsMdLegalInvoice{
 	private String legalEntityCode;
 	private String legalEntityName;
 	private String invoiceTypeName;
+	private String registrationNumber;
 	
+	public String getRegistrationNumber() {
+		return registrationNumber;
+	}
+
+	public void setRegistrationNumber(String registrationNumber) {
+		this.registrationNumber = registrationNumber;
+	}
+
 	public String getLegalEntityCode() {
 		return legalEntityCode;
 	}

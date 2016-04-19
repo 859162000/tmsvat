@@ -20,9 +20,11 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.deloitte.tms.base.masterdata.model.BaseOrg;
 import com.deloitte.tms.base.masterdata.model.Customer;
 import com.deloitte.tms.base.masterdata.model.TmsMdLegalEntity;
 import com.deloitte.tms.base.taxsetting.model.TmsMdInventoryItems;
+import com.deloitte.tms.base.taxsetting.model.TmsMdTrxAffirmSetting;
 import com.deloitte.tms.pl.core.commons.annotation.ModelProperty;
 import com.deloitte.tms.pl.core.hibernate.identifier.Ling2UUIDGenerator;
 import com.deloitte.tms.pl.core.model.impl.BaseEntity;
@@ -65,16 +67,41 @@ public class TmsCrvatInvReqBatchesL extends BaseEntity {
     @Column(name="CONTRACT_ID", length=36)
 	@ModelProperty(comment="合同ID(冗余)")
 	private String contractId;
+    
+    @Column(name="IS_RECEIPTS", length=36)
+    @ModelProperty(comment="是否已收款")
+    private String isReceipts;
 
-    @Column(name="INVENTORY_ITEM_QTY")
+    public String getIsReceipts() {
+		return isReceipts;
+	}
+
+	public void setIsReceipts(String isReceipts) {
+		this.isReceipts = isReceipts;
+	}
+
+	@Column(name="INVENTORY_ITEM_QTY")
 	@ModelProperty(comment="数量")
 	private Long inventoryItemQty;
 
     @Column(name="TRX_AFFIRM_SETTING_ID", length=36)
 	@ModelProperty(comment="涉税交易认定设置规则ID")
 	private String trxAffirmSettingId;
+    //TmsMdTrxAffirmSetting
+    @ManyToOne
+  	@Cascade(CascadeType.REFRESH)
+  	@JoinColumn(name="TRX_AFFIRM_SETTING_ID",insertable=false,updatable=false,nullable=true)
+    private TmsMdTrxAffirmSetting tmsMdTrxAffirmSetting;
 
-    @Column(name="TAX_TRX_TYPE_ID", length=36)
+    public TmsMdTrxAffirmSetting getTmsMdTrxAffirmSetting() {
+		return tmsMdTrxAffirmSetting;
+	}
+
+	public void setTmsMdTrxAffirmSetting(TmsMdTrxAffirmSetting tmsMdTrxAffirmSetting) {
+		this.tmsMdTrxAffirmSetting = tmsMdTrxAffirmSetting;
+	}
+
+	@Column(name="TAX_TRX_TYPE_ID", length=36)
 	@ModelProperty(comment="涉税交易类型ID")
 	private String taxTrxTypeId;
 
@@ -121,8 +148,21 @@ public class TmsCrvatInvReqBatchesL extends BaseEntity {
     @Column(name="ORG_ID", length=36)
 	@ModelProperty(comment="组织ID")
 	private String orgId;
+    @ManyToOne
+  	@Cascade(CascadeType.REFRESH)
+  	@JoinColumn(name="ORG_ID",insertable=false,updatable=false,nullable=true)
+    private BaseOrg baseOrg;
     
-    @Column(name="INVENTORY_ITEM_ID", length=36)
+    
+    public BaseOrg getBaseOrg() {
+		return baseOrg;
+	}
+
+	public void setBaseOrg(BaseOrg baseOrg) {
+		this.baseOrg = baseOrg;
+	}
+
+	@Column(name="INVENTORY_ITEM_ID", length=36)
    	@ModelProperty(comment="商品及服务编码ID")
    	private String inventoryItemId;
     

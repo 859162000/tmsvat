@@ -644,8 +644,16 @@ public class LegalEquipmentController extends BaseController{
 				
 				String isDefault = (String)obj[0];
 				TmsMdEquipment equ = (TmsMdEquipment)obj[1];
-				
-				listOk.add(new TmsMdEquipmentInParam2(isDefault, equ));
+				TmsMdEquipmentInParam2 equInparam = new TmsMdEquipmentInParam2(isDefault, equ);
+				if(null==equ.getParentEquipmentId()){
+					equInparam.setParentEquipmentName("");
+				}else{
+					TmsMdEquipment parent = (TmsMdEquipment) equipmentService.get(TmsMdEquipment.class, equ.getParentEquipmentId());
+					if(null!=parent){
+						equInparam.setParentEquipmentName(parent.getEquipmentName());
+					}
+				}
+				listOk.add(equInparam);
 			}
 		}
 	/*	if(daoPage.getTotal()<1){
@@ -703,8 +711,6 @@ public class LegalEquipmentController extends BaseController{
 			
 		}*/
 		this.returnList(response,total , list);
-
-	
 		}catch(Exception e){
 			e.printStackTrace();
 		}

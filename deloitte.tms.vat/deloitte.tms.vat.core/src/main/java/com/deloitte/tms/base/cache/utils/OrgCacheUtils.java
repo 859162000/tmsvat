@@ -3,14 +3,16 @@ package com.deloitte.tms.base.cache.utils;
 import java.util.Collection;
 //import java.util.Enumeration;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.deloitte.tms.base.cache.model.BizOrgNode;
-import com.deloitte.tms.base.cache.model.LegalEntityNode;
 import com.deloitte.tms.base.cache.model.OrgNode;
 import com.deloitte.tms.base.cache.service.OrgCacheService;
 import com.deloitte.tms.base.cache.service.impl.OrgCacheProvider;
 import com.deloitte.tms.pl.cache.CacheUtils;
 import com.deloitte.tms.pl.core.commons.utils.AssertHelper;
 import com.deloitte.tms.pl.core.commons.utils.SpringUtil;
+import com.deloitte.tms.pl.orgpath.model.OrgPath;
 import com.deloitte.tms.pl.version.party.model.organization.node.Node;
 
 public class OrgCacheUtils{
@@ -97,5 +99,35 @@ public class OrgCacheUtils{
 	}
 	public static void refreshBizOrgNode() {
 		CacheUtils.putCacheObject(OrgCacheService.DEPT_CACHE_ID,null);
+	}
+	/**
+	 * 
+	 * @param orgId 机构id
+	 * @return
+	 */
+	public static String getUserOrgStrByHql(String orgId) {
+		AssertHelper.notEmpty_assert(orgId, "机构代码不能为空");
+		BizOrgNode bizOrgNode=OrgCacheUtils.getNodeByOrgCode(orgId);
+		AssertHelper.notEmpty_assert(bizOrgNode, "机构id:"+orgId+"没有找到相应orgPath数据");
+		StringBuffer query = new StringBuffer();
+		query.append(" select orgId from OrgPath u where u.orgseq  like ");
+		query.append(" '"+bizOrgNode.getDataSeq() + "%' ");
+		return query.toString();
+	}
+	public static String getUserOrgStrBySql(String orgId) {
+		return convertUserDeptStrToSql(getUserOrgStrByHql(orgId));
+	}
+	/**
+	 * 转换查询getUserDeptStr的HQL为SQL
+	 * @param userDeptStr
+	 * @return
+	 * @author dada
+	 */
+	public static String convertUserDeptStrToSql(String userDeptStr) {
+		String retval = userDeptStr;
+		retval = StringUtils.replace(retval, "OrgPath", OrgPath.TABLE);
+		retval = StringUtils.replace(retval, "orgId", "org_id");
+		retval = StringUtils.replace(retval, "orgseq", "org_seq");
+		return retval;
 	}
 }

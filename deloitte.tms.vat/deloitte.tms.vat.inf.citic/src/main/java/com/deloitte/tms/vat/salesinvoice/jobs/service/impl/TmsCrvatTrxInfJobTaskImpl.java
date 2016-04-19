@@ -97,15 +97,16 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 	@Override
 	public int executeTransactionInfDatas(List<TmsCrvatTrxInf> tmsCrvatTrxInfs
 			,List<TmsMdLegalEntity> allLegalEntities
-			,List<TmsMdOrgLegalEntity> allOrgLegalEntities
+//			,List<TmsMdOrgLegalEntity> allOrgLegalEntities
 			,List<BaseOrg> allOrgs
 			,List<Customer> allCustomers
 			, List<CustomerSite> allListSite
 			, List<CustBankAccount> allCustBankAccount) {
 		int sucessnum=0;
 		for(TmsCrvatTrxInf tmsCrvatTrxInf:tmsCrvatTrxInfs){
-			if(executeTransactionInfData(tmsCrvatTrxInf, 
-					allLegalEntities, allOrgLegalEntities
+			if(executeTransactionInfData(tmsCrvatTrxInf 
+					,allLegalEntities
+//					, allOrgLegalEntities
 					,allOrgs,allCustomers
 					, allListSite, allCustBankAccount)){
 				sucessnum++;
@@ -114,9 +115,10 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 		return sucessnum;
 	}
 	
-	public boolean executeTransactionInfData(TmsCrvatTrxInf tmsCrvatTrxInf,List<TmsMdLegalEntity> allLegalEntities,
-			List<TmsMdOrgLegalEntity> allOrgLegalEntities,
-			List<BaseOrg> allOrgs
+	public boolean executeTransactionInfData(TmsCrvatTrxInf tmsCrvatTrxInf
+			,List<TmsMdLegalEntity> allLegalEntities
+//			,List<TmsMdOrgLegalEntity> allOrgLegalEntities
+			,List<BaseOrg> allOrgs
 			,List<Customer> allCustomers
 			, List<CustomerSite> allListSite
 			, List<CustBankAccount> allCustBankAccount) {
@@ -132,7 +134,9 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 			//如果客户号不为空,处理客户数据
 			//中信不给客户信息,特殊处理用户元数据
 			if(AssertHelper.notEmpty(tmsCrvatTrxInf.getCustomerNumber())){
-				Customer customer = processCustomer(tmsCrvatTrxInf,allCustomers, allListSite, allCustBankAccount);
+				Customer customer = processCustomer(tmsCrvatTrxInf,allCustomers
+						, allListSite, allCustBankAccount
+						,invoiceTrxPool);
 				invoiceTrxPool.setCustomerId(customer.getId());	
 			}
 			//处理legalentityId,orgId
@@ -220,9 +224,10 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 	private Customer processCustomer(TmsCrvatTrxInf tmsCrvatTrxInf
 			,List<Customer> allCustomers
 			, List<CustomerSite> allListSite
-			, List<CustBankAccount> allCustBankAccount) {
+			, List<CustBankAccount> allCustBankAccount
+			,InvoiceTrxPool invoiceTrxPool) {
 		AssertHelper.notEmpty_assert(tmsCrvatTrxInf.getCustomerNumber(), "进入此方法客户id不能为空");
-		String customerNumber = tmsCrvatTrxInf.getCustomerNumber();
+//		String customerNumber = tmsCrvatTrxInf.getCustomerNumber();
 		String sourceCustomerId = tmsCrvatTrxInf.getCustomerNumber();
 		String customerName = tmsCrvatTrxInf.getCustomerName();
 		String sourceCustomerName = tmsCrvatTrxInf.getCustomerName();
@@ -232,7 +237,7 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 		String custRegistrationNumber = tmsCrvatTrxInf.getRegistrationNumber();
 		String gsnRegistrationNumber = tmsCrvatTrxInf.getRegistrationNumber();
 		String custDepositBankName = tmsCrvatTrxInf.getCustBankBranchName();
-		String custDepositBankNumber = tmsCrvatTrxInf.getCustBankAccountNum();
+//		String custDepositBankNumber = tmsCrvatTrxInf.getCustBankAccountNum();
 		String custRegistrationAddress = tmsCrvatTrxInf.getCustRegistrationAddress();
 		String contactPhone = tmsCrvatTrxInf.getCustContactPhone();
 		String printPeriodName = tmsCrvatTrxInf.getPrintPeriodName();
@@ -250,12 +255,13 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 //			customer = new Customer();
 //		}
 		/**** bo.wang 用缓存吧*****************/
-		Customer customer=getCustomer(customerNumber,allCustomers);		
+		boolean isnew=false;
+		Customer customer=getCustomer(tmsCrvatTrxInf.getCustomerNumber(),allCustomers);		
 		if(customer==null){
+			isnew=true;
 			customer=new Customer();
-		}
-		
-		customer.setCustomerNumber(customerNumber);
+		}		
+		customer.setCustomerNumber(tmsCrvatTrxInf.getCustomerNumber());
 		customer.setSourceCustomerId(sourceCustomerId);
 		customer.setCustomerName(customerName);
 		customer.setSourceCustomerName(sourceCustomerName);
@@ -265,7 +271,7 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 		customer.setCustRegistrationNumber(custRegistrationNumber);
 		customer.setGsnRegistrationNumber(gsnRegistrationNumber);
 		customer.setCustDepositBankName(custDepositBankName);
-		customer.setCustDepositBankNumber(custDepositBankNumber);
+		customer.setCustDepositBankNumber(tmsCrvatTrxInf.getCustBankAccountNum());//开户行账号
 		customer.setCustRegistrationAddress(custRegistrationAddress);
 		customer.setContactPhone(contactPhone);
 		customer.setPrintPeriodName(printPeriodName);
@@ -274,62 +280,50 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 		customer.setIsInvoiceProviding("N");
 		customer.setEnabledFlag("N");
 		
+		
+		//开票上用,一个客户只有一个开票号,getCustomerAccount是银行账号 getCustBankAccountNum才是用户一一对应的开票用的账号
+		customer.setCustDepositBankAccountNum(tmsCrvatTrxInf.getCustBankAccountNum());
+		//客户编号
+		customer.setCustomerNumber(tmsCrvatTrxInf.getCustomerNumber());
+		
 		if(customer.getId()==null){
 			customerDao.save(customer);
-			allCustomers.add(customer);
-			if(AssertHelper.notEmpty(tmsCrvatTrxInf.getCustBankAccountNum())){
-				CustBankAccount custBankAccount = createCustBankAccount(tmsCrvatTrxInf);
-				custBankAccount.setCustomerId(customer.getId());
-				custBankAccountDao.save(custBankAccount);
-				allCustBankAccount.add(custBankAccount);
-			}
-			if(AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientName())||
-					AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientAddr())||
-					AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientComp())||
-					AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientPhone())){
-				CustomerSite tmsMdCustSite = createCustomerSite(tmsCrvatTrxInf);					
-				tmsMdCustSite.setCustomerId(customer.getId());	
-				customerSiteDao.save(tmsMdCustSite);
-				allListSite.add(tmsMdCustSite);
-			}			
+			allCustomers.add(customer);	
 		}else{
 			customerDao.update(customer);
-			String customerId=customer.getId();
-			//根据客户号和客户地址检查是否一致
-			if(AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientAddr())){
-//				Map<String, String> params=new HashMap<String, String>();
-//				params.put("customerId", customerId);
-//				params.put("recipientAddr", tmsCrvatTrxInf.getRecipientAddr());
-//				List<CustomerSite> listSite=customerSiteDao.findCustomerSiteByParams(params);
-//				if(listSite.size()<1){
-				CustomerSite customerSite=getCustomerSite(customerId,tmsCrvatTrxInf.getRecipientAddr(),allListSite);
-				if(customerSite==null){
-					customerSite = createCustomerSite(tmsCrvatTrxInf);
-					customerSiteDao.save(customerSite);
-					allListSite.add(customerSite);
-				}
-			}
-			if(AssertHelper.notEmpty(tmsCrvatTrxInf.getCustBankAccountNum())){
-				//根据客户号和资金账号检查是否一致
-//				Map<String, String> param_2=new HashMap<String, String>();
-//				param_2.put("customerId", customerId);
-//				param_2.put("custBankAccountNum", tmsCrvatTrxInf.getCustBankAccountNum());
-//				List<CustBankAccount> listBank=custBankAccountDao.findCustBankAccountByParams(param_2);
-//				if(listBank.size()<1){
-				CustBankAccount custBankAccount=getCustBankAccount(customerId,tmsCrvatTrxInf.getCustBankAccountNum(),allCustBankAccount);
-				if(custBankAccount==null)
-					custBankAccount = createCustBankAccount(tmsCrvatTrxInf);
-					custBankAccountDao.save(custBankAccount);
-					allCustBankAccount.add(custBankAccount);
-				}
+		}
+		//处理银行账号 这里getCustomerAccount是银行账号 getCustBankAccountNum才是用户一一对应的开票用的账号
+		if(AssertHelper.notEmpty(tmsCrvatTrxInf.getCustomerAccount())){
+			CustBankAccount custBankAccount=getCustBankAccount(tmsCrvatTrxInf.getCustomerAccount(),allCustBankAccount);
+			if(custBankAccount==null){
+				custBankAccount = new CustBankAccount();
+				custBankAccount.setCustBankAccountNum(tmsCrvatTrxInf.getCustomerAccount());
+				custBankAccount.setEnabledFlag("N");;
+				custBankAccount.setCustomerId(customer.getId());
+				custBankAccount.setCustBankOrgCode(tmsCrvatTrxInf.getCustBankOrgCode());
+				custBankAccountDao.save(custBankAccount);
+				allCustBankAccount.add(custBankAccount);
 			}			
+		}
+		//处理地址 只有地址不为空才处理,否则会导致数据没有意义或数据重复
+		if(AssertHelper.notEmpty(tmsCrvatTrxInf.getRecipientAddr())){
+			CustomerSite customerSite=null;
+			if(!isnew){
+				customerSite=getCustomerSite(customer.getId(),tmsCrvatTrxInf.getRecipientAddr(),allListSite);
+			}
+			if(customerSite==null){
+				customerSite = createCustomerSite(tmsCrvatTrxInf);
+				customerSite.setCustomerId(customer.getId());
+				customerSiteDao.save(customerSite);
+				allListSite.add(customerSite);
+			}
+		}	
 		return customer;
 	}
-	private CustBankAccount getCustBankAccount(String customerId,
+	private CustBankAccount getCustBankAccount(
 			String custBankAccountNum, List<CustBankAccount> allCustBankAccount) {
 		for(CustBankAccount custBankAccount:allCustBankAccount){
-			if(customerId.equals(custBankAccount.getId())
-					&&custBankAccountNum.equals(custBankAccount.getCustBankAccountNum())){
+			if(custBankAccountNum.equals(custBankAccount.getCustBankAccountNum())){
 				return custBankAccount;
 			}
 		}
@@ -424,6 +418,11 @@ public class TmsCrvatTrxInfJobTaskImpl implements TmsCrvatTrxInfJobTask {
 		invoiceTrxPool.setBizOrgCode(StringUtils.trim(bizOrgCode));
 		invoiceTrxPool.setIsAccount("N");
 		invoiceTrxPool.setArchiveBaseDate(new Date());
+		
+		//开票上用,一个客户只有一个开票号,getCustomerAccount是银行账号 getCustBankAccountNum才是用户一一对应的开票用的账号
+		invoiceTrxPool.setCustBankAccountNum(tmsCrvatTrxInf.getCustBankAccountNum());
+		invoiceTrxPool.setCustBankOrgCode(tmsCrvatTrxInf.getCustBankOrgCode());
+		
 		return invoiceTrxPool;
 	}
 

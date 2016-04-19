@@ -60,8 +60,8 @@ public class TmsMdFlexStructuresDaoImpl extends BaseDao<TmsMdFlexStructures> imp
 		}
 		if(value2!=null && !"".equals(value2))
 		{
-			query.append(" and flexStructuresCode like :flexStructuresCode");
-			values.put("flexStructuresCode", "%"+value2+"%");
+			query.append(" and flexStructuresCode = :flexStructuresCode");
+			values.put("flexStructuresCode", value2);
 		}
 		if(value3!=null && !"".equals(value3))
 		{

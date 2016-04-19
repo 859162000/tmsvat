@@ -8,6 +8,7 @@ import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.dao.IDao;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreH;
 import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreL;
+import com.deloitte.tms.vat.salesinvoice.model.TmsCrvatInvoicePreP;
 /**
  * Home object for domain model class TmsCrvatInvoicePreH.
  * @see com.deloitte.tms.vat.salesinvoice.model
@@ -19,5 +20,6 @@ public interface TmsCrvatInvoicePreHDao extends IDao<TmsCrvatInvoicePreH>{
 	public List<TmsCrvatInvoicePreH> findTmsCrvatInvoicePreHByParams(Map params);
 	public DaoPage findTmsCrvatInvoicePreLByParams(Map params, Integer pageIndex,Integer pageSize);
 	public List<TmsCrvatInvoicePreL> findTmsCrvatInvoicePreLByParams(Map params);
+	public List<TmsCrvatInvoicePreP> findTmsCrvatInvoicePrePByParams(Map params);
 }
 

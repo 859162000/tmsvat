@@ -37,7 +37,6 @@ public class TmsMdLegalEquipmentServiceImpl extends BaseService implements TmsMd
 	
 	@Override
 	public Integer runHqlOrSql(String sql, Map values){
-		
 		return this.tmsMdLegalEquipmentDao.executeHqlProduce(sql, values);
 	}
 
@@ -240,24 +239,23 @@ public class TmsMdLegalEquipmentServiceImpl extends BaseService implements TmsMd
 		  return daoPage;
 	}
 	
-	public static void convertToEquWithInfo(DaoPage daoPage){
-		
+	public void convertToEquWithInfo(DaoPage daoPage){
 		List<TmsMdEquipment> list =  (List<TmsMdEquipment>)daoPage.getResult();
-		
 		ArrayList<TmsMdEquipmentInParam2> listInfo = new ArrayList<TmsMdEquipmentInParam2>();
-		
 		for(TmsMdEquipment tmsMdEquipment : list){
-			
-		
 			TmsMdEquipmentInParam2 einfo = new TmsMdEquipmentInParam2(tmsMdEquipment);
-			
+			if(null==tmsMdEquipment.getParentEquipmentId()){
+				einfo.setParentEquipmentName("");
+			}else{
+				TmsMdEquipment parent = (TmsMdEquipment) get(TmsMdEquipment.class, tmsMdEquipment.getParentEquipmentId());
+				if(null!=parent){
+					einfo.setParentEquipmentName(parent.getEquipmentName());
+				}
+			}
 			listInfo.add(einfo);
-			
 		}
-		
 		daoPage.setResult(listInfo);
 	}
-	
 	
 	@Override
 	public void saveBindEqu(String legalId, String[] equIds){

@@ -7,8 +7,8 @@ import java.util.Map;
 import com.deloitte.tms.pl.core.commons.support.DaoPage;
 import com.deloitte.tms.pl.core.dao.IDao;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxD;
-import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxDataDict;
 import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxH;
+import com.deloitte.tms.vat.salesinvoice.model.InvoiceTrxL;
 /**
  * Home object for domain model class InvoiceTrx.
  * @see com.deloitte.tms.vat.salesinvoice.model
@@ -24,6 +24,8 @@ public interface InvoiceTrxDao extends IDao<InvoiceTrxH>{
 	public DaoPage findInvoiceTrxLByParams(Map params, Integer pageIndex,Integer pageSize);
 	
 	public List<InvoiceTrxH> findInvoiceTrxByParams(Map params);
+
+	public List<InvoiceTrxL> findAllInvoiceTrxL(Map params);
 	
 	public List<InvoiceTrxD> findInvoiceTrxDByParams(Map params);
 	

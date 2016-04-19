@@ -4,6 +4,7 @@
 package com.deloitte.tms.vat.salesinvoice.dao.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
@@ -31,6 +32,13 @@ public class TmsCrvatInvoiceReqPDaoImpl extends BaseDao<TmsCrvatInvoiceReqP> imp
 	
 	private void buildTmsCrvatInvoiceReqPuery(StringBuffer query,Map values,Map params) {
 		query.append(" from TmsCrvatInvoiceReqP where 1=1 ");
+	}
+
+	@Override
+	public List<TmsCrvatInvoiceReqP> findInvoiceReLByReqHId(String crvatInvoiceReqHId) {
+		Map map = new HashMap();
+		map.put("crvatInvoiceReqHId", crvatInvoiceReqHId);
+		return find(" from TmsCrvatInvoiceReqP where crvatInvoiceReqHId=:crvatInvoiceReqHId", map);
 	}
 
 }

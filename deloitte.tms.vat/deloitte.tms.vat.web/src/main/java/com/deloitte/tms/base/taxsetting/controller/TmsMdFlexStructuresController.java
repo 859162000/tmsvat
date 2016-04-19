@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
@@ -54,6 +55,8 @@ public class TmsMdFlexStructuresController extends BaseController{
 	@RequestMapping(value = "/loadTmsMdFlexStructuresPage", method = RequestMethod.POST)
 	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
 	public void loadTmsMdFlexStructuresPage(@RequestParam Map<String,Object> parameter,HttpServletResponse response) throws Exception {
+		
+		
 		DaoPage daoPage=tmsMdFlexStructuresService.findTmsMdFlexStructuresByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
 	
 		JSONObject result = new JSONObject();
@@ -64,7 +67,7 @@ public class TmsMdFlexStructuresController extends BaseController{
 		result.put("rows", jsonArray);// daoPage.getr
 		result.put("pages", daoPage.getPageCount());
 		result.put("success", true);
-		retJson(response, result);
+		retJson(response, result);  
 		//return daoPage;
 	}
 	@ResponseBody
@@ -215,7 +218,29 @@ public class TmsMdFlexStructuresController extends BaseController{
 		return result;
 	}
 	
+	@ResponseBody            
+	@RequestMapping(value = "/loadTmsMdFlexStructuresPageRequest", method = RequestMethod.POST)
+	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
+	public void loadTmsMdFlexStructuresPageRequest(@RequestParam Map<String,Object> parameter,HttpServletResponse response,HttpServletRequest request) throws Exception {
+		
+	    String param =(String)request.getParameter("flexStructuresCode");
+	    if(param!=null&&!"".equals(param)){
+		    parameter.put("flexStructuresCode", param);
+	    }
+
+		DaoPage daoPage=tmsMdFlexStructuresService.findTmsMdFlexStructuresByParams(parameter,PageUtils.getPageNumber(parameter),PageUtils.getPageSize(parameter));
 	
+		JSONObject result = new JSONObject();
+		 JsonConfig jsonConfig = new JsonConfig();  
+		 jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd")); 
+		 JSONArray jsonArray = JSONArray.fromObject(daoPage.getResult(),jsonConfig);
+		result.put("total", daoPage.getRecordCount());
+		result.put("rows", jsonArray);// daoPage.getr
+		result.put("pages", daoPage.getPageCount());
+		result.put("success", true);
+		retJson(response, result);  
+		//return daoPage;
+	}
 	
 	
 }

@@ -7,6 +7,8 @@ import javax.persistence.Table;
 
 
 
+import javax.persistence.Transient;
+
 import com.deloitte.tms.pl.core.commons.annotation.ModelProperty;
 import com.deloitte.tms.pl.core.model.impl.BaseEntity;
 
@@ -100,6 +102,37 @@ public class TempTmsCrvatInvoiceReqL  {
     @Column(name="IS_EXITS_CUSTOMER", length=1)
    	@ModelProperty(comment="是否无主交易开票申请")
    	private String isExitsCustomer;
+    
+    @Transient
+    private String trxBatchNum;
+    
+    @Transient
+    private String sourceCode;
+    
+    @Transient
+    private String customerNumber;
+    
+    @Transient
+    private String customerName;
+    
+    @Transient
+    private String custBankAccountNum;
+    
+    @Transient
+    private String custBankBranchName;
+    
+    @Transient
+    private String taxBaseName;
+    
+    @Transient
+    private String taxSettingMethod;
+    
+    @Transient
+    private String invoiceCategoryName;
+    
+    @Transient
+    private String registrationNumber;
+    
     
 	public String getId() {
 		return id;
@@ -260,8 +293,87 @@ public class TempTmsCrvatInvoiceReqL  {
 	public void setIsExitsCustomer(String isExitsCustomer) {
 		this.isExitsCustomer = isExitsCustomer;
 	}
-	
 
+	public String getTrxBatchNum() {
+		return trxBatchNum;
+	}
+
+	public void setTrxBatchNum(String trxBatchNum) {
+		this.trxBatchNum = trxBatchNum;
+	}
+
+	public String getSourceCode() {
+		return sourceCode;
+	}
+
+	public void setSourceCode(String sourceCode) {
+		this.sourceCode = sourceCode;
+	}
+
+	public String getCustomerNumber() {
+		return customerNumber;
+	}
+
+	public void setCustomerNumber(String customerNumber) {
+		this.customerNumber = customerNumber;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public String getCustBankAccountNum() {
+		return custBankAccountNum;
+	}
+
+	public void setCustBankAccountNum(String custBankAccountNum) {
+		this.custBankAccountNum = custBankAccountNum;
+	}
+
+	public String getCustBankBranchName() {
+		return custBankBranchName;
+	}
+
+	public void setCustBankBranchName(String custBankBranchName) {
+		this.custBankBranchName = custBankBranchName;
+	}
+
+	public String getTaxBaseName() {
+		return taxBaseName;
+	}
+
+	public void setTaxBaseName(String taxBaseName) {
+		this.taxBaseName = taxBaseName;
+	}
+
+	public String getTaxSettingMethod() {
+		return taxSettingMethod;
+	}
+
+	public void setTaxSettingMethod(String taxSettingMethod) {
+		this.taxSettingMethod = taxSettingMethod;
+	}
+
+	public String getInvoiceCategoryName() {
+		return invoiceCategoryName;
+	}
+
+	public void setInvoiceCategoryName(String invoiceCategoryName) {
+		this.invoiceCategoryName = invoiceCategoryName;
+	}
+
+	public String getRegistrationNumber() {
+		return registrationNumber;
+	}
+
+	public void setRegistrationNumber(String registrationNumber) {
+		this.registrationNumber = registrationNumber;
+	}
+	
 }
 
 

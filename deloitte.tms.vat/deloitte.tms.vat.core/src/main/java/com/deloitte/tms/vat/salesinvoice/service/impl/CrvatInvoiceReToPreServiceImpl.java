@@ -30,6 +30,7 @@ import com.deloitte.tms.vat.base.enums.CrvaInvoicePreStatusEnums;
 import com.deloitte.tms.vat.base.enums.CrvatTaxPoolStatuEnums;
 import com.deloitte.tms.vat.core.common.IdGenerator;
 import com.deloitte.tms.base.cache.model.LegalEntityNode;
+import com.deloitte.tms.base.cache.model.LicenseNoNode;
 import com.deloitte.tms.base.cache.model.PrintSiteNode;
 import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 
@@ -141,6 +142,7 @@ public class CrvatInvoiceReToPreServiceImpl extends BaseService implements
 		Map<String, List<InvoiceReqL>> map = new HashMap<String,List<InvoiceReqL>>();		
 		for(InvoiceReqL invoiceReqL:reqllist){		
 			PrintSiteNode pringOrgNode = PrintOrgCacheUtils.getPrintNodeByLegalId(invoiceReqL.getLegalEntityId());
+			//PrintSiteNode pringOrgNode = PrintOrgCacheUtils.getPrintNodeByOrgId(invoiceReqL.getOrgId());
 		    if(pringOrgNode!=null){
 		    	String orgId = pringOrgNode.getId();
 			    if(map.get(orgId)!=null){
@@ -174,8 +176,7 @@ public class CrvatInvoiceReToPreServiceImpl extends BaseService implements
 			tmsCrvatInvoicePreH.setLegalEntityName(invoiceReqH.getLegalEntityName());
 			tmsCrvatInvoicePreH.setPrtLegalEntityId(key);
 			LegalEntityNode legalEntityNode=LegalEntityCacheUtils.getLegalNodeByLegalId(key);
-			tmsCrvatInvoicePreH.setPrtLegalEntityCode(legalEntityNode.getCode());
-			tmsCrvatInvoicePreH.setPrtLegalEntityCode(legalEntityNode.getCode());
+			tmsCrvatInvoicePreH.setPrtLegalEntityCode(legalEntityNode.getCode());		
 			tmsCrvatInvoicePreH.setRegistrationCode(invoiceReqH.getRegistrationCode());
 			tmsCrvatInvoicePreH.setRegistrationNumber(invoiceReqH.getRegistrationNumber());
 			tmsCrvatInvoicePreH.setSubmitDate(invoiceReqH.getSubmitDate());
@@ -203,13 +204,22 @@ public class CrvatInvoiceReToPreServiceImpl extends BaseService implements
 				tmsCrvatInvoicePreL.setLegalEntityCode(invoiceReqL.getLegalEntityCode());
 				tmsCrvatInvoicePreL.setLegalEntityId(invoiceReqL.getLegalEntityId());
 				tmsCrvatInvoicePreL.setLegalEntityName(invoiceReqL.getLegalEntityName());
-				tmsCrvatInvoicePreL.setOrigLegalEntityCode(invoiceReqL.getLegalEntityCode());
-				tmsCrvatInvoicePreL.setOrigLegalEntityId(invoiceReqL.getLegalEntityId());
-				tmsCrvatInvoicePreL.setOrigLegalEntityName(invoiceReqL.getLegalEntityName());
+				tmsCrvatInvoicePreL.setOrigLegalEntityCode(invoiceReqL.getLegalEntityCode());			
+				LegalEntityNode entityNode=LegalEntityCacheUtils.getLegalNodeByLegalId(invoiceReqL.getLegalEntityId());			
+				if(entityNode!=null){
+					tmsCrvatInvoicePreL.setOrigLegalEntityId(entityNode.getLicenseNoId());
+					tmsCrvatInvoicePreL.setOrigLegalEntityName(entityNode.getLicenseName());
+					LicenseNoNode licenseNode = entityNode.getLicenseNoNode();
+					if(licenseNode!=null){
+						tmsCrvatInvoicePreL.setRegistrationNumber(licenseNode.getCode());
+					}
+					
+				}			
+				//tmsCrvatInvoicePreL.setOrigLegalEntityName(invoiceReqL.getLegalEntityName());
 				tmsCrvatInvoicePreL.setOrigRegistrationCode(invoiceReqL.getRegistrationCode());
 				tmsCrvatInvoicePreL.setOrigRegistrationNumber(invoiceReqL.getRegistrationNumber());		
 				tmsCrvatInvoicePreL.setRegistrationCode(invoiceReqL.getRegistrationCode());
-				tmsCrvatInvoicePreL.setRegistrationNumber(invoiceReqL.getRegistrationNumber());
+				//tmsCrvatInvoicePreL.setRegistrationNumber(invoiceReqL.getRegistrationNumber());
 				tmsCrvatInvoicePreL.setTaxTrxTypeId(invoiceReqL.getTaxTrxTypeId());
 				tmsCrvatInvoicePreL.setStartDate(invoiceReqL.getStartDate());
 				tmsCrvatInvoicePreL.setEndDate(invoiceReqL.getEndDate());

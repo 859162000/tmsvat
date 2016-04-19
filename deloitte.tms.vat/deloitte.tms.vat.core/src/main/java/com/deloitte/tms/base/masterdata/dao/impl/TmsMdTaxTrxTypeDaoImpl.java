@@ -19,7 +19,6 @@ import com.deloitte.tms.base.masterdata.dao.TmsMdTaxTrxTypeDao;
  */
 @Component(TmsMdTaxTrxTypeDao.BEAN_ID)
 public class TmsMdTaxTrxTypeDaoImpl extends BaseDao<TmsMdTaxTrxType> implements TmsMdTaxTrxTypeDao{
-	
 	public DaoPage findTmsMdTaxTrxTypeByParams(Map params, Integer pageIndex,Integer pageSize)
 	{
 		StringBuffer query=new StringBuffer();
@@ -36,27 +35,29 @@ public class TmsMdTaxTrxTypeDaoImpl extends BaseDao<TmsMdTaxTrxType> implements 
 	}
 	private void buildTmsMdTaxTrxTypeQuery(StringBuffer query,Map values,Map params) {
 		query.append(" from TmsMdTaxTrxType where flag='1' ");
-		String taxTrxTypeName  = (String) params.get("customerNameInSendFormid");
-		String taxTrxTypeCode =(String) params.get("taxTransactionType");
-		if(AssertHelper.notEmpty(taxTrxTypeCode))
+		Object value=params.get("status");
+		Object taxTrxTypeCode = params.get("taxTrxTypeCode");
+		if(value!=null)
 		{
-			query.append(" and taxTrxTypeCode = :taxTrxTypeCode");
+			query.append(" and status=:status");
+			values.put("status", value);
+		}
+		value=params.get("id");
+		if(value!=null)
+		{
+			query.append(" and id=:id");
+			values.put("id", value);
+		}
+	    if(taxTrxTypeCode!=null&&!"".equals(taxTrxTypeCode)){
+			
+			query.append(" and taxTrxTypeCode=:taxTrxTypeCode");
 			values.put("taxTrxTypeCode", taxTrxTypeCode);
 		}
-		if(AssertHelper.notEmpty(taxTrxTypeName))
-		{
-			query.append(" and taxTrxTypeName=:taxTrxTypeName");
-			values.put("taxTrxTypeName", taxTrxTypeName);
-		}
-		
-		
-		
 	}
 	@Override
 	public int removeTmsMdTaxTrxTypes(String tmsMdTaxTrxTypeId) {
 		this.removeById(TmsMdTaxTrxType.class,tmsMdTaxTrxTypeId);
 		return 0;
 	}
-
 }
 

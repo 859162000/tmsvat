@@ -92,15 +92,6 @@ public class TmsMdEquipmentInParam2  implements Serializable{
 		
 		String parentEquipmentName="";
 		
-		try{
-			parentEquipmentName = equ.getParent().getEquipmentName();
-			if(AssertHelper.empty(parentEquipmentName)){
-				parentEquipmentName="";
-			}
-		}catch(Exception e){
-			parentEquipmentName="";
-		}
-		
 		this.parentEquipmentName= parentEquipmentName;
 	}
 	
@@ -112,15 +103,6 @@ equipmentType
 equipmentIp
 		 */
 		String parentEquipmentName="";
-		
-		try{
-			parentEquipmentName = tmsMdEquipment.getParent().getEquipmentName();
-			if(AssertHelper.empty(parentEquipmentName)){
-				parentEquipmentName="";
-			}
-		}catch(Exception e){
-			parentEquipmentName="";
-		}
 		
 		this.id=tmsMdEquipment.getId();
 		this.parentEquipmentName= parentEquipmentName;

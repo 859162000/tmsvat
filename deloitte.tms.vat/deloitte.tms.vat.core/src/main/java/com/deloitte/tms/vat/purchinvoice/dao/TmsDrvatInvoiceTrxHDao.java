@@ -25,5 +25,7 @@ public interface TmsDrvatInvoiceTrxHDao extends IDao<TmsDrvatInvoiceTrxH>{
 	public List<TmsDrvatInvoiceTrxL> findTmsDrvatInvoiceTrxLByDate(Map params);
 	public DaoPage findTmsDrvatInvoiceTrxLByParams2(Map params, Integer pageIndex,
 			Integer pageSize);
+	public void removeTrxL(String ids);
+	public List findExistsRecords(Map<String, String> params);
 }
 

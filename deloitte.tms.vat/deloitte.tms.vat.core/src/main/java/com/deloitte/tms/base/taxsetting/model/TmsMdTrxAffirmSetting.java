@@ -15,6 +15,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Parameter;
 
 import com.deloitte.tms.base.masterdata.model.BaseOrg;
@@ -134,29 +136,34 @@ public class TmsMdTrxAffirmSetting extends BaseEntity {
 	@ModelProperty(comment="商品及服务编码ID")
     private String  inventoryItemId;
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY) 
 	@Cascade(CascadeType.REFRESH) //商品及服务编码
-	@JoinColumn(name="INVENTORY_ITEM_ID",insertable=false,updatable=false,nullable=true)
+	@JoinColumn(name="INVENTORY_ITEM_ID",unique = false, nullable = false, insertable = false, updatable = false)
+    @NotFound(action=NotFoundAction.IGNORE) 
 	private TmsMdInventoryItems tmsMdInventoryItems;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY) 
  	@Cascade(CascadeType.REFRESH) //税目
- 	@JoinColumn(name="TAX_ITEM_ID",insertable=false,updatable=false,nullable=true)
+ 	@JoinColumn(name="TAX_ITEM_ID",unique = false, nullable = false, insertable = false, updatable = false)
+    @NotFound(action=NotFoundAction.IGNORE) 
     private Items items;
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY) 
  	@Cascade(CascadeType.REFRESH) //涉税交易类型
- 	@JoinColumn(name="TAX_TRX_TYPE_ID",insertable=false,updatable=false,nullable=true)
+ 	@JoinColumn(name="TAX_TRX_TYPE_ID",unique = false, nullable = false, insertable = false, updatable = false)
+    @NotFound(action=NotFoundAction.IGNORE) 
     private TmsMdTaxTrxType tmsMdTaxTrxType;
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY) 
  	@Cascade(CascadeType.REFRESH) //税种
- 	@JoinColumn(name="TAX_CATEGORY_ID",insertable=false,updatable=false,nullable=true)
+ 	@JoinColumn(name="TAX_CATEGORY_ID",unique = false, nullable = false, insertable = false, updatable = false)
+    @NotFound(action=NotFoundAction.IGNORE) 
     private TaxCategory taxCategory;
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY) 
  	@Cascade(CascadeType.REFRESH) //组织
- 	@JoinColumn(name="ORG_ID",insertable=false,updatable=false,nullable=true)
+ 	@JoinColumn(name="ORG_ID",unique = false, nullable = false, insertable = false, updatable = false)
+    @NotFound(action=NotFoundAction.IGNORE) 
     private BaseOrg baseOrg;
      
     

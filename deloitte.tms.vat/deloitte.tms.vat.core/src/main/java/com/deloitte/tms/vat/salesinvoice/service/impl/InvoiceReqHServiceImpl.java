@@ -161,11 +161,30 @@ public class InvoiceReqHServiceImpl extends BaseService implements InvoiceReqHSe
 			//InvoiceTrxPoolInParam inparam=new InvoiceTrxPoolInParam();
 			inparam.setTaxRate(null!=initiation.getTaxRate()?initiation.getTaxRate():0.00);
 			inparam.setTrxAffirmId(initiation.getTrxAffirmId());
-			InvoiceReqLInParam amountInParam=getAmout(initiation.getId(),initiation);
+			inparam.setTrxBatchNum(initiation.getTrxBatchNum());
+			inparam.setTrxNumber(initiation.getTrxNumber());
+			inparam.setSourceCode(initiation.getSourceCode());
+			inparam.setCustRegistrationCode(initiation.getCustRegistrationCode());
+			inparam.setCustRegistrationNumber(initiation.getCustRegistrationNumber());
+			inparam.setCustBankAccountNum(initiation.getCustBankAccountNum());
+			inparam.setCustBankBranchName(initiation.getCustBankBranchName());
+			inparam.setTaxRate(initiation.getTaxRate());
+			inparam.setTaxBaseName(initiation.getTaxBaseName());
+			inparam.setTaxSettingMethod(initiation.getTaxSettingMethod());
+			inparam.setInvoiceCategoryName(DictionaryCacheUtils.getCodeName("VAT_INVOICE_RULE", initiation.getInvoiceCategory()));
+			inparam.setLegalEntityName(initiation.getLegalEntityName());
+			inparam.setRegistrationNumber(initiation.getRegistrationNumber());
+			/*InvoiceReqLInParam amountInParam=getAmout(initiation.getId(),initiation);
 			inparam.setUsedAmount(amountInParam.getUsedAmount());
-			inparam.setUserfulAmount(amountInParam.getUserfulAmount());
+			inparam.setUserfulAmount(amountInParam.getUserfulAmount());*/
+			if(AssertHelper.isOrNotEmpty_assert(initiation.getCustomerId())){
+				Customer customer = (Customer) customerService.get(Customer.class, initiation.getCustomerId());
+				inparam.setCustomerNumber(customer.getCustomerNumber());
+				inparam.setCustomerName(customer.getCustomerName());
+			}
 			inparam.setCrvatTrxPoolId(initiation.getId());
-			inparam.setInvoiceAmount(null!=inparam.getCurrencyAmountCr()?inparam.getCurrencyAmountCr():BigDecimal.valueOf(0.00).multiply(null!=inparam.getExchangeRate()?inparam.getExchangeRate():BigDecimal.valueOf(0.00)));
+			inparam.setInvoiceAmount(initiation.getExchangeAmount());
+			//inparam.setInvoiceAmount(null!=initiation.getCurrencyAmount()?initiation.getCurrencyAmount():BigDecimal.valueOf(0.00).multiply(null!=initiation.getExchangeRate()?initiation.getExchangeRate():BigDecimal.valueOf(0.00)));
 			if(AssertHelper.isOrNotEmpty_assert(initiation.getOrgId())){
 				BizOrgNode node=OrgCacheUtils.getNodeByOrgId(initiation.getOrgId());
 				if(null!=node){
@@ -277,7 +296,7 @@ public class InvoiceReqHServiceImpl extends BaseService implements InvoiceReqHSe
 			inparam.setPageStatus(model.getStatus());
 			inparam.setReqStatus(model.getStatus());
 		}if(AssertHelper.isOrNotEmpty_assert(model.getOrgId())){
-			BizOrgNode node=OrgCacheUtils.getNodeByOrgId(model.getOrgId());
+			BizOrgNode node=OrgCacheUtils.getNodeByOrgId(model.getOrgId().trim());
 			if(node!=null){
 				inparam.setOrgName(node.getName());
 				inparam.setOrgCode(node.getCode());		
@@ -303,7 +322,7 @@ public class InvoiceReqHServiceImpl extends BaseService implements InvoiceReqHSe
 				//性能很慢，用于字段改造
 				//realAmount=realAmount.add(invoiceSyncProvider.getUserfulAmountByTrxPoolId(list.get(i).getCrvatTrxPoolId()));
 				String realAmountStr = list.get(i).getAttribute1();
-				if(AssertHelper.isOrNotEmpty_assert(realAmount)){
+				if(AssertHelper.isOrNotEmpty_assert(realAmountStr)){
 					BigDecimal realBigDecimal = new BigDecimal(realAmountStr);
 					realAmount = realAmount.add(realBigDecimal);
 				}
@@ -566,6 +585,7 @@ public class InvoiceReqHServiceImpl extends BaseService implements InvoiceReqHSe
 		Object custRegistrationNumber=map.get("custRegistrationNumber");
 		Object customerNumber=map.get("customerNumber");
 		Object custRegistrationCode=map.get("custRegistrationCode");
+		Object custBankAccountNum=map.get("custBankAccountNum");
 		//String code = dictionaryService.
 		if(AssertHelper.isOrNotEmpty_assert(custRegistrationCode)){
 			query.append(" and custRegistrationCode=:custRegistrationCode");
@@ -577,6 +597,10 @@ public class InvoiceReqHServiceImpl extends BaseService implements InvoiceReqHSe
 		}if(AssertHelper.isOrNotEmpty_assert(custRegistrationNumber)){
 			query.append(" and custRegistrationNumber=:custRegistrationNumber");
 			values.put("custRegistrationNumber", custRegistrationNumber.toString().trim());
+		}
+		if(AssertHelper.isOrNotEmpty_assert(custBankAccountNum)){
+			query.append(" and custDepositBankNumber=:custDepositBankNumber");
+			values.put("custDepositBankNumber", custBankAccountNum.toString().trim());
 		}
 		List<Customer>list= customerService.findBy(query, values);
 		if(values.size()>0){

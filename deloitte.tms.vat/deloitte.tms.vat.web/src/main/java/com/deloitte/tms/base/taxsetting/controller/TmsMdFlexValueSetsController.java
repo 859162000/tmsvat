@@ -248,42 +248,40 @@ public class TmsMdFlexValueSetsController extends BaseController{
 	}
 
 
-//用于数字结构定义获取值集名字
-@ResponseBody
-@RequestMapping(value = "/getName", method = RequestMethod.POST)
-//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
-public DaoPage getName(@RequestParam Map<String,Object> parameter,HttpServletResponse response,HttpServletRequest request) 
+	@ResponseBody
+	@RequestMapping(value = "/getName", method = RequestMethod.POST)
+	//@RoleAnnotation(roles=RoleDef.ECOMMERCE_ADMIN)
+	public DaoPage getName(@RequestParam Map<String,Object> parameter,HttpServletResponse response,HttpServletRequest request) 
 
-throws Exception {
- 
-	   String str = request.getParameter("flexValueSetId");
-	   String pageNumber = request.getParameter("pageNumber");
-	   String pageSize = request.getParameter("pageSize");
-	    if(str != null && !"".equals(str)){
-	
-	    	 parameter.put("flexValueSetId",str);
-	    	 parameter.put("page", pageNumber);
-	    	 parameter.put("rows", pageSize);
-	   	    
-	DaoPage daoPage=tmsMdFlexValueSetsService.findTmsMdFlexValueSetsByParams(parameter,Integer.parseInt(parameter.get
+	throws Exception {
+	 
+		   String str = request.getParameter("flexValueSetId");
+		   String pageNumber = request.getParameter("pageNumber");
+		   String pageSize = request.getParameter("pageSize");
+		    if(str != null && !"".equals(str)){
+		    	 parameter.put("flexValueSetId",str);
+		     }
+		    	 parameter.put("page", pageNumber);
+		    	 parameter.put("rows", pageSize);
+		   	    
+		DaoPage daoPage=tmsMdFlexValueSetsService.findTmsMdFlexValueSetsByParams(parameter,Integer.parseInt(parameter.get
 
-("page").toString()),Integer.parseInt(parameter.get("rows").toString()));
-	JSONObject result = new JSONObject();
-	 JsonConfig jsonConfig = new JsonConfig();
-	 jsonConfig.registerJsonValueProcessor(Date.class,
-				new JsonDateValueProcessor("yyyy-MM-dd"));
-	 JSONArray jsonArray = JSONArray.fromObject(daoPage.getResult(),jsonConfig);
-	result.put("total", daoPage.getRecordCount());
-	result.put("rows", jsonArray);
-	result.put("pages", daoPage.getPageCount());
-	result.put("success", true);
+	("page").toString()),Integer.parseInt(parameter.get("rows").toString()));
+		JSONObject result = new JSONObject();
+		 JsonConfig jsonConfig = new JsonConfig();
+		 jsonConfig.registerJsonValueProcessor(Date.class,
+					new JsonDateValueProcessor("yyyy-MM-dd"));
+		 JSONArray jsonArray = JSONArray.fromObject(daoPage.getResult(),jsonConfig);
+		result.put("total", daoPage.getRecordCount());
+		result.put("rows", jsonArray);
+		result.put("pages", daoPage.getPageCount());
+		result.put("success", true);
+		
+		result.put("name", daoPage.getResult());
+		retJson(response, result);
 	
-	result.put("name", daoPage.getResult());
-	retJson(response, result);
-	
-	    }
-	return null;
-}
+		return null;
+	}
 
 }
 

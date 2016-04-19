@@ -43,8 +43,11 @@
 		    		<tr>
 		    			<td>购方证件类型</td>
 		    			<td>
-		    				<input id="searchform_custRegistrationCode" class="easyui-textbox" name="custRegistrationCode" style="width: 150px;">
-		    			</td>
+							<input:select id="searchform_custRegistrationCode" name="custRegistrationCode" value="$searchform_custRegistrationCode" easyuiClass="easyui-combobox" easyuiStyle="width:150px;">
+							            <option value=""></option>
+							            <input:systemStatusOption parentCode="VAT_CUSTOMER_DISC_OPTION"/>
+							</input:select>
+		    			</td>		    			
 		    			<td>购方证件号码</td>
 		    			<td>
 		    				<input id="searchform_custRegistrationNumber" class="easyui-textbox" name="custRegistrationNumber" style="width: 150px;">

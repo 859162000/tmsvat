@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.deloitte.tms.base.masterdata.model.CustBankAccountInParam;
 import com.deloitte.tms.base.taxsetting.model.TaxCategory;
 import com.deloitte.tms.base.taxsetting.model.TaxCategoryInParam;
 import com.deloitte.tms.base.taxsetting.model.ItemsInParam;
@@ -59,7 +61,7 @@ public class TaxCategoryController extends BaseController {
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/getTaxCategorys")
+	@RequestMapping(value = "/getTaxCategorys",method = RequestMethod.POST)
 	public void loadTaxCategoryPage(@RequestParam Map<String, Object> parameter,HttpServletResponse response) throws Exception {
 		
 		
@@ -104,24 +106,35 @@ public class TaxCategoryController extends BaseController {
 	 * taxCategoryService.update(entity); } inParam.setId(entity.getId()); }
 	 */
 
-	@RequestMapping("/saveTaxCategory")
-	public void saveTaxCategory(@ModelAttribute("taxFormParam") TaxCategoryInParam inParam,HttpServletResponse response) throws IOException {
+	@RequestMapping(value ="/saveTaxCategory",method = RequestMethod.POST)
+	public void saveTaxCategory(@ModelAttribute("taxFormParam") TaxCategoryInParam inParam,HttpServletResponse response,HttpServletRequest request) throws IOException {
 	//	JSONObject result = new JSONObject();
-		
-		TaxCategory entity = taxCategoryService.convertTaxCategoryInParamToEntity(inParam);
-		if(AssertHelper.empty(entity.getId())){
-			entity.setId(IdGenerator.getUUID());
-		
-			taxCategoryService.save(entity);//entity.set
-		} else {
-			taxCategoryService.update(entity);
-		}
-		
+			
+		 String param = request.getParameter("param");
+         System.out.println(param);      
+         param=param.replace("“", "\""); 
+         JSONArray jsonArry = new JSONArray();
+         jsonArry = JSONArray.fromObject(param);
+         Object[] obj = jsonArry.toArray();       
+         for(int i = 0; i < obj.length; i++){  
+        	 TaxCategoryInParam taxCategoryInParam = new TaxCategoryInParam();
+             JSONObject jsonObject = jsonArry.getJSONObject(i);  
+             taxCategoryInParam = (TaxCategoryInParam)JSONObject.toBean(jsonObject, TaxCategoryInParam.class);  
+             TaxCategory entity = taxCategoryService.convertTaxCategoryInParamToEntity(taxCategoryInParam);        
+             if(AssertHelper.empty(entity.getId())){
+     			entity.setId(IdGenerator.getUUID());     			
+     			taxCategoryService.save(entity);     			
+     		}else{    			
+     			taxCategoryService.update(entity);
+     		}
+             inParam.setId(entity.getId());
+        }
+        JSONObject result = new JSONObject();
+     	result.put("success", true);
+		result.put("msg", "保存成功！");
+		retJson(response, result);
 
-		inParam.setId(entity.getId());
-	//	result.put("success", true);
-//		result.put("msg", "保存成功！");
-//		retJson(response, result);
+
 	}
 
 	@ResponseBody
